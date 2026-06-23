@@ -464,14 +464,9 @@
 <!-- Header -->
 <header class="app-header">
   <div class="logo">🌊 心を凪に</div>
-  <div style="display:flex;align-items:center;gap:10px">
-    <button id="header-menu-btn" onclick="showScreen('screen-menu')" style="display:none;padding:6px 14px;border-radius:20px;border:2px solid var(--primary);background:transparent;color:var(--primary);font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer">
-      ☰ メニュー
-    </button>
-    <div class="xp-badge">
-      <span class="star">⭐</span>
-      <span id="header-xp">0 XP</span>
-    </div>
+  <div class="xp-badge">
+    <span class="star">⭐</span>
+    <span id="header-xp">0 XP</span>
   </div>
 </header>
 
@@ -593,6 +588,20 @@
 
   <div class="card" id="w1-breathe">
     <div class="card-title">ステップ 1 — 深呼吸</div>
+    <div style="display:flex;justify-content:center;gap:0;margin-bottom:20px">
+      <div id="rhythm-inhale" style="flex:4;text-align:center;padding:8px 4px;border-radius:8px 0 0 8px;background:var(--surface2);transition:background 0.3s">
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px">吸う</div>
+        <div style="font-size:18px;font-weight:700;color:var(--primary)">4</div>
+      </div>
+      <div id="rhythm-hold" style="flex:4;text-align:center;padding:8px 4px;border-left:1px solid var(--border);border-right:1px solid var(--border);background:var(--surface2);transition:background 0.3s">
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px">止める</div>
+        <div style="font-size:18px;font-weight:700;color:var(--primary)">4</div>
+      </div>
+      <div id="rhythm-exhale" style="flex:8;text-align:center;padding:8px 4px;border-radius:0 8px 8px 0;background:var(--surface2);transition:background 0.3s">
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px">吐く</div>
+        <div style="font-size:18px;font-weight:700;color:var(--primary)">8</div>
+      </div>
+    </div>
     <div class="breathe-circle-wrap">
       <div class="breathe-circle" id="breathe-circle">準備</div>
       <div class="breathe-label" id="breathe-label">ボタンを押してスタート</div>
@@ -972,6 +981,19 @@
     <div class="card-title">セッション履歴</div>
     <h2>あなたの記録</h2>
   </div>
+  <div class="card" id="wave-graph-card" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div class="card-title" style="margin:0">過去30日の心の波</div>
+      <div style="display:flex;gap:12px;font-size:11px;color:var(--text-muted)">
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:3px;background:var(--danger);border-radius:2px;display:inline-block"></span>前</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:3px;background:var(--success);border-radius:2px;display:inline-block"></span>後</span>
+      </div>
+    </div>
+    <canvas id="wave-chart" style="width:100%;height:160px"></canvas>
+  </div>
+  <div style="display:flex;justify-content:flex-end;padding:0 4px 4px">
+    <button id="clear-all-btn" class="btn btn-ghost" style="font-size:12px;color:var(--danger);border-color:var(--danger);padding:6px 14px" onclick="clearAllHistory()">すべて削除</button>
+  </div>
   <div id="history-cards"></div>
   <div class="flex-row">
     <button class="btn btn-primary" onclick="startNewSession()">メニューを選ぶ →</button>
@@ -1008,8 +1030,6 @@ function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   const el = document.getElementById(id);
   if (el) { el.classList.add('active'); el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-  const showMenuBtn = ['screen-work-1','screen-work-2','screen-work-3','screen-work-4','screen-work-5','screen-afterscale'].includes(id);
-  document.getElementById('header-menu-btn').style.display = showMenuBtn ? '' : 'none';
 }
 
 // ═══════════════════════════════════════
@@ -1247,35 +1267,41 @@ function doBreatheRound() {
   const timer = document.getElementById('breathe-timer');
   timer.textContent = `${breatheRound} / ${BREATHE_ROUNDS}回目`;
 
-  // Inhale 4s
-  label.textContent = '吸う…'; circle.textContent = '🌬️'; circle.classList.add('inhale');
-  let count = 4;
-  const inhaleInterval = setInterval(() => {
-    circle.textContent = count--; if (count < 0) { clearInterval(inhaleInterval); }
-  }, 1000);
-  setTimeout(() => {
-    clearInterval(inhaleInterval);
-    // Hold 4s
-    label.textContent = '止める'; circle.textContent = '⏸'; circle.classList.remove('inhale');
-    let h = 4;
-    const holdInterval = setInterval(() => {
-      circle.textContent = h--; if (h < 0) { clearInterval(holdInterval); }
+  const highlight = id => {
+    ['rhythm-inhale','rhythm-hold','rhythm-exhale'].forEach(r => {
+      document.getElementById(r).style.background = r === id ? 'rgba(91,143,168,0.18)' : 'var(--surface2)';
+    });
+  };
+  const countUp = (max, onDone) => {
+    let n = 1;
+    circle.textContent = n;
+    const iv = setInterval(() => {
+      n++;
+      if (n <= max) { circle.textContent = n; }
+      else { clearInterval(iv); onDone(); }
     }, 1000);
-    setTimeout(() => {
-      clearInterval(holdInterval);
+    return iv;
+  };
+
+  // Inhale 4s
+  highlight('rhythm-inhale');
+  label.textContent = '吸う…'; circle.classList.add('inhale');
+  countUp(4, () => {
+    circle.classList.remove('inhale');
+    // Hold 4s
+    highlight('rhythm-hold');
+    label.textContent = '止める…'; circle.textContent = '1';
+    countUp(4, () => {
       // Exhale 8s
-      label.textContent = '吐く…'; circle.textContent = '💨'; circle.classList.add('exhale');
-      let c = 8;
-      const exhaleInterval = setInterval(() => {
-        circle.textContent = c--; if (c < 0) { clearInterval(exhaleInterval); }
-      }, 1000);
-      setTimeout(() => {
-        clearInterval(exhaleInterval);
+      highlight('rhythm-exhale');
+      label.textContent = '吐く…'; circle.classList.add('exhale');
+      countUp(8, () => {
         circle.classList.remove('exhale');
+        highlight('');
         doBreatheRound();
-      }, 8000);
-    }, 4000);
-  }, 4000);
+      });
+    });
+  });
 }
 
 const eyeSteps = [
@@ -1894,11 +1920,102 @@ function startNewSession() {
   showScreen('screen-checkin');
 }
 
+function deleteSession(ts) {
+  if (!confirm('この記録を削除しますか？')) return;
+  const data = loadData();
+  data.sessions = data.sessions.filter(s => s.ts !== ts);
+  saveData(data);
+  showHistory();
+}
+
+function clearAllHistory() {
+  if (!confirm('すべての記録を削除しますか？\nXPやバッジもリセットされます。')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  showHistory();
+  updateHeader();
+}
+
+function drawWaveChart(sessions) {
+  const card = document.getElementById('wave-graph-card');
+  const canvas = document.getElementById('wave-chart');
+  const now = Date.now();
+  const thirtyDays = 30 * 24 * 60 * 60 * 1000;
+  const recent = sessions.filter(s => now - s.ts < thirtyDays && (s.before != null || s.after != null));
+  if (recent.length < 2) { card.style.display = 'none'; return; }
+  card.style.display = '';
+
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.parentElement.clientWidth - 32;
+  const H = 160;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width = W + 'px';
+  canvas.style.height = H + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const pad = { top: 12, right: 12, bottom: 24, left: 24 };
+  const gw = W - pad.left - pad.right;
+  const gh = H - pad.top - pad.bottom;
+
+  const sorted = recent.slice().sort((a, b) => a.ts - b.ts);
+  const minTs = sorted[0].ts, maxTs = sorted[sorted.length - 1].ts;
+  const tsRange = maxTs - minTs || 1;
+
+  const xOf = ts => pad.left + ((ts - minTs) / tsRange) * gw;
+  const yOf = v => pad.top + gh - (v / 10) * gh;
+
+  ctx.strokeStyle = 'rgba(0,0,0,0.06)';
+  ctx.lineWidth = 1;
+  [0, 2, 4, 6, 8, 10].forEach(v => {
+    const y = yOf(v);
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + gw, y); ctx.stroke();
+    ctx.fillStyle = '#999'; ctx.font = '10px sans-serif'; ctx.textAlign = 'right';
+    ctx.fillText(v, pad.left - 4, y + 3);
+  });
+
+  const drawLine = (points, color, alpha) => {
+    const pts = points.filter(p => p.v != null);
+    if (pts.length < 2) return;
+    ctx.beginPath();
+    ctx.strokeStyle = color; ctx.globalAlpha = alpha; ctx.lineWidth = 2;
+    ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+    pts.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 3.5, 0, Math.PI * 2);
+      ctx.fillStyle = color; ctx.globalAlpha = alpha; ctx.fill();
+      ctx.globalAlpha = 1;
+    });
+  };
+
+  const beforePts = sorted.map(s => ({ x: xOf(s.ts), y: yOf(s.before ?? 0), v: s.before }));
+  const afterPts  = sorted.map(s => ({ x: xOf(s.ts), y: yOf(s.after  ?? 0), v: s.after  }));
+  drawLine(beforePts, '#C97B7B', 0.6);
+  drawLine(afterPts,  '#7BAE7F', 0.9);
+
+  ctx.fillStyle = '#aaa'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+  const tickDates = [sorted[0], sorted[sorted.length - 1]];
+  if (sorted.length > 2) tickDates.splice(1, 0, sorted[Math.floor(sorted.length / 2)]);
+  tickDates.forEach(s => {
+    const d = new Date(s.ts);
+    const label = `${d.getMonth()+1}/${d.getDate()}`;
+    ctx.fillText(label, xOf(s.ts), H - 6);
+  });
+}
+
 function showHistory() {
   const data = loadData();
   const container = document.getElementById('history-cards');
   container.innerHTML = '';
-  if (!data.sessions || data.sessions.length === 0) {
+  const hasSessions = data.sessions && data.sessions.length > 0;
+  document.getElementById('clear-all-btn').style.display = hasSessions ? '' : 'none';
+
+  drawWaveChart(data.sessions || []);
+
+  if (!hasSessions) {
     container.innerHTML = '<div class="card"><p style="text-align:center;color:var(--text-muted)">まだ記録がありません</p></div>';
   } else {
     data.sessions.slice().reverse().forEach(s => {
@@ -1907,14 +2024,17 @@ function showHistory() {
       const date = new Date(s.ts).toLocaleString('ja-JP', {month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
       const drop = s.before - s.after;
       card.innerHTML = `
-        <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
           <div style="font-size:13px;color:var(--text-muted)">${date}</div>
-          <div class="tag tag-teal">${menuName(s.menu)}</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="tag tag-teal">${menuName(s.menu)}</div>
+            <button onclick="deleteSession(${s.ts})" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:16px;line-height:1;padding:2px 4px" title="削除">×</button>
+          </div>
         </div>
         <div class="change-indicator" style="padding:12px">
-          <div style="text-align:center"><div class="text-muted" style="font-size:11px">前</div><div style="font-size:22px;font-weight:700;color:var(--danger)">${s.before}</div></div>
+          <div style="text-align:center"><div class="text-muted" style="font-size:11px">前</div><div style="font-size:22px;font-weight:700;color:var(--danger)">${s.before ?? '—'}</div></div>
           <div style="font-size:16px;color:var(--text-muted)">→</div>
-          <div style="text-align:center"><div class="text-muted" style="font-size:11px">後</div><div style="font-size:22px;font-weight:700;color:var(--success)">${s.after}</div></div>
+          <div style="text-align:center"><div class="text-muted" style="font-size:11px">後</div><div style="font-size:22px;font-weight:700;color:var(--success)">${s.after ?? '—'}</div></div>
           <div style="margin-left:auto;text-align:center"><div class="text-muted" style="font-size:11px">変化</div><div style="font-size:22px;font-weight:700;color:${drop>0?'var(--success)':'var(--danger)'}">${drop>0?'↓'+drop:drop===0?'±0':'↑'+Math.abs(drop)}</div></div>
         </div>
         ${s.babyStep ? `<div style="margin-top:10px;font-size:13px;color:var(--text-muted)">次の一歩: ${s.babyStep}</div>` : ''}
