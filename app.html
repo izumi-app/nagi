@@ -1,0 +1,1942 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>心を凪に — 荒れた心を整えて、軽くしていく</title>
+<style>
+  :root {
+    --bg: #FAF8F5;
+    --surface: #FFFFFF;
+    --surface2: #F0EDE8;
+    --primary: #5B8FA8;
+    --primary-dark: #3D6B82;
+    --accent: #E8A87C;
+    --accent-dark: #C8844E;
+    --success: #7BAE7F;
+    --danger: #C97B7B;
+    --text: #2D2D2D;
+    --text-muted: #7A7A7A;
+    --border: #DDD8D0;
+    --shadow: 0 4px 24px rgba(0,0,0,0.08);
+    --radius: 16px;
+    --radius-sm: 8px;
+    --font: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ── Layout ── */
+  .app-header {
+    width: 100%;
+    max-width: 600px;
+    padding: 20px 24px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .logo { font-size: 15px; font-weight: 700; color: var(--primary); letter-spacing: 0.05em; }
+  .xp-badge {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--surface2); border-radius: 20px;
+    padding: 4px 12px; font-size: 13px; color: var(--text-muted); font-weight: 600;
+  }
+  .xp-badge .star { color: var(--accent); }
+
+  .screen {
+    display: none;
+    width: 100%;
+    max-width: 600px;
+    padding: 24px 24px 48px;
+    flex-direction: column;
+    gap: 20px;
+    animation: fadeIn 0.4s ease;
+  }
+  .screen.active { display: flex; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+  }
+  .card-title {
+    font-size: 13px; font-weight: 700; color: var(--primary);
+    letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px;
+  }
+  .card h2 { font-size: 22px; font-weight: 700; line-height: 1.5; margin-bottom: 8px; }
+  .card p { font-size: 15px; line-height: 1.8; color: var(--text-muted); }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 14px 24px; border-radius: var(--radius-sm);
+    font-family: var(--font); font-size: 15px; font-weight: 700;
+    border: none; cursor: pointer; transition: all 0.2s; text-decoration: none;
+    width: 100%;
+  }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(91,143,168,0.35); }
+  .btn-accent { background: var(--accent); color: #fff; }
+  .btn-accent:hover { background: var(--accent-dark); transform: translateY(-1px); }
+  .btn-ghost {
+    background: transparent; color: var(--text-muted);
+    border: 2px solid var(--border); padding: 12px 20px; font-size: 14px;
+  }
+  .btn-ghost:hover { border-color: var(--primary); color: var(--primary); }
+  .btn-success { background: var(--success); color: #fff; }
+  .btn-danger { background: var(--danger); color: #fff; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+
+  /* ── Wave Gauge ── */
+  .wave-gauge-wrap {
+    display: flex; align-items: center; justify-content: center;
+    gap: 24px; padding: 20px 0;
+  }
+  .wave-gauge-labels {
+    display: flex; flex-direction: column; justify-content: space-between;
+    height: 220px; text-align: right;
+  }
+  .wave-gauge-labels span {
+    font-size: 12px; font-weight: 600; color: var(--text-muted);
+    line-height: 1.4;
+  }
+  .wave-gauge-track {
+    position: relative; width: 64px; height: 220px;
+    background: #EAF4F8; border-radius: 32px;
+    overflow: hidden; cursor: ns-resize;
+    box-shadow: inset 0 3px 10px rgba(0,0,0,0.12);
+    touch-action: none; user-select: none;
+  }
+  .wave-gauge-fill {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: linear-gradient(180deg, #4A7FA0 0%, #6DADC8 100%);
+    transition: height 0.08s ease;
+    min-height: 0;
+  }
+  .wave-surface {
+    position: absolute; top: -12px; left: 0; width: 200%;
+    height: 24px; border-radius: 40%;
+    animation: wave-rock 3s linear infinite;
+  }
+  .wave-surface-2 {
+    position: absolute; top: -8px; left: -50%; width: 200%;
+    height: 20px; border-radius: 40%;
+    opacity: 0.5;
+    animation: wave-rock 2.2s linear infinite reverse;
+  }
+  @keyframes wave-rock {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+  .wave-gauge-right {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 8px;
+  }
+  .wave-value-num {
+    font-size: 36px; font-weight: 800; color: var(--primary);
+    line-height: 1; min-width: 48px; text-align: center;
+    transition: color 0.3s;
+  }
+  .wave-value-name {
+    font-size: 13px; font-weight: 700; color: var(--text-muted);
+    text-align: center; line-height: 1.4;
+  }
+  .wave-hint {
+    font-size: 11px; color: var(--text-muted); margin-top: 4px; text-align: center;
+  }
+
+  /* ── Menu Cards ── */
+  .menu-grid { display: flex; flex-direction: column; gap: 12px; }
+  .menu-card {
+    background: var(--surface); border-radius: var(--radius);
+    border: 2px solid var(--border); padding: 18px 20px;
+    display: flex; align-items: center; gap: 16px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .menu-card:hover { border-color: var(--primary); box-shadow: var(--shadow); transform: translateY(-1px); }
+  .menu-card.recommended { border-color: var(--accent); }
+  .menu-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; flex-shrink: 0;
+  }
+  .menu-info { flex: 1; min-width: 0; }
+  .menu-info h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .menu-info p { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+  .menu-tag {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+    padding: 2px 8px; border-radius: 4px; background: var(--accent); color: #fff;
+    flex-shrink: 0; align-self: flex-start; white-space: nowrap;
+  }
+
+  /* ── Work Screens ── */
+  .step-indicator {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--text-muted);
+  }
+  .step-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--border);
+  }
+  .step-dot.active { background: var(--primary); }
+
+  /* Work 1 — Breathe */
+  .breathe-circle-wrap {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; padding: 24px 0; gap: 20px;
+  }
+  .breathe-circle {
+    width: 160px; height: 160px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(91,143,168,0.3) 0%, rgba(91,143,168,0.05) 70%);
+    border: 3px solid rgba(91,143,168,0.4);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 700; color: var(--primary);
+    transition: transform 4s ease-in-out, opacity 0.3s;
+  }
+  .breathe-circle.inhale { transform: scale(1.5); }
+  .breathe-circle.exhale { transform: scale(1.0); }
+  .breathe-label { font-size: 24px; font-weight: 700; color: var(--primary); }
+  .breathe-timer { font-size: 15px; color: var(--text-muted); }
+  .eye-guide { text-align: center; padding: 16px; background: var(--surface2); border-radius: var(--radius-sm); }
+
+  /* Work 2 — Detox */
+  .detox-area {
+    position: relative;
+  }
+  .detox-textarea {
+    width: 100%; min-height: 160px;
+    border: 2px solid var(--border); border-radius: var(--radius-sm);
+    padding: 16px; font-family: var(--font); font-size: 15px;
+    line-height: 1.8; resize: vertical; background: var(--surface);
+    color: var(--text); transition: border-color 0.2s;
+  }
+  .detox-textarea:focus { outline: none; border-color: var(--primary); }
+  .detox-textarea.listening { border-color: var(--danger); background: #FFF8F8; }
+  .voice-btn {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 16px; border-radius: var(--radius-sm);
+    border: 2px solid var(--border); background: var(--surface);
+    font-family: var(--font); font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; color: var(--text);
+  }
+  .voice-btn.active { background: var(--danger); color: #fff; border-color: var(--danger); }
+  .voice-btn .mic-dot {
+    width: 10px; height: 10px; border-radius: 50%; background: var(--danger);
+    animation: none;
+  }
+  .voice-btn.active .mic-dot { animation: pulse-red 1s infinite; background: #fff; }
+  @keyframes pulse-red { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  .trash-animation {
+    display: none; flex-direction: column; align-items: center;
+    gap: 12px; padding: 32px; text-align: center;
+  }
+  .trash-animation.show { display: flex; }
+  .trash-icon { font-size: 60px; animation: trashIn 0.6s ease; }
+  @keyframes trashIn { from { transform: scale(0.5) rotate(-10deg); opacity: 0; } to { transform: scale(1) rotate(0deg); opacity: 1; } }
+
+  /* Work 3 — SMD Submodality */
+  .smd-image-desc {
+    width: 100%; padding: 14px; border: 2px solid var(--border);
+    border-radius: var(--radius-sm); font-family: var(--font); font-size: 15px;
+    background: var(--surface); color: var(--text); resize: none;
+  }
+  .smd-image-desc:focus { outline: none; border-color: var(--primary); }
+
+  .slider-group { display: flex; flex-direction: column; gap: 20px; }
+  .slider-item { }
+  .slider-item label {
+    display: flex; justify-content: space-between;
+    font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--text);
+  }
+  .slider-item label span { font-weight: 400; color: var(--primary); }
+  input[type="range"] {
+    width: 100%; height: 6px; border-radius: 3px;
+    appearance: none; background: var(--border); cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    appearance: none; width: 22px; height: 22px;
+    border-radius: 50%; background: var(--primary);
+    box-shadow: 0 2px 8px rgba(91,143,168,0.4);
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    background: linear-gradient(to right, var(--primary) var(--pct,50%), var(--border) var(--pct,50%));
+    height: 6px; border-radius: 3px;
+  }
+  .slider-ends { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+  .smd-preview {
+    display: flex; align-items: center; justify-content: center;
+    height: 120px; border-radius: var(--radius-sm);
+    background: var(--surface2); overflow: hidden; position: relative;
+  }
+  .smd-blob {
+    border-radius: 50%; background: rgba(201,123,123,0.6);
+    transition: all 0.5s ease;
+  }
+
+  /* Work 4 — Image Work */
+  .iw-type-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 4px;
+  }
+  @media (max-width: 400px) { .iw-type-grid { grid-template-columns: repeat(3, 1fr); } }
+  .iw-type-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 10px 6px; border-radius: 12px; border: 2px solid var(--border);
+    background: var(--surface); cursor: pointer; transition: all 0.2s; font-family: var(--font);
+  }
+  .iw-type-btn:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+  .iw-type-btn .iw-icon { font-size: 26px; }
+  .iw-type-btn .iw-name { font-size: 10px; font-weight: 600; color: var(--text-muted); text-align: center; line-height: 1.3; }
+
+  .iw-scene {
+    position: relative; height: 260px; border-radius: var(--radius);
+    overflow: hidden; cursor: pointer; transition: background 0.5s;
+  }
+  .iw-main-el {
+    position: absolute; font-size: 60px; left: 50%; bottom: 24px;
+    transform: translateX(-50%);
+    transition: none;
+  }
+  .iw-label-el {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.85);
+    background: rgba(0,0,0,0.25); padding: 3px 10px; border-radius: 20px;
+    white-space: nowrap; bottom: 94px;
+    transition: none;
+  }
+  .cloud { position: absolute; font-size: 36px; opacity: 0.6; }
+
+  /* Scene keyframes */
+  @keyframes iwBalloonUp   { to { bottom: 320px; opacity: 0; } }
+  @keyframes iwLeafFlow    { 0%{transform:translateX(-50%) rotate(-10deg);opacity:1} 100%{transform:translateX(180px) translateY(-30px) rotate(30deg);opacity:0} }
+  @keyframes iwLeafLabelFlow { 0%{transform:translateX(-50%);opacity:1} 100%{transform:translateX(180px);opacity:0} }
+  @keyframes iwRocketUp    { 0%{bottom:24px;opacity:1} 100%{bottom:340px;opacity:0} }
+  @keyframes iwSink        { 0%{bottom:24px;opacity:1} 100%{bottom:-60px;opacity:0} }
+  @keyframes iwSinkLabel   { 0%{bottom:94px;opacity:1} 100%{bottom:0px;opacity:0} }
+  @keyframes iwBurstPetal  { 0%{transform:translate(-50%,-50%) scale(1);opacity:1} 100%{transform:translate(var(--tx),var(--ty)) scale(0.5);opacity:0} }
+  @keyframes iwStarPop     { 0%{transform:translateX(-50%) scale(0) rotate(-30deg);opacity:0} 60%{transform:translateX(-50%) scale(1.4) rotate(10deg);opacity:1} 100%{transform:translateX(-50%) scale(1) rotate(0deg);opacity:1} }
+  @keyframes iwStarFade    { to { opacity: 0; transform: translateX(-50%) scale(2); } }
+  @keyframes iwWaveRise    { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  @keyframes iwFireworkUp  { 0%{bottom:10px;opacity:1} 100%{bottom:180px;opacity:0.6} }
+  @keyframes iwSpark       { 0%{transform:translate(-50%,-50%) scale(0);opacity:1} 100%{transform:translate(var(--tx),var(--ty)) scale(1);opacity:0} }
+
+  /* Work 5 — SCORE */
+  .score-nav { display: flex; gap: 6px; flex-wrap: wrap; }
+  .score-tab {
+    padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;
+    border: 2px solid var(--border); background: var(--surface);
+    cursor: pointer; color: var(--text-muted); transition: all 0.2s;
+  }
+  .score-tab.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+  .score-tab.done { background: var(--success); border-color: var(--success); color: #fff; }
+  .score-panel { display: none; flex-direction: column; gap: 16px; }
+  .score-panel.active { display: flex; }
+  .score-question { font-size: 15px; font-weight: 600; line-height: 1.6; margin-bottom: 4px; }
+  .score-hint { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 8px; }
+  .score-textarea {
+    width: 100%; min-height: 100px;
+    border: 2px solid var(--border); border-radius: var(--radius-sm);
+    padding: 14px; font-family: var(--font); font-size: 14px;
+    line-height: 1.8; resize: vertical; background: var(--surface); color: var(--text);
+  }
+  .score-textarea:focus { outline: none; border-color: var(--primary); }
+
+  /* ── After scale & baby steps ── */
+  .change-indicator {
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    padding: 20px; background: var(--surface2); border-radius: var(--radius-sm);
+  }
+  .before-num { font-size: 36px; font-weight: 700; color: var(--danger); }
+  .after-num { font-size: 36px; font-weight: 700; color: var(--success); }
+  .arrow { font-size: 24px; color: var(--text-muted); }
+  .change-text { font-size: 15px; color: var(--text-muted); text-align: center; margin-top: 8px; }
+
+  .babystep-box {
+    background: linear-gradient(135deg, #FFF8F0, #FFF); border-radius: var(--radius);
+    border: 2px solid var(--accent); padding: 20px;
+  }
+  .babystep-box h3 { font-size: 15px; font-weight: 700; color: var(--accent-dark); margin-bottom: 12px; }
+  .babystep-options { display: flex; flex-direction: column; gap: 8px; }
+  .babystep-opt {
+    padding: 12px 16px; border-radius: var(--radius-sm);
+    border: 2px solid var(--border); background: var(--surface);
+    font-size: 14px; cursor: pointer; transition: all 0.2s; color: var(--text);
+    text-align: left;
+  }
+  .babystep-opt:hover { border-color: var(--accent); }
+  .babystep-opt.selected { border-color: var(--accent); background: #FFF3E8; font-weight: 600; }
+
+  /* ── Exit / Reward ── */
+  .reward-screen { text-align: center; }
+  .reward-badge {
+    display: inline-flex; flex-direction: column; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, #FFF8E7, #FFF3D6);
+    border: 3px solid var(--accent); border-radius: 24px;
+    padding: 32px 40px; margin: 12px auto;
+  }
+  .badge-icon { font-size: 64px; animation: pop 0.5s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes pop { from { transform: scale(0.3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .badge-title { font-size: 18px; font-weight: 700; color: var(--accent-dark); }
+  .badge-xp { font-size: 14px; color: var(--text-muted); }
+  .xp-animation {
+    font-size: 20px; font-weight: 700; color: var(--accent);
+    animation: xpFloat 1s ease forwards;
+  }
+  @keyframes xpFloat { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-30px); opacity: 0; } }
+
+  .event-card {
+    background: linear-gradient(135deg, #EEF6FF, #F5F0FF);
+    border: 2px solid var(--primary); border-radius: var(--radius);
+    padding: 24px; text-align: center;
+  }
+  .event-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+  .event-card p { font-size: 14px; color: var(--text-muted); line-height: 1.7; margin-bottom: 16px; }
+  .event-price { font-size: 20px; font-weight: 700; color: var(--primary); margin-bottom: 16px; }
+
+  .history-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px; background: var(--surface2); border-radius: var(--radius-sm);
+  }
+  .history-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--success); flex-shrink: 0; }
+
+  /* ── Progress bar ── */
+  .progress-track {
+    height: 6px; background: var(--border); border-radius: 3px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; background: var(--primary); border-radius: 3px;
+    transition: width 0.5s ease;
+  }
+
+  /* ── Confetti ── */
+  .confetti-wrap {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; overflow: hidden; z-index: 1000;
+  }
+  .confetti-piece {
+    position: absolute; top: -20px; width: 10px; height: 10px;
+    border-radius: 2px; animation: confettiFall linear forwards;
+  }
+  @keyframes confettiFall {
+    from { transform: translateY(0) rotate(0deg); opacity: 1; }
+    to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* ── Misc ── */
+  .divider { height: 1px; background: var(--border); margin: 4px 0; }
+  .text-center { text-align: center; }
+  .text-muted { color: var(--text-muted); font-size: 13px; }
+  .flex-row { display: flex; gap: 10px; }
+  .flex-row .btn { flex: 1; }
+  .tag {
+    display: inline-block; font-size: 11px; font-weight: 700;
+    padding: 3px 10px; border-radius: 4px; letter-spacing: 0.06em;
+  }
+  .tag-teal { background: rgba(91,143,168,0.15); color: var(--primary); }
+
+  /* Mobile */
+  @media (max-width: 480px) {
+    .screen { padding: 16px 16px 40px; }
+    .card { padding: 18px; }
+    .scale-btn { width: 44px; height: 44px; font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Confetti container -->
+<div class="confetti-wrap" id="confetti"></div>
+
+<!-- Header -->
+<header class="app-header">
+  <div class="logo">🌊 心を凪に</div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <button id="header-menu-btn" onclick="showScreen('screen-menu')" style="display:none;padding:6px 14px;border-radius:20px;border:2px solid var(--primary);background:transparent;color:var(--primary);font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer">
+      ☰ メニュー
+    </button>
+    <div class="xp-badge">
+      <span class="star">⭐</span>
+      <span id="header-xp">0 XP</span>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════
+     SCREEN 0: Welcome / Check-in
+════════════════════════════════════════ -->
+<section id="screen-checkin" class="screen active">
+  <div class="card">
+    <div class="card-title">チェックイン</div>
+    <h2>今、心の海は<br>どんな状態ですか？</h2>
+    <p style="margin-top:8px">上下にドラッグして、今の波の高さを合わせてください。</p>
+    <div class="wave-gauge-wrap">
+      <div class="wave-gauge-labels">
+        <span>🌊<br>荒波</span>
+        <span>〜〜<br>さざ波</span>
+        <span>—<br>凪</span>
+      </div>
+      <div class="wave-gauge-track" id="before-gauge-track">
+        <div class="wave-gauge-fill" id="before-gauge-fill">
+          <div class="wave-surface" id="before-wave-s1"></div>
+          <div class="wave-surface-2" id="before-wave-s2"></div>
+        </div>
+      </div>
+      <div class="wave-gauge-right">
+        <div class="wave-value-num" id="before-val-num">—</div>
+        <div class="wave-value-name" id="before-val-name">ドラッグで設定</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn btn-primary" id="checkin-next">
+    メニューを選ぶ →
+  </button>
+</section>
+
+<!-- ══════════════════════════════════════
+     SCREEN 1: Menu Selection
+════════════════════════════════════════ -->
+<section id="screen-menu" class="screen">
+  <div class="card">
+    <div class="card-title">リセットメニュー</div>
+    <h2>今日はどのアプローチで<br>整えていきますか?</h2>
+    <p style="margin-top:8px">気になるものを直感で選んでください。</p>
+  </div>
+
+  <div class="menu-grid">
+    <div class="menu-card" onclick="selectMenu(1)">
+      <div class="menu-icon" style="background:rgba(91,143,168,0.12)">🌬️</div>
+      <div class="menu-info">
+        <h3>ブレークステート</h3>
+        <p>思考のループを今すぐ断ち切る</p>
+      </div>
+      <span class="menu-tag" id="tag-1" style="display:none">おすすめ</span>
+    </div>
+    <div class="menu-card" onclick="selectMenu(2)">
+      <div class="menu-icon" style="background:rgba(232,168,124,0.15)">🗑️</div>
+      <div class="menu-info">
+        <h3>吐き出しデトックス</h3>
+        <p>話すだけ・書くだけで頭が軽くなる</p>
+      </div>
+      <span class="menu-tag" id="tag-2" style="display:none">おすすめ</span>
+    </div>
+    <div class="menu-card" onclick="selectMenu(3)">
+      <div class="menu-icon" style="background:rgba(123,174,127,0.15)">🎨</div>
+      <div class="menu-info">
+        <h3>五感チューニング</h3>
+        <p>嫌なイメージの「見え方・聞こえ方」を変える</p>
+      </div>
+      <span class="menu-tag" id="tag-3" style="display:none">おすすめ</span>
+    </div>
+    <div class="menu-card" onclick="selectMenu(4)">
+      <div class="menu-icon" style="background:rgba(232,168,124,0.15)">🎈</div>
+      <div class="menu-info">
+        <h3>イメージワーク</h3>
+        <p>プレッシャーを風船に詰めて手放す</p>
+      </div>
+      <span class="menu-tag" id="tag-4" style="display:none">おすすめ</span>
+    </div>
+    <div class="menu-card" onclick="selectMenu(5)">
+      <div class="menu-icon" style="background:rgba(91,143,168,0.12)">🗺️</div>
+      <div class="menu-info">
+        <h3>海図モデル</h3>
+        <p>現在地と次の一歩を構造的に整理する</p>
+      </div>
+      <span class="menu-tag" id="tag-5" style="display:none">おすすめ</span>
+    </div>
+  </div>
+
+  <button class="btn btn-ghost" onclick="showScreen('screen-checkin')">← 戻る</button>
+</section>
+
+<!-- ══════════════════════════════════════
+     SCREEN W1: Break State
+════════════════════════════════════════ -->
+<section id="screen-work-1" class="screen">
+  <div class="card">
+    <div class="card-title">🌬️ ブレークステート</div>
+    <h2>思考のループを<br>物理的に断ち切る</h2>
+    <p>まず体と呼吸から「今、ここ」に戻りましょう。</p>
+  </div>
+
+  <div class="card" id="w1-breathe">
+    <div class="card-title">ステップ 1 — 深呼吸</div>
+    <div class="breathe-circle-wrap">
+      <div class="breathe-circle" id="breathe-circle">準備</div>
+      <div class="breathe-label" id="breathe-label">ボタンを押してスタート</div>
+      <div class="breathe-timer" id="breathe-timer">3回繰り返します</div>
+    </div>
+    <button class="btn btn-primary" id="breathe-start-btn" onclick="startBreathe()">深呼吸をはじめる</button>
+  </div>
+
+  <div class="card" id="w1-eye" style="display:none">
+    <div class="card-title">ステップ 2 — 遠くを見る</div>
+    <p style="margin-bottom:16px">遠くを見ると、目のピントが切り替わり、思考の「スタック」が解除されます。</p>
+    <div class="eye-guide">
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px">各ステップで3〜5秒、じっくり見てください</div>
+      <div id="eye-step" style="font-size:28px;margin:16px 0">👆</div>
+      <div id="eye-desc" style="font-size:15px;font-weight:600;color:var(--primary)">上を見る</div>
+      <div id="eye-progress" style="font-size:13px;color:var(--text-muted);margin-top:8px">1 / 8</div>
+    </div>
+    <button class="btn btn-primary" style="margin-top:16px" id="eye-next-btn" onclick="nextEyeStep()">次へ →</button>
+  </div>
+
+  <div class="card" id="w1-done" style="display:none">
+    <p style="text-align:center;font-size:15px;line-height:1.8">
+      ✅ よくできました！<br>
+      少し意識が「今、ここ」に戻りましたか？<br>
+      <span style="color:var(--text-muted);font-size:13px">身体感覚の変化をそっと感じてみてください。</span>
+    </p>
+    <button class="btn btn-primary" style="margin-top:16px" onclick="goToAfterScale()">変化を確認する →</button>
+  </div>
+
+  <button class="btn btn-ghost" onclick="showScreen('screen-menu')">← メニューに戻る</button>
+</section>
+
+<!-- ══════════════════════════════════════
+     SCREEN W2: Detox
+════════════════════════════════════════ -->
+<section id="screen-work-2" class="screen">
+  <div class="card">
+    <div class="card-title">🗑️ 吐き出しデトックス</div>
+    <h2>頭の中のゴミを<br>全部出してしまおう</h2>
+    <p>評価なし・答えなし。ただ吐き出すだけでOKです。<br>音声入力でもテキストでも。</p>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div class="card-title" style="margin:0">つぶやいてみる</div>
+      <button class="voice-btn" id="voice-btn" onclick="toggleVoice()">
+        <span class="mic-dot" id="mic-dot"></span>
+        <span id="voice-label">🎤 音声入力</span>
+      </button>
+    </div>
+    <div class="detox-area">
+      <textarea class="detox-textarea" id="detox-text" placeholder="ここに頭の中を全部吐き出してください。
+誰にも見せません。後で消します。
+
+・今、モヤモヤしていること
+・「ねばならない」と思っていること
+・誰かへの不満、焦り、怖さ
+
+なんでもOKです…"></textarea>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+      <span class="text-muted" id="detox-count">0文字</span>
+      <button class="btn btn-danger" style="width:auto;padding:10px 20px" onclick="throwAway()" id="throw-btn" disabled>
+        🗑️ ゴミ箱へ捨てる
+      </button>
+    </div>
+  </div>
+
+  <div class="card trash-animation" id="trash-anim">
+    <div class="trash-icon">🗑️</div>
+    <div style="font-size:18px;font-weight:700;color:var(--success)">捨てました。</div>
+    <div style="font-size:14px;color:var(--text-muted);line-height:1.7">
+      頭の中から外に出した瞬間、<br>あなたはもうそれを「持ち歩いていない」のです。<br>少し軽くなりましたか？
+    </div>
+    <button class="btn btn-primary" style="margin-top:8px" onclick="goToAfterScale()">変化を確認する →</button>
+  </div>
+
+  <button class="btn btn-ghost" onclick="showScreen('screen-menu')">← メニューに戻る</button>
+</section>
+
+<!-- ══════════════════════════════════════
+     SCREEN W3: SMD Submodality
+════════════════════════════════════════ -->
+<section id="screen-work-3" class="screen">
+  <div class="card">
+    <div class="card-title">🎨 五感チューニング (SMDs)</div>
+    <h2>嫌なイメージの<br>「見え方」を調整する</h2>
+    <p>頭の中にある不快なシーンや感覚を、スライダーで変化させます。</p>
+  </div>
+
+  <div class="card" id="w3-input-card">
+    <div class="card-title">ステップ 1 — イメージを特定する</div>
+    <p class="score-hint">今、頭に浮かぶ「重くなる場面やプレッシャー」を簡単に書いてください。</p>
+    <textarea class="smd-image-desc" id="smd-desc" rows="3" placeholder="例：明日の会議で詰められる場面、締め切りに間に合わない不安…"></textarea>
+    <button class="btn btn-primary" style="margin-top:14px" onclick="showSmdSliders()">イメージを調整する →</button>
+  </div>
+
+  <div class="card" id="w3-sliders" style="display:none">
+    <div class="card-title">ステップ 2 — スライダーで変える</div>
+    <p class="score-hint" style="margin-bottom:16px">各スライダーを動かして、嫌なイメージを「小さく・薄く・遠く」していきましょう。</p>
+
+    <div class="smd-preview">
+      <div class="smd-blob" id="smd-blob"></div>
+    </div>
+
+    <div class="slider-group" style="margin-top:20px">
+      <div class="slider-item">
+        <label>🔆 明るさ・鮮明さ <span id="val-brightness">50</span>%</label>
+        <input type="range" min="0" max="100" value="50" id="sld-brightness" oninput="updateSmdPreview()">
+        <div class="slider-ends"><span>薄い・モノクロ</span><span>鮮明・リアル</span></div>
+      </div>
+      <div class="slider-item">
+        <label>📐 サイズ <span id="val-size">50</span>%</label>
+        <input type="range" min="0" max="100" value="50" id="sld-size" oninput="updateSmdPreview()">
+        <div class="slider-ends"><span>豆粒ほど小さく</span><span>大きくリアル</span></div>
+      </div>
+      <div class="slider-item">
+        <label>📏 距離 <span id="val-distance">50</span>%</label>
+        <input type="range" min="0" max="100" value="50" id="sld-distance" oninput="updateSmdPreview()">
+        <div class="slider-ends"><span>遠くへ押しやる</span><span>すぐ目の前</span></div>
+      </div>
+      <div class="slider-item">
+        <label>🔉 音量 <span id="val-volume">50</span>%</label>
+        <input type="range" min="0" max="100" value="50" id="sld-volume" oninput="updateSmdPreview()">
+        <div class="slider-ends"><span>聞こえない・無音</span><span>大きく響く</span></div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px;padding:16px;background:var(--surface2);border-radius:var(--radius-sm);text-align:center">
+      <div style="font-size:13px;color:var(--text-muted)">不快感スコア(推定)</div>
+      <div style="font-size:28px;font-weight:700;color:var(--primary)" id="smd-score-display">—</div>
+    </div>
+
+    <button class="btn btn-primary" style="margin-top:16px" onclick="goToAfterScale()">
+      変化を確認する →
+    </button>
+  </div>
+
+  <button class="btn btn-ghost" onclick="showScreen('screen-menu')">← メニューに戻る</button>
+</section>
+
+<!-- ══════════════════════════════════════
+     SCREEN W4: Image Work
+════════════════════════════════════════ -->
+<section id="screen-work-4" class="screen">
+  <div class="card">
+    <div class="card-title">✨ イメージワーク</div>
+    <h2>重たいものを<br>手放してしまおう</h2>
+    <p>プレッシャーや不安を、好きな方法で飛ばしましょう。</p>
+  </div>
+
+  <div class="card" id="w4-input-card">
+    <div class="card-title">ステップ 1 — 何を手放しますか？</div>
+    <p class="score-hint">今のプレッシャー・不安・怒り・焦りを一言で書いてください。</p>
+    <textarea class="smd-image-desc" id="iw-content" rows="2" placeholder="例：明日の締め切りへの恐怖、〇〇さんへの怒り…" style="min-height:80px"></textarea>
+    <button class="btn btn-primary" style="margin-top:14px" onclick="showIwTypeSelect()">次へ →</button>
+  </div>
+
+  <div class="card" id="w4-type-card" style="display:none">
+    <div class="card-title">ステップ 2 — どうやって手放しますか？</div>
+    <div class="iw-type-grid">
+      <button class="iw-type-btn" onclick="startIwScene('balloon')"><span class="iw-icon">🎈</span><span class="iw-name">風船で<br>飛ばす</span></button>
+      <button class="iw-type-btn" onclick="startIwScene('river')"><span class="iw-icon">🍃</span><span class="iw-name">川に<br>流す</span></button>
+      <button class="iw-type-btn" onclick="startIwScene('homerun')"><span class="iw-icon">⚾</span><span class="iw-name">ホームラン<br>で星に</span></button>
+      <button class="iw-type-btn" onclick="startIwScene('blossom')"><span class="iw-icon">🌸</span><span class="iw-name">花びらで<br>散らす</span></button>
+      <button class="iw-type-btn" onclick="startIwScene('rocket')"><span class="iw-icon">🚀</span><span class="iw-name">ロケットで<br>宇宙へ</span></button>
+      <button class="iw-type-btn" onclick="startIwScene('ocean')"><span class="iw-icon">🌊</span><span class="iw-name">海に<br>飲み込む</span></button>
+      <button class="iw-type-btn" onclick="startIwScene('fireworks')"><span class="iw-icon">🎆</span><span class="iw-name">打ち上げ<br>花火に</span></button>
+    </div>
+  </div>
+
+  <div class="card" id="w4-scene" style="display:none">
+    <div class="card-title" id="w4-scene-title">タップして手放す</div>
+    <div class="iw-scene" id="iw-scene" onclick="releaseIw()"></div>
+    <p style="margin-top:12px;text-align:center;font-size:13px;color:var(--text-muted)" id="w4-scene-hint">
+      タップすると手放せます
+    </p>
+  </div>
+
+  <div class="card" id="w4-done" style="display:none">
+    <p style="text-align:center;font-size:15px;line-height:1.9" id="w4-done-msg">
+      ✨ 手放しました。<br>
+      <span style="color:var(--text-muted);font-size:13px">
+        「軽くなること」を、心が知っています。
+      </span>
+    </p>
+    <button class="btn btn-primary" style="margin-top:16px" onclick="goToAfterScale()">変化を確認する →</button>
+  </div>
+
+  <button class="btn btn-ghost" onclick="showScreen('screen-menu')">← メニューに戻る</button>
+</section>
+
+<!-- ══════════════════════════════════════
+     SCREEN W5: SCORE Model
+════════════════════════════════════════ -->
+<section id="screen-work-5" class="screen">
+  <div class="card">
+    <div class="card-title">🗺️ 海図モデル</div>
+    <h2>現在地と次の一歩を<br>構造的に整理する</h2>
+    <p>5つの質問に短く答えるだけで、頭の中が地図になります。</p>
+  </div>
+
+  <div class="card">
+    <div class="score-nav" style="margin-bottom:16px">
+      <button class="score-tab active" id="stab-S" onclick="switchScore('S')">S 状況</button>
+      <button class="score-tab" id="stab-C" onclick="switchScore('C')">C 原因</button>
+      <button class="score-tab" id="stab-O" onclick="switchScore('O')">O 目標</button>
+      <button class="score-tab" id="stab-R" onclick="switchScore('R')">R リソース</button>
+      <button class="score-tab" id="stab-E" onclick="switchScore('E')">E 効果</button>
+    </div>
+
+    <div class="progress-track" style="margin-bottom:20px">
+      <div class="progress-fill" id="score-progress" style="width:20%"></div>
+    </div>
+
+    <div class="score-panel active" id="spanel-S">
+      <div class="score-question">📍 今、何が問題になっていますか？</div>
+      <div class="score-hint">状況を客観的に一言で。「〜が〜な状態」という形でOKです。</div>
+      <textarea class="score-textarea" id="score-S" placeholder="例：案件が重なって締め切りが3つ重複している状態"></textarea>
+      <button class="btn btn-primary" onclick="nextScore('C')">次へ →</button>
+    </div>
+
+    <div class="score-panel" id="spanel-C">
+      <div class="score-question">🔍 なぜそうなっていると思いますか？</div>
+      <div class="score-hint">分析より直感で。思い当たることを書いてみてください。</div>
+      <textarea class="score-textarea" id="score-C" placeholder="例：仕事を断れなかった、見積もりが甘かった…"></textarea>
+      <button class="btn btn-primary" onclick="nextScore('O')">次へ →</button>
+    </div>
+
+    <div class="score-panel" id="spanel-O">
+      <div class="score-question">🎯 本当はどんな状態になりたいですか？</div>
+      <div class="score-hint">理想の状態を。「〜できている状態」「〜な自分」という形でも。</div>
+      <textarea class="score-textarea" id="score-O" placeholder="例：1つのことに集中して、落ち着いて仕事できている状態"></textarea>
+      <button class="btn btn-primary" onclick="nextScore('R')">次へ →</button>
+    </div>
+
+    <div class="score-panel" id="spanel-R">
+      <div class="score-question">💪 今、使えるリソース・強みは何ですか？</div>
+      <div class="score-hint">スキル・人脈・時間・経験など。小さくてもOKです。</div>
+      <textarea class="score-textarea" id="score-R" placeholder="例：明日午前は空いている、〇〇さんに相談できる…"></textarea>
+      <button class="btn btn-primary" onclick="nextScore('E')">次へ →</button>
+    </div>
+
+    <div class="score-panel" id="spanel-E">
+      <div class="score-question">✨ 解決したら何が変わりますか？</div>
+      <div class="score-hint">未来の自分はどんな気持ち・状態になっていますか？</div>
+      <textarea class="score-textarea" id="score-E" placeholder="例：週末ゆっくり休める、自信を持って仕事できている…"></textarea>
+      <button class="btn btn-success" onclick="completeSCORE()">整理完了 ✓</button>
+    </div>
+  </div>
+
+  <div class="card" id="score-summary" style="display:none">
+    <div class="card-title">あなたの現在地マップ</div>
+    <div id="score-summary-content"></div>
+    <button class="btn btn-primary" style="margin-top:16px" onclick="goToAfterScale()">変化を確認する →</button>
+  </div>
+
+  <button class="btn btn-ghost" onclick="showScreen('screen-menu')">← メニューに戻る</button>
+</section>
+
+<!-- ══════════════════════════════════════
+     SCREEN: After Scale
+════════════════════════════════════════ -->
+<section id="screen-afterscale" class="screen">
+  <div class="card">
+    <div class="card-title">チェックアウト</div>
+    <h2>ワーク後、<br>心の海はどうですか？</h2>
+    <p>波は少し落ち着きましたか？ドラッグして今の状態を合わせてください。</p>
+    <div class="wave-gauge-wrap">
+      <div class="wave-gauge-labels">
+        <span>🌊<br>荒波</span>
+        <span>〜〜<br>さざ波</span>
+        <span>—<br>凪</span>
+      </div>
+      <div class="wave-gauge-track" id="after-gauge-track">
+        <div class="wave-gauge-fill" id="after-gauge-fill">
+          <div class="wave-surface" id="after-wave-s1"></div>
+          <div class="wave-surface-2" id="after-wave-s2"></div>
+        </div>
+      </div>
+      <div class="wave-gauge-right">
+        <div class="wave-value-num" id="after-val-num">—</div>
+        <div class="wave-value-name" id="after-val-name">ドラッグで設定</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="change-card" style="display:none">
+    <div class="card-title">変化の確認</div>
+    <div class="change-indicator">
+      <div style="text-align:center"><div class="text-muted" style="font-size:12px;margin-bottom:4px">ワーク前</div><div class="before-num" id="display-before">—</div></div>
+      <div class="arrow">→</div>
+      <div style="text-align:center"><div class="text-muted" style="font-size:12px;margin-bottom:4px">ワーク後</div><div class="after-num" id="display-after">—</div></div>
+    </div>
+    <div class="change-text" id="change-text"></div>
+  </div>
+
+  <div class="babystep-box" id="babystep-box" style="display:none">
+    <h3>🐣 次の小さな一歩</h3>
+    <p style="font-size:14px;color:var(--text-muted);margin-bottom:12px">
+      今すぐできる「最小の行動」を1つ選ぶか、自分で書いてください。
+    </p>
+    <div class="babystep-options" id="babystep-options"></div>
+    <div style="margin-top:10px;position:relative">
+      <input type="text" id="babystep-custom"
+        placeholder="✏️ 自分で書く…"
+        style="width:100%;padding:12px 16px;border:2px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font);font-size:14px;background:var(--surface);color:var(--text);"
+        oninput="onCustomBabyStep(this.value)"
+        onfocus="clearBabyStepSelection()">
+    </div>
+  </div>
+
+  <button class="btn btn-accent" id="after-complete-btn" onclick="completeSession()">
+    セッション完了 ✓
+  </button>
+</section>
+
+<!-- ══════════════════════════════════════
+     SCREEN: Exit / Reward
+════════════════════════════════════════ -->
+<section id="screen-exit" class="screen">
+  <div class="card reward-screen">
+    <div class="reward-badge" id="reward-badge">
+      <div class="badge-icon" id="badge-icon">🌊</div>
+      <div class="badge-title" id="badge-title">脳のメモリ解放!</div>
+      <div class="badge-xp" id="badge-xp">+50 XP 獲得</div>
+    </div>
+    <p style="margin-top:16px;line-height:1.8;color:var(--text-muted)" id="exit-message">
+      おめでとうございます！<br>
+      頭の中の荷物を置いて、少し軽くなりましたね。<br>
+      またいつでも荷物を置きにきてください。
+    </p>
+  </div>
+
+  <div class="card" id="event-invite" style="display:none">
+    <div class="event-card">
+      <div class="tag tag-teal" style="margin-bottom:12px">NEXT STEP</div>
+      <h3>「整理された今の自分」で<br>次の一歩を踏み出しませんか？</h3>
+      <p>このアプリで整理したデータを持って、プロと一緒に「どう軽やかに前進するか」を考える、少額のオンラインセッションです。</p>
+      <div class="event-price">¥3,000〜 / 回</div>
+      <a href="#" class="btn btn-primary" onclick="trackEventClick(); return false;">
+        ゆるメントレに参加する →
+      </a>
+      <p style="font-size:12px;margin-top:10px">※外部のオンラインイベントページに移動します</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">あなたの統計</div>
+    <div style="display:flex;gap:16px;justify-content:space-around;text-align:center">
+      <div>
+        <div style="font-size:28px;font-weight:700;color:var(--primary)" id="stat-total">0</div>
+        <div class="text-muted">クリア回数</div>
+      </div>
+      <div>
+        <div style="font-size:28px;font-weight:700;color:var(--accent)" id="stat-xp">0</div>
+        <div class="text-muted">総 XP</div>
+      </div>
+      <div>
+        <div style="font-size:28px;font-weight:700;color:var(--success)" id="stat-avg-drop">—</div>
+        <div class="text-muted">平均改善</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex-row">
+    <button class="btn btn-primary" onclick="startNewSession()">メニューへ →</button>
+    <button class="btn btn-ghost" onclick="showHistory()">履歴を見る</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SCREEN: History
+════════════════════════════════════════ -->
+<section id="screen-history" class="screen">
+  <div class="card">
+    <div class="card-title">セッション履歴</div>
+    <h2>あなたの記録</h2>
+  </div>
+  <div id="history-cards"></div>
+  <div class="flex-row">
+    <button class="btn btn-primary" onclick="startNewSession()">メニューを選ぶ →</button>
+    <button class="btn btn-ghost" onclick="showScreen('screen-exit')">← 戻る</button>
+  </div>
+</section>
+
+<script>
+// ═══════════════════════════════════════
+// State & Storage
+// ═══════════════════════════════════════
+const STORAGE_KEY = 'nagini_v1';
+
+function loadData() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
+      totalClears: 0, totalXp: 0, sessions: [], scoreCompletes: 0
+    };
+  } catch { return { totalClears: 0, totalXp: 0, sessions: [], scoreCompletes: 0 }; }
+}
+function saveData(d) { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }
+
+let state = {
+  beforeScore: null,
+  afterScore: null,
+  currentMenu: null,
+  selectedBabyStep: null,
+};
+
+// ═══════════════════════════════════════
+// Screen Navigation
+// ═══════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) { el.classList.add('active'); el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  const showMenuBtn = ['screen-work-1','screen-work-2','screen-work-3','screen-work-4','screen-work-5','screen-afterscale'].includes(id);
+  document.getElementById('header-menu-btn').style.display = showMenuBtn ? '' : 'none';
+}
+
+// ═══════════════════════════════════════
+// Init
+// ═══════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  initGauge('before-gauge-track', 'before-gauge-fill', 'before-wave-s1', 'before-wave-s2', 'before-val-num', 'before-val-name', val => {
+    state.beforeScore = val;
+    document.getElementById('checkin-next').disabled = false;
+    suggestMenu(val);
+  });
+  initGauge('after-gauge-track', 'after-gauge-fill', 'after-wave-s1', 'after-wave-s2', 'after-val-num', 'after-val-name', val => {
+    state.afterScore = val;
+    showChangeResult();
+  });
+  updateHeader();
+  loadRecentHistory();
+  showScreen('screen-checkin');
+});
+
+function waveLabel(val) {
+  if (val === 0) return '凪';
+  if (val <= 2) return 'ほぼ凪';
+  if (val <= 4) return 'さざ波';
+  if (val <= 6) return 'うねり';
+  if (val <= 8) return '荒波';
+  return '大荒波 🌊';
+}
+
+function waveColor(val) {
+  // calm teal → stormy dark blue
+  if (val <= 2) return { top: '#6BB8D0', bot: '#8ECFE0' };
+  if (val <= 4) return { top: '#5B8FA8', bot: '#7EB5CA' };
+  if (val <= 6) return { top: '#4A7A96', bot: '#5B8FA8' };
+  if (val <= 8) return { top: '#3A6080', bot: '#4A7A96' };
+  return { top: '#2A4560', bot: '#3A6080' };
+}
+
+function initGauge(trackId, fillId, s1Id, s2Id, numId, nameId, onChange) {
+  const track = document.getElementById(trackId);
+  const fill  = document.getElementById(fillId);
+  const s1    = document.getElementById(s1Id);
+  const s2    = document.getElementById(s2Id);
+  const numEl = document.getElementById(numId);
+  const nameEl= document.getElementById(nameId);
+  let currentVal = null;
+
+  function pctFromClientY(clientY) {
+    const rect = track.getBoundingClientRect();
+    const y = clientY - rect.top;
+    return 1 - Math.max(0, Math.min(1, y / rect.height));
+  }
+
+  function applyVal(val) {
+    if (val === currentVal) return;
+    currentVal = val;
+    const pct = val / 10 * 100;
+    fill.style.height = pct < 1 ? '0%' : `${pct}%`;
+
+    const c = waveColor(val);
+    fill.style.background = `linear-gradient(180deg, ${c.top} 0%, ${c.bot} 100%)`;
+    s1.style.background = c.top;
+    s2.style.background = c.bot;
+
+    // Wave speed: calm=slow, stormy=fast
+    const dur = Math.max(0.7, 3.5 - val * 0.27);
+    s1.style.animationDuration = `${dur}s`;
+    s2.style.animationDuration = `${dur * 0.7}s`;
+
+    // Wave amplitude (height) increases with val
+    const h = 12 + val * 2.5;
+    s1.style.height = `${h}px`;
+    s1.style.top = `${-h / 2}px`;
+    s2.style.height = `${h * 0.7}px`;
+    s2.style.top = `${-h * 0.35}px`;
+
+    numEl.textContent = val;
+    nameEl.textContent = waveLabel(val);
+    numEl.style.color = val >= 7 ? 'var(--danger)' : val >= 4 ? 'var(--primary)' : 'var(--success)';
+
+    onChange(val);
+  }
+
+  function valFromPct(pct) { return Math.round(pct * 10); }
+
+  track.addEventListener('mousedown', e => {
+    e.preventDefault();
+    applyVal(valFromPct(pctFromClientY(e.clientY)));
+    const move = e => applyVal(valFromPct(pctFromClientY(e.clientY)));
+    const up   = () => { document.removeEventListener('mousemove', move); document.removeEventListener('mouseup', up); };
+    document.addEventListener('mousemove', move);
+    document.addEventListener('mouseup', up);
+  });
+
+  track.addEventListener('touchstart', e => {
+    e.preventDefault();
+    applyVal(valFromPct(pctFromClientY(e.touches[0].clientY)));
+    const move = e => { e.preventDefault(); applyVal(valFromPct(pctFromClientY(e.touches[0].clientY))); };
+    const end  = () => { track.removeEventListener('touchmove', move); track.removeEventListener('touchend', end); };
+    track.addEventListener('touchmove', move, { passive: false });
+    track.addEventListener('touchend', end);
+  });
+}
+
+function suggestMenu(score) {
+  // Reset tags
+  for (let i=1;i<=5;i++) document.getElementById(`tag-${i}`).style.display = 'none';
+  if (score >= 8) { document.getElementById('tag-1').style.display=''; document.getElementById('tag-2').style.display=''; }
+  else if (score >= 6) { document.getElementById('tag-2').style.display=''; document.getElementById('tag-4').style.display=''; }
+  else if (score >= 4) { document.getElementById('tag-3').style.display=''; document.getElementById('tag-5').style.display=''; }
+  else { document.getElementById('tag-5').style.display=''; }
+}
+
+document.getElementById('checkin-next').addEventListener('click', () => {
+  showScreen('screen-menu');
+});
+
+function updateHeader() {
+  const d = loadData();
+  document.getElementById('header-xp').textContent = `${d.totalXp} XP`;
+}
+
+function loadRecentHistory() {
+  const d = loadData();
+  if (!d.sessions || d.sessions.length === 0) return;
+  const card = document.getElementById('checkin-history');
+  const list = document.getElementById('history-list');
+  card.style.display = '';
+  list.innerHTML = '';
+  const recent = d.sessions.slice(-3).reverse();
+  recent.forEach(s => {
+    const row = document.createElement('div');
+    row.className = 'history-row';
+    const drop = s.before - s.after;
+    const date = new Date(s.ts).toLocaleDateString('ja-JP', {month:'numeric',day:'numeric'});
+    row.innerHTML = `<div class="history-dot"></div>
+      <div style="flex:1;font-size:13px">${date} — ${menuName(s.menu)}</div>
+      <div style="font-size:13px;font-weight:700;color:var(--success)">${s.before}→${s.after} (↓${drop})</div>`;
+    list.appendChild(row);
+  });
+}
+
+function menuName(n) {
+  return ['','ブレークステート','デトックス','五感チューニング','イメージワーク','海図モデル'][n] || '—';
+}
+
+// ═══════════════════════════════════════
+// Menu Selection
+// ═══════════════════════════════════════
+function selectMenu(n) {
+  state.currentMenu = n;
+  // Reset work screens
+  resetWork(n);
+  showScreen(`screen-work-${n}`);
+}
+
+function resetWork(n) {
+  if (n === 1) {
+    document.getElementById('w1-breathe').style.display = '';
+    document.getElementById('w1-eye').style.display = 'none';
+    document.getElementById('w1-done').style.display = 'none';
+    document.getElementById('breathe-start-btn').style.display = '';
+    document.getElementById('breathe-circle').textContent = '準備';
+    document.getElementById('breathe-label').textContent = 'ボタンを押してスタート';
+    document.getElementById('breathe-timer').textContent = '3回繰り返します';
+    breatheRound = 0; breatheRunning = false;
+  }
+  if (n === 2) {
+    document.getElementById('detox-text').value = '';
+    document.getElementById('detox-count').textContent = '0文字';
+    document.getElementById('throw-btn').disabled = true;
+    document.getElementById('trash-anim').classList.remove('show');
+    if (speechRunning) toggleVoice();
+  }
+  if (n === 3) {
+    document.getElementById('w3-input-card').style.display = '';
+    document.getElementById('w3-sliders').style.display = 'none';
+    document.getElementById('smd-desc').value = '';
+    ['brightness','size','distance','volume'].forEach(k => {
+      document.getElementById(`sld-${k}`).value = 50;
+      document.getElementById(`val-${k}`).textContent = 50;
+    });
+    updateSmdPreview();
+  }
+  if (n === 4) {
+    document.getElementById('w4-input-card').style.display = '';
+    document.getElementById('w4-type-card').style.display = 'none';
+    document.getElementById('w4-scene').style.display = 'none';
+    document.getElementById('w4-done').style.display = 'none';
+    document.getElementById('iw-content').value = '';
+    iwReleased = false;
+  }
+  if (n === 5) {
+    ['S','C','O','R','E'].forEach(k => {
+      document.getElementById(`score-${k}`).value = '';
+      document.getElementById(`stab-${k}`).className = 'score-tab';
+      document.getElementById(`spanel-${k}`).className = 'score-panel';
+    });
+    document.getElementById('stab-S').className = 'score-tab active';
+    document.getElementById('spanel-S').className = 'score-panel active';
+    document.getElementById('score-progress').style.width = '20%';
+    document.getElementById('score-summary').style.display = 'none';
+  }
+}
+
+// ═══════════════════════════════════════
+// Work 1: Break State
+// ═══════════════════════════════════════
+let breatheRound = 0, breatheRunning = false, breatheTimer = null;
+const BREATHE_ROUNDS = 3;
+
+function startBreathe() {
+  if (breatheRunning) return;
+  breatheRunning = true;
+  document.getElementById('breathe-start-btn').style.display = 'none';
+  breatheRound = 0;
+  doBreatheRound();
+}
+
+function doBreatheRound() {
+  if (breatheRound >= BREATHE_ROUNDS) {
+    document.getElementById('breathe-label').textContent = '完了！';
+    document.getElementById('breathe-timer').textContent = 'ゆっくり目を開けてください';
+    document.getElementById('breathe-circle').textContent = '✓';
+    setTimeout(() => {
+      document.getElementById('w1-breathe').style.display = 'none';
+      document.getElementById('w1-eye').style.display = '';
+      eyeStep = 0; showEyeStep();
+    }, 1500);
+    return;
+  }
+  breatheRound++;
+  const circle = document.getElementById('breathe-circle');
+  const label = document.getElementById('breathe-label');
+  const timer = document.getElementById('breathe-timer');
+  timer.textContent = `${breatheRound} / ${BREATHE_ROUNDS}回目`;
+
+  // Inhale 4s
+  label.textContent = '吸う…'; circle.textContent = '🌬️'; circle.classList.add('inhale');
+  let count = 4;
+  const inhaleInterval = setInterval(() => {
+    circle.textContent = count--; if (count < 0) { clearInterval(inhaleInterval); }
+  }, 1000);
+  setTimeout(() => {
+    clearInterval(inhaleInterval);
+    // Hold 4s
+    label.textContent = '止める'; circle.textContent = '⏸'; circle.classList.remove('inhale');
+    let h = 4;
+    const holdInterval = setInterval(() => {
+      circle.textContent = h--; if (h < 0) { clearInterval(holdInterval); }
+    }, 1000);
+    setTimeout(() => {
+      clearInterval(holdInterval);
+      // Exhale 8s
+      label.textContent = '吐く…'; circle.textContent = '💨'; circle.classList.add('exhale');
+      let c = 8;
+      const exhaleInterval = setInterval(() => {
+        circle.textContent = c--; if (c < 0) { clearInterval(exhaleInterval); }
+      }, 1000);
+      setTimeout(() => {
+        clearInterval(exhaleInterval);
+        circle.classList.remove('exhale');
+        doBreatheRound();
+      }, 8000);
+    }, 4000);
+  }, 4000);
+}
+
+const eyeSteps = [
+  { icon: '🏔️', desc: 'できるだけ遠くを見る\n窓の外・壁の向こうをイメージして' },
+  { icon: '☁️', desc: '空や天井の遠い一点を\nぼんやり眺める' },
+  { icon: '🌅', desc: '視線を水平線のはるか先へ\n地平線・海の向こうをイメージして' },
+  { icon: '🌿', desc: '部屋の中で一番遠い角を\nゆっくり見る' },
+  { icon: '✨', desc: '遠くの光や明るい点を\n3秒間じっと見つめる' },
+  { icon: '🌊', desc: '目を閉じて\n広い海の水平線をイメージする' },
+];
+let eyeStep = 0;
+
+function showEyeStep() {
+  const s = eyeSteps[eyeStep];
+  document.getElementById('eye-step').textContent = s.icon;
+  document.getElementById('eye-desc').innerHTML = s.desc.replace(/\n/g, '<br>');
+  document.getElementById('eye-progress').textContent = `${eyeStep+1} / ${eyeSteps.length}`;
+  const btn = document.getElementById('eye-next-btn');
+  btn.textContent = eyeStep < eyeSteps.length - 1 ? '次へ →' : '完了 ✓';
+}
+
+function nextEyeStep() {
+  eyeStep++;
+  if (eyeStep >= eyeSteps.length) {
+    document.getElementById('w1-eye').style.display = 'none';
+    document.getElementById('w1-done').style.display = '';
+  } else { showEyeStep(); }
+}
+
+// ═══════════════════════════════════════
+// Work 2: Detox + Voice
+// ═══════════════════════════════════════
+let recognition = null, speechRunning = false;
+const detoxArea = () => document.getElementById('detox-text');
+
+detoxArea()?.addEventListener?.('input', updateDetoxCount);
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('detox-text').addEventListener('input', updateDetoxCount);
+});
+
+function updateDetoxCount() {
+  const txt = document.getElementById('detox-text').value;
+  document.getElementById('detox-count').textContent = `${txt.length}文字`;
+  document.getElementById('throw-btn').disabled = txt.trim().length === 0;
+}
+
+function toggleVoice() {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    alert('お使いのブラウザは音声入力に対応していません。\nChrome をお試しください。');
+    return;
+  }
+  if (speechRunning) {
+    recognition?.stop();
+    return;
+  }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.lang = 'ja-JP';
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  let finalTranscript = document.getElementById('detox-text').value;
+  let interimBase = finalTranscript;
+
+  recognition.onstart = () => {
+    speechRunning = true;
+    document.getElementById('voice-btn').classList.add('active');
+    document.getElementById('voice-label').textContent = '🔴 停止';
+    document.getElementById('detox-text').classList.add('listening');
+    interimBase = document.getElementById('detox-text').value;
+    if (interimBase && !interimBase.endsWith('\n')) interimBase += '\n';
+  };
+  recognition.onresult = e => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) {
+        finalTranscript = interimBase + e.results[i][0].transcript;
+        interimBase = finalTranscript;
+      } else { interim = e.results[i][0].transcript; }
+    }
+    document.getElementById('detox-text').value = interimBase + interim;
+    updateDetoxCount();
+  };
+  recognition.onend = () => {
+    speechRunning = false;
+    document.getElementById('voice-btn').classList.remove('active');
+    document.getElementById('voice-label').textContent = '🎤 音声入力';
+    document.getElementById('detox-text').classList.remove('listening');
+  };
+  recognition.start();
+}
+
+function throwAway() {
+  if (speechRunning) toggleVoice();
+  document.getElementById('detox-text').value = '';
+  updateDetoxCount();
+  const anim = document.getElementById('trash-anim');
+  anim.classList.add('show');
+  anim.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// ═══════════════════════════════════════
+// Work 3: SMD Sliders
+// ═══════════════════════════════════════
+function showSmdSliders() {
+  document.getElementById('w3-input-card').style.display = 'none';
+  document.getElementById('w3-sliders').style.display = '';
+  updateSmdPreview();
+}
+
+function updateSmdPreview() {
+  const b = parseInt(document.getElementById('sld-brightness').value);
+  const s = parseInt(document.getElementById('sld-size').value);
+  const d = parseInt(document.getElementById('sld-distance').value);
+  const v = parseInt(document.getElementById('sld-volume').value);
+  document.getElementById('val-brightness').textContent = b;
+  document.getElementById('val-size').textContent = s;
+  document.getElementById('val-distance').textContent = d;
+  document.getElementById('val-volume').textContent = v;
+
+  // Update range track fill
+  ['brightness','size','distance','volume'].forEach(k => {
+    const el = document.getElementById(`sld-${k}`);
+    el.style.setProperty('--pct', `${el.value}%`);
+  });
+
+  // Blob preview
+  const blob = document.getElementById('smd-blob');
+  const size = Math.max(20, s * 0.8);
+  const opacity = b / 100 * 0.8;
+  const grayness = Math.round(255 * (1 - b/100) + 180 * (b/100));
+  blob.style.width = `${size}px`;
+  blob.style.height = `${size}px`;
+  blob.style.opacity = opacity;
+  blob.style.filter = `blur(${(100-b)/25}px) grayscale(${100-b}%)`;
+  blob.style.transform = `scale(${1 - d/200})`;
+
+  const score = Math.round((b + s + d + v) / 4);
+  const scoreEl = document.getElementById('smd-score-display');
+  scoreEl.textContent = `${score}%`;
+  scoreEl.style.color = score > 50 ? 'var(--danger)' : 'var(--success)';
+}
+
+// ═══════════════════════════════════════
+// Work 4: Image Work (7 types)
+// ═══════════════════════════════════════
+let iwReleased = false;
+let iwCurrentType = 'balloon';
+
+const IW_CONFIG = {
+  balloon:   { title:'タップして空へ飛ばす', hint:'風船をタップすると飛んでいきます', doneMsg:'🎈 飛んでいきました。\n重たかったものが、空の向こうへ。', bg:'linear-gradient(180deg,#C8E8F8 0%,#EEF5E8 100%)' },
+  river:     { title:'タップして川に流す',   hint:'タップすると流れていきます',        doneMsg:'🍃 流れていきました。\n川はすべてを飲み込んで、海へと運びます。', bg:'linear-gradient(180deg,#A0D0C0 0%,#4A9AB0 60%,#2A6880 100%)' },
+  homerun:   { title:'タップしてホームラン！', hint:'タップすると星になります',          doneMsg:'⭐ 星になりました。\n夜空のどこかで、ずっと輝いています。', bg:'linear-gradient(180deg,#0A0A2A 0%,#1A2A6A 60%,#2A3A8A 100%)' },
+  blossom:   { title:'タップして花を散らす', hint:'タップすると花びらが散ります',       doneMsg:'🌸 散っていきました。\n花びらのように、軽やかに。', bg:'linear-gradient(180deg,#FFE8F0 0%,#FFF4F8 100%)' },
+  rocket:    { title:'タップして宇宙へ飛ばす', hint:'タップするとロケット発射！',        doneMsg:'🚀 宇宙へ飛び立ちました。\nもう重力は関係ありません。', bg:'linear-gradient(180deg,#000010 0%,#040430 35%,#0A3080 75%,#2060A8 100%)' },
+  ocean:     { title:'タップして海へ沈める', hint:'タップすると波が飲み込みます',       doneMsg:'🌊 海が飲み込みました。\n深い海の底で、静かに溶けていきます。', bg:'linear-gradient(180deg,#90C8E0 0%,#2860A0 50%,#102860 100%)' },
+  fireworks: { title:'タップして打ち上げる', hint:'タップすると花火が上がります',       doneMsg:'🎆 打ち上がりました！\nパーン！と空に弾けて、消えていきました。', bg:'linear-gradient(180deg,#060620 0%,#100840 50%,#1A0A60 100%)' },
+};
+
+function showIwTypeSelect() {
+  const content = document.getElementById('iw-content').value.trim();
+  if (!content) { document.getElementById('iw-content').focus(); return; }
+  document.getElementById('w4-input-card').style.display = 'none';
+  document.getElementById('w4-type-card').style.display = '';
+}
+
+function startIwScene(type) {
+  iwCurrentType = type;
+  iwReleased = false;
+  const cfg = IW_CONFIG[type];
+  const content = document.getElementById('iw-content').value.trim();
+  const label = content.length > 14 ? content.substring(0,14)+'…' : content;
+
+  document.getElementById('w4-type-card').style.display = 'none';
+  document.getElementById('w4-scene').style.display = '';
+  document.getElementById('w4-scene-title').textContent = cfg.title;
+  document.getElementById('w4-scene-hint').textContent = cfg.hint;
+
+  const scene = document.getElementById('iw-scene');
+  scene.style.background = cfg.bg;
+  scene.innerHTML = buildIwScene(type, label);
+}
+
+function buildIwScene(type, label) {
+  const lbl = `<div class="iw-label-el" id="iw-lbl">${label}</div>`;
+  if (type === 'balloon') {
+    return `<div class="cloud" style="top:28px;left:18px;font-size:26px;opacity:.6">☁️</div>
+            <div class="cloud" style="top:44px;right:28px;font-size:18px;opacity:.5">☁️</div>
+            <div class="cloud" style="top:16px;left:52%;font-size:14px;opacity:.4">☁️</div>
+            <div class="iw-main-el" id="iw-main">🎈</div>
+            <div style="position:absolute;bottom:84px;left:calc(50% + 10px);width:2px;height:36px;background:rgba(0,0,0,0.18);transition:none" id="iw-string"></div>
+            ${lbl}`;
+  }
+  if (type === 'river') {
+    return `<div style="position:absolute;bottom:0;left:0;right:0;height:80px;background:rgba(40,120,160,0.5);border-radius:0 0 16px 16px"></div>
+            <div style="position:absolute;bottom:60px;left:10%;font-size:12px;color:rgba(255,255,255,0.5)">〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜</div>
+            <div style="position:absolute;bottom:40px;left:5%;font-size:12px;color:rgba(255,255,255,0.4)">〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜</div>
+            <div class="iw-main-el" id="iw-main" style="bottom:70px;font-size:42px">🍃</div>
+            ${lbl.replace('bottom:94px','bottom:116px')}`;
+  }
+  if (type === 'homerun') {
+    return `<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 50% 110%,rgba(60,80,160,0.6) 0%,transparent 70%)"></div>
+            <div style="position:absolute;top:20px;right:20px;font-size:20px;opacity:0.4">✨</div>
+            <div style="position:absolute;top:50px;left:30px;font-size:14px;opacity:0.3">⭐</div>
+            <div style="position:absolute;top:30px;left:50%;font-size:12px;opacity:0.3">✦</div>
+            <div class="iw-main-el" id="iw-main" style="left:20%;font-size:44px">⚾</div>
+            ${lbl.replace('left:50%','left:20%').replace('translateX(-50%)','translateX(-50%)')}`;
+  }
+  if (type === 'blossom') {
+    return `<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 50% 30%,rgba(255,200,220,0.8) 0%,transparent 70%)"></div>
+            <div class="iw-main-el" id="iw-main" style="font-size:48px">🌸</div>
+            ${lbl}`;
+  }
+  if (type === 'rocket') {
+    return `<div style="position:absolute;top:0;left:0;right:0;bottom:0">
+              <div style="position:absolute;top:20px;left:15%;color:rgba(255,255,200,0.6);font-size:10px">★</div>
+              <div style="position:absolute;top:40px;right:20%;color:rgba(255,255,200,0.4);font-size:14px">★</div>
+              <div style="position:absolute;top:60px;left:40%;color:rgba(255,255,200,0.5);font-size:8px">★</div>
+              <div style="position:absolute;top:80px;right:35%;color:rgba(255,255,200,0.3);font-size:12px">★</div>
+            </div>
+            <div class="iw-main-el" id="iw-main" style="font-size:52px">🚀</div>
+            ${lbl}`;
+  }
+  if (type === 'ocean') {
+    return `<div style="position:absolute;bottom:0;left:0;right:0;height:100px;background:linear-gradient(180deg,rgba(20,80,160,0.7),rgba(10,40,100,0.9));border-radius:0 0 16px 16px"></div>
+            <div style="position:absolute;bottom:90px;left:0;right:0;font-size:24px;text-align:center;opacity:0.7;letter-spacing:-4px">🌊🌊🌊🌊🌊</div>
+            <div class="iw-main-el" id="iw-main" style="bottom:110px;font-size:44px">⛵</div>
+            ${lbl.replace('bottom:94px','bottom:154px')}`;
+  }
+  if (type === 'fireworks') {
+    return `<div style="position:absolute;top:0;left:0;right:0;bottom:0">
+              <div style="position:absolute;top:25px;left:20%;color:rgba(255,200,100,0.4);font-size:12px">✦</div>
+              <div style="position:absolute;top:45px;right:25%;color:rgba(200,150,255,0.4);font-size:8px">✦</div>
+              <div style="position:absolute;top:15px;right:15%;color:rgba(100,220,255,0.4);font-size:10px">✦</div>
+            </div>
+            <div class="iw-main-el" id="iw-main" style="font-size:32px">🔥</div>
+            ${lbl}`;
+  }
+  return '';
+}
+
+function releaseIw() {
+  if (iwReleased) return;
+  iwReleased = true;
+  const cfg = IW_CONFIG[iwCurrentType];
+
+  if (iwCurrentType === 'balloon')   animBalloon();
+  else if (iwCurrentType === 'river')     animRiver();
+  else if (iwCurrentType === 'homerun')   animHomerun();
+  else if (iwCurrentType === 'blossom')   animBlossom();
+  else if (iwCurrentType === 'rocket')    animRocket();
+  else if (iwCurrentType === 'ocean')     animOcean();
+  else if (iwCurrentType === 'fireworks') animFireworks();
+
+  const doneLines = cfg.doneMsg.split('\n');
+  setTimeout(() => {
+    document.getElementById('w4-scene').style.display = 'none';
+    document.getElementById('w4-done').style.display = '';
+    document.getElementById('w4-done-msg').innerHTML =
+      `${doneLines[0]}<br><span style="color:var(--text-muted);font-size:13px">${doneLines[1] || ''}</span>`;
+  }, 2200);
+}
+
+function animEl(id, keyframe, dur, fill='forwards') {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.style.animation = `${keyframe} ${dur}ms ease-in ${fill}`;
+}
+
+function animBalloon() {
+  const m = document.getElementById('iw-main');
+  const s = document.getElementById('iw-string');
+  const l = document.getElementById('iw-lbl');
+  [m, s, l].forEach(el => { if (el) { el.style.transition = 'bottom 1.6s ease-in, opacity 1.6s ease-in'; } });
+  setTimeout(() => {
+    if (m) { m.style.bottom = '340px'; m.style.opacity = '0'; }
+    if (s) { s.style.bottom = '400px'; s.style.opacity = '0'; }
+    if (l) { l.style.bottom = '310px'; l.style.opacity = '0'; }
+  }, 50);
+}
+
+function animRiver() {
+  const m = document.getElementById('iw-main');
+  const l = document.getElementById('iw-lbl');
+  [m, l].forEach(el => {
+    if (el) {
+      el.style.transition = 'transform 2s ease-in, opacity 2s ease-in';
+    }
+  });
+  setTimeout(() => {
+    if (m) { m.style.transform = 'translateX(220px) translateY(-20px) rotate(30deg)'; m.style.opacity = '0'; }
+    if (l) { l.style.transform = 'translateX(160px)'; l.style.opacity = '0'; }
+  }, 50);
+}
+
+function animHomerun() {
+  const m = document.getElementById('iw-main');
+  if (!m) return;
+  const scene = document.getElementById('iw-scene');
+  const rect = scene.getBoundingClientRect();
+  const dur = 1400;
+  const startX = rect.width * 0.2;
+  const startY = rect.height - 44;
+  const endX = rect.width * 0.75;
+  const endY = 30;
+  const peakY = -60;
+  let start = null;
+  m.style.transition = 'none';
+  m.style.bottom = 'auto';
+  m.style.top = startY + 'px';
+  m.style.left = startX + 'px';
+  m.style.transform = 'none';
+
+  function step(ts) {
+    if (!start) start = ts;
+    const t = Math.min((ts - start) / dur, 1);
+    const ease = t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+    const x = startX + (endX - startX) * ease;
+    const y = startY + (endY - startY) * ease - 4 * (startY - peakY) * ease * (1 - ease);
+    m.style.left = x + 'px';
+    m.style.top = y + 'px';
+    m.style.fontSize = (44 + t * 12) + 'px';
+    if (t < 1) { requestAnimationFrame(step); }
+    else {
+      m.textContent = '⭐';
+      m.style.animation = 'iwStarPop 0.5s ease forwards';
+      setTimeout(() => { m.style.animation = 'iwStarFade 0.8s ease 0.6s forwards'; }, 0);
+    }
+  }
+  const lbl = document.getElementById('iw-lbl');
+  if (lbl) { lbl.style.transition = 'opacity 0.5s'; lbl.style.opacity = '0'; }
+  requestAnimationFrame(step);
+}
+
+function animBlossom() {
+  const m = document.getElementById('iw-main');
+  if (!m) return;
+  const scene = document.getElementById('iw-scene');
+  m.style.display = 'none';
+  const petals = ['🌸','🌷','🌺','🌼','🌸','🌷','🌺','🌸'];
+  const angles = [0, 45, 90, 135, 180, 225, 270, 315];
+  angles.forEach((deg, i) => {
+    const p = document.createElement('div');
+    const rad = deg * Math.PI / 180;
+    const dist = 80 + Math.random() * 60;
+    const tx = Math.cos(rad) * dist + 'px';
+    const ty = (-Math.sin(rad) * dist) + 'px';
+    p.style.cssText = `position:absolute;left:50%;top:50%;font-size:${24+Math.random()*16}px;
+      --tx:${tx};--ty:${ty};
+      animation:iwBurstPetal ${900+i*80}ms ease-out ${i*60}ms forwards;
+      transform:translate(-50%,-50%);`;
+    p.textContent = petals[i];
+    scene.appendChild(p);
+  });
+  const lbl = document.getElementById('iw-lbl');
+  if (lbl) { lbl.style.transition = 'opacity 0.5s'; setTimeout(() => lbl.style.opacity = '0', 300); }
+}
+
+function animRocket() {
+  const m = document.getElementById('iw-main');
+  const l = document.getElementById('iw-lbl');
+  if (m) { m.style.animation = 'iwRocketUp 1.6s cubic-bezier(.4,0,.2,1) forwards'; }
+  if (l) { l.style.animation = 'iwRocketUp 1.6s cubic-bezier(.4,0,.2,1) forwards'; }
+  // Fire trail
+  const scene = document.getElementById('iw-scene');
+  setTimeout(() => {
+    const fire = document.createElement('div');
+    fire.style.cssText = 'position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-size:28px;animation:iwRocketUp 1.6s cubic-bezier(.4,0,.2,1) forwards;opacity:0.7';
+    fire.textContent = '🔥';
+    scene.appendChild(fire);
+  }, 100);
+}
+
+function animOcean() {
+  const m = document.getElementById('iw-main');
+  const l = document.getElementById('iw-lbl');
+  if (m) { m.style.animation = 'iwSink 1.8s ease-in forwards'; }
+  if (l) { l.style.animation = 'iwSinkLabel 1.8s ease-in forwards'; }
+  // Rising wave overlay
+  const scene = document.getElementById('iw-scene');
+  const wave = document.createElement('div');
+  wave.style.cssText = `position:absolute;bottom:0;left:0;right:0;height:100%;
+    background:linear-gradient(180deg,rgba(20,80,160,0) 0%,rgba(10,50,120,0.85) 40%,rgba(5,30,80,0.95) 100%);
+    animation:iwWaveRise 2s ease-out forwards;transform:translateY(100%);border-radius:0 0 16px 16px;`;
+  scene.appendChild(wave);
+}
+
+function animFireworks() {
+  const m = document.getElementById('iw-main');
+  const l = document.getElementById('iw-lbl');
+  if (m) { m.style.animation = 'iwFireworkUp 0.8s ease-in forwards'; }
+  if (l) { l.style.transition = 'opacity 0.3s'; l.style.opacity = '0'; }
+  const scene = document.getElementById('iw-scene');
+  // Burst after projectile reaches top
+  setTimeout(() => {
+    const colors = ['🔴','🟡','🔵','🟢','🟠','🟣','⚪','🔶'];
+    const cx = scene.clientWidth / 2;
+    const cy = 70;
+    for (let i = 0; i < 12; i++) {
+      const spark = document.createElement('div');
+      const deg = (i / 12) * 360;
+      const rad = deg * Math.PI / 180;
+      const dist = 70 + Math.random() * 50;
+      const tx = (Math.cos(rad) * dist) + 'px';
+      const ty = (Math.sin(rad) * dist) + 'px';
+      spark.style.cssText = `position:absolute;left:${cx}px;top:${cy}px;font-size:18px;
+        --tx:calc(${tx} - 9px);--ty:calc(${ty} - 9px);
+        animation:iwSpark 1s ease-out forwards;`;
+      spark.textContent = colors[i % colors.length];
+      scene.appendChild(spark);
+    }
+    // Text flash
+    const flash = document.createElement('div');
+    flash.style.cssText = 'position:absolute;left:50%;top:40px;transform:translateX(-50%);font-size:20px;font-weight:800;color:#FFD700;text-shadow:0 0 10px #FFD700;animation:iwStarFade 1.5s ease 0.5s forwards;white-space:nowrap';
+    flash.textContent = '🎆 ドーン！';
+    scene.appendChild(flash);
+  }, 850);
+}
+
+// ═══════════════════════════════════════
+// Work 5: SCORE
+// ═══════════════════════════════════════
+const scoreOrder = ['S','C','O','R','E'];
+let currentScore = 'S';
+
+function switchScore(key) {
+  scoreOrder.forEach(k => {
+    document.getElementById(`spanel-${k}`).className = 'score-panel';
+    const tab = document.getElementById(`stab-${k}`);
+    if (!tab.classList.contains('done')) tab.className = 'score-tab';
+  });
+  document.getElementById(`spanel-${key}`).className = 'score-panel active';
+  document.getElementById(`stab-${key}`).classList.add('active');
+  currentScore = key;
+}
+
+function nextScore(next) {
+  document.getElementById(`stab-${currentScore}`).className = 'score-tab done';
+  const pct = (scoreOrder.indexOf(next)+1) / scoreOrder.length * 100;
+  document.getElementById('score-progress').style.width = `${pct}%`;
+  switchScore(next);
+}
+
+function completeSCORE() {
+  const data = loadData();
+  data.scoreCompletes = (data.scoreCompletes || 0) + 1;
+  saveData(data);
+
+  scoreOrder.forEach(k => document.getElementById(`stab-${k}`).className = 'score-tab done');
+  document.getElementById('score-progress').style.width = '100%';
+
+  // Build summary
+  const labels = {S:'📍 状況',C:'🔍 原因',O:'🎯 目標',R:'💪 リソース',E:'✨ 効果'};
+  let html = '';
+  scoreOrder.forEach(k => {
+    const val = document.getElementById(`score-${k}`).value.trim();
+    if (val) html += `<div style="margin-bottom:14px"><div style="font-size:12px;font-weight:700;color:var(--primary);margin-bottom:4px">${labels[k]}</div><div style="font-size:14px;line-height:1.7;background:var(--surface2);padding:12px;border-radius:8px">${val}</div></div>`;
+  });
+  document.getElementById('score-summary-content').innerHTML = html;
+  document.getElementById('score-summary').style.display = '';
+  document.getElementById('score-summary').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ═══════════════════════════════════════
+// After Scale & Baby Steps
+// ═══════════════════════════════════════
+function goToAfterScale() {
+  // Reset after gauge
+  const fill = document.getElementById('after-gauge-fill');
+  fill.style.height = '0%';
+  document.getElementById('after-val-num').textContent = '—';
+  document.getElementById('after-val-name').textContent = 'ドラッグで設定';
+  state.afterScore = null;
+  document.getElementById('change-card').style.display = 'none';
+  document.getElementById('babystep-box').style.display = '';
+  showBabySteps();
+  showScreen('screen-afterscale');
+}
+
+function showChangeResult() {
+  if (state.afterScore === null) return;
+  const before = state.beforeScore ?? '—';
+  const after  = state.afterScore;
+  const diff   = state.beforeScore !== null ? state.beforeScore - after : null;
+  document.getElementById('display-before').textContent = before;
+  document.getElementById('display-after').textContent = after;
+  document.getElementById('change-card').style.display = '';
+
+  let msg = '波の変化を感じましたか？';
+  if (diff !== null) {
+    if (diff >= 4) msg = '素晴らしい！波がぐっと静まりましたね ✨';
+    else if (diff >= 2) msg = '凪に近づいています 🌿';
+    else if (diff >= 1) msg = '少しさざ波になりましたね。小さな変化も大切です 🌱';
+    else if (diff === 0) msg = '今日は現状維持でもOK。ここに来たこと自体、一歩です。';
+    else msg = '今日は特に荒れた日だったんですね。それでも来てくれてありがとう。';
+  }
+  document.getElementById('change-text').textContent = msg;
+}
+
+const babyStepsByMenu = {
+  1: ['今日の最優先タスクを1つだけ紙に書く', '5分だけ散歩に出てみる', '冷たい水を一杯飲む', '今日やらないことを決める'],
+  2: ['書き出したことを一度だけ読み返す', '今日の「やること」を3つだけ絞る', '信頼できる人に一言話す', '10分間、何もしない時間を作る'],
+  3: ['今日の気分を5段階で日記に書く', '嫌なイメージを思い出して、また「薄く」してみる', '好きな音楽を一曲聴く', '深呼吸を3回やってみる'],
+  4: ['軽くなった感覚をメモに残す', '今日の「できたこと」を1つ書く', '明日の最小タスクを1つ決める', '好きな香りを嗅ぐ'],
+  5: ['SCOREのOをもう一度読み返す', 'Rで書いたリソースを使える人に連絡する', '最小の次の行動を30分以内に実行する', '今日の整理を誰かに話す'],
+};
+
+function showBabySteps() {
+  const steps = babyStepsByMenu[state.currentMenu] || babyStepsByMenu[1];
+  const box = document.getElementById('babystep-box');
+  const opts = document.getElementById('babystep-options');
+  opts.innerHTML = '';
+  // shuffle and pick 3 random suggestions
+  const shuffled = [...steps].sort(() => Math.random() - 0.5).slice(0, 3);
+  shuffled.forEach(s => {
+    const btn = document.createElement('button');
+    btn.className = 'babystep-opt';
+    btn.textContent = '✦ ' + s;
+    btn.onclick = () => {
+      document.querySelectorAll('.babystep-opt').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      state.selectedBabyStep = s;
+      document.getElementById('babystep-custom').value = '';
+    };
+    opts.appendChild(btn);
+  });
+  box.style.display = '';
+  document.getElementById('babystep-custom').value = '';
+  state.selectedBabyStep = null;
+}
+
+function clearBabyStepSelection() {
+  document.querySelectorAll('.babystep-opt').forEach(b => b.classList.remove('selected'));
+  state.selectedBabyStep = null;
+}
+
+function onCustomBabyStep(val) {
+  state.selectedBabyStep = val.trim() || null;
+  if (val.trim()) {
+    document.querySelectorAll('.babystep-opt').forEach(b => b.classList.remove('selected'));
+  }
+}
+
+// ═══════════════════════════════════════
+// Complete Session
+// ═══════════════════════════════════════
+function completeSession() {
+  const data = loadData();
+  data.totalClears = (data.totalClears || 0) + 1;
+  const xpEarned = calcXP();
+  data.totalXp = (data.totalXp || 0) + xpEarned;
+  const drop = (state.beforeScore !== null && state.afterScore !== null) ? state.beforeScore - state.afterScore : null;
+  data.sessions = data.sessions || [];
+  data.sessions.push({
+    ts: Date.now(),
+    menu: state.currentMenu,
+    before: state.beforeScore,
+    after: state.afterScore,
+    drop,
+    xp: xpEarned,
+    babyStep: state.selectedBabyStep,
+  });
+  saveData(data);
+
+  setupExitScreen(data, xpEarned);
+  showScreen('screen-exit');
+  updateHeader();
+  triggerConfetti();
+}
+
+function calcXP() {
+  let xp = 30;
+  if (state.beforeScore !== null && state.afterScore !== null) {
+    const drop = state.beforeScore - state.afterScore;
+    if (drop >= 4) xp += 30;
+    else if (drop >= 2) xp += 15;
+    else if (drop >= 1) xp += 5;
+  }
+  if (state.currentMenu === 5) xp += 20;
+  if (state.selectedBabyStep) xp += 10;
+  return xp;
+}
+
+function setupExitScreen(data, xpEarned) {
+  const drop = (state.beforeScore !== null && state.afterScore !== null) ? state.beforeScore - state.afterScore : null;
+  let icon = '🌊', title = '脳のメモリ解放！', msg = 'おめでとうございます！\n頭の中の荷物を置いて、少し軽くなりましたね。\nまたいつでも荷物を置きにきてください。';
+  if (drop !== null) {
+    if (drop >= 5) { icon = '🏆'; title = 'パーフェクトリセット！'; }
+    else if (drop >= 3) { icon = '🌟'; title = 'ナイスリセット！'; }
+    else if (drop <= -1) { icon = '🤝'; title = 'ここに来てくれてありがとう'; msg = '今日は特に荒れた日。\nここに来てケアしようとした、それだけで十分です。\n明日また来てください。'; }
+  }
+
+  document.getElementById('badge-icon').textContent = icon;
+  document.getElementById('badge-title').textContent = title;
+  document.getElementById('badge-xp').textContent = `+${xpEarned} XP 獲得`;
+  document.getElementById('exit-message').innerHTML = msg.replace(/\n/g, '<br>');
+
+  document.getElementById('stat-total').textContent = data.totalClears;
+  document.getElementById('stat-xp').textContent = data.totalXp;
+
+  const drops = data.sessions.filter(s => s.drop > 0).map(s => s.drop);
+  const avg = drops.length ? Math.round(drops.reduce((a,b) => a+b, 0) / drops.length * 10) / 10 : null;
+  document.getElementById('stat-avg-drop').textContent = avg !== null ? `-${avg}` : '—';
+
+  // Show event invite?
+  const shouldInvite = data.totalClears >= 3 || (data.scoreCompletes >= 1);
+  document.getElementById('event-invite').style.display = shouldInvite ? '' : 'none';
+}
+
+function startNewSession() {
+  state = { beforeScore: null, afterScore: null, currentMenu: null, selectedBabyStep: null };
+  document.getElementById('before-gauge-fill').style.height = '0%';
+  document.getElementById('before-val-num').textContent = '—';
+  document.getElementById('before-val-name').textContent = 'ドラッグで設定';
+  document.getElementById('checkin-next').disabled = true;
+  loadRecentHistory();
+  showScreen('screen-checkin');
+}
+
+function showHistory() {
+  const data = loadData();
+  const container = document.getElementById('history-cards');
+  container.innerHTML = '';
+  if (!data.sessions || data.sessions.length === 0) {
+    container.innerHTML = '<div class="card"><p style="text-align:center;color:var(--text-muted)">まだ記録がありません</p></div>';
+  } else {
+    data.sessions.slice().reverse().forEach(s => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      const date = new Date(s.ts).toLocaleString('ja-JP', {month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+      const drop = s.before - s.after;
+      card.innerHTML = `
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:13px;color:var(--text-muted)">${date}</div>
+          <div class="tag tag-teal">${menuName(s.menu)}</div>
+        </div>
+        <div class="change-indicator" style="padding:12px">
+          <div style="text-align:center"><div class="text-muted" style="font-size:11px">前</div><div style="font-size:22px;font-weight:700;color:var(--danger)">${s.before}</div></div>
+          <div style="font-size:16px;color:var(--text-muted)">→</div>
+          <div style="text-align:center"><div class="text-muted" style="font-size:11px">後</div><div style="font-size:22px;font-weight:700;color:var(--success)">${s.after}</div></div>
+          <div style="margin-left:auto;text-align:center"><div class="text-muted" style="font-size:11px">変化</div><div style="font-size:22px;font-weight:700;color:${drop>0?'var(--success)':'var(--danger)'}">${drop>0?'↓'+drop:drop===0?'±0':'↑'+Math.abs(drop)}</div></div>
+        </div>
+        ${s.babyStep ? `<div style="margin-top:10px;font-size:13px;color:var(--text-muted)">次の一歩: ${s.babyStep}</div>` : ''}
+        <div style="margin-top:8px;font-size:12px;color:var(--accent)">+${s.xp} XP</div>
+      `;
+      container.appendChild(card);
+    });
+  }
+  showScreen('screen-history');
+}
+
+function trackEventClick() {
+  // Placeholder for analytics or redirect
+  alert('オンラインイベントのリンクをここに設定してください。');
+}
+
+// ═══════════════════════════════════════
+// Confetti
+// ═══════════════════════════════════════
+function triggerConfetti() {
+  const container = document.getElementById('confetti');
+  const colors = ['#5B8FA8','#E8A87C','#7BAE7F','#C97B7B','#F5D76E','#A8D8EA'];
+  for (let i = 0; i < 60; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.cssText = `
+      left: ${Math.random()*100}%;
+      background: ${colors[Math.floor(Math.random()*colors.length)]};
+      width: ${Math.random()*8+5}px;
+      height: ${Math.random()*8+5}px;
+      border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+      animation-duration: ${Math.random()*2+2}s;
+      animation-delay: ${Math.random()*0.5}s;
+      animation-name: confettiFall;
+      animation-fill-mode: forwards;
+    `;
+    container.appendChild(piece);
+    setTimeout(() => piece.remove(), 4000);
+  }
+}
+</script>
+</body>
+</html>
