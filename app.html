@@ -303,7 +303,7 @@
   .iw-type-btn .iw-name { font-size: 10px; font-weight: 600; color: var(--text-muted); text-align: center; line-height: 1.3; }
 
   .iw-scene {
-    position: relative; height: 260px; border-radius: var(--radius);
+    position: relative;
     overflow: hidden; cursor: pointer; transition: background 0.5s;
   }
   .iw-main-el {
@@ -832,12 +832,10 @@
     </div>
   </div>
 
-  <div class="card" id="w4-scene" style="display:none">
-    <div class="card-title" id="w4-scene-title">タップして手放す</div>
-    <div class="iw-scene" id="iw-scene" onclick="releaseIw()"></div>
-    <p style="margin-top:12px;text-align:center;font-size:13px;color:var(--text-muted)" id="w4-scene-hint">
-      タップすると手放せます
-    </p>
+  <div id="w4-scene" style="display:none;width:100%;position:relative">
+    <div id="iw-scene" onclick="releaseIw()" style="width:100%;min-height:75vh;border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:background 0.5s;position:relative"></div>
+    <div style="text-align:center;padding:10px 0 4px;font-size:13px;color:var(--text-muted)" id="w4-scene-hint">タップすると手放せます</div>
+    <div style="text-align:center;font-size:14px;font-weight:600;color:var(--primary);padding-bottom:4px" id="w4-scene-title"></div>
   </div>
 
   <div class="card" id="w4-done" style="display:none">
@@ -2006,7 +2004,7 @@ function startNewSession() {
   document.getElementById('before-val-name').textContent = 'ドラッグで設定';
   document.getElementById('checkin-next').disabled = true;
   loadRecentHistory();
-  showScreen('screen-checkin');
+  showScreen('screen-menu');
 }
 
 function deleteSession(ts) {
