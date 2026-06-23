@@ -307,7 +307,7 @@
     overflow: hidden; cursor: pointer; transition: background 0.5s;
   }
   .iw-main-el {
-    position: absolute; font-size: 60px; left: 50%; bottom: 24px;
+    position: absolute; font-size: 90px; left: 50%; bottom: 24px;
     transform: translateX(-50%);
     transition: none;
   }
@@ -518,6 +518,7 @@
   <button class="btn btn-primary" id="checkin-next">
     メニューを選ぶ →
   </button>
+  <button class="btn btn-ghost" onclick="showScreen('screen-top')">← トップへ戻る</button>
 </section>
 
 <!-- ══════════════════════════════════════
@@ -687,21 +688,70 @@
 ════════════════════════════════════════ -->
 <section id="screen-work-3" class="screen">
   <div class="card">
-    <div class="card-title">🎨 五感チューニング (SMDs)</div>
-    <h2>嫌なイメージの<br>「見え方」を調整する</h2>
-    <p>頭の中にある不快なシーンや感覚を、スライダーで変化させます。</p>
+    <div class="card-title">🎨 五感チューニング</div>
+    <h2>嫌なイメージの<br>インパクトを弱める</h2>
+    <p>頭の中の不快なシーンを確認し、感覚を調整していきます。</p>
   </div>
 
+  <!-- Step 1: テーマ特定 -->
   <div class="card" id="w3-input-card">
     <div class="card-title">ステップ 1 — イメージを特定する</div>
-    <p class="score-hint">今、頭に浮かぶ「重くなる場面やプレッシャー」を簡単に書いてください。</p>
+    <p class="score-hint">今、頭に浮かぶ「重くなる場面やプレッシャー」を書いてください。</p>
     <textarea class="smd-image-desc" id="smd-desc" rows="3" placeholder="例：明日の会議で詰められる場面、締め切りに間に合わない不安…"></textarea>
-    <button class="btn btn-primary" style="margin-top:14px" onclick="showSmdSliders()">イメージを調整する →</button>
+    <button class="btn btn-primary" style="margin-top:14px" onclick="showSmdCheck()">現状を確認する →</button>
   </div>
 
+  <!-- Step 1b: 現状のサブモダリティを確認 -->
+  <div class="card" id="w3-check-card" style="display:none">
+    <div class="card-title">ステップ 1 — 今の感覚を確認する</div>
+    <p class="score-hint" style="margin-bottom:16px">そのイメージが今どう見えているか、感じているかを確認してください。</p>
+
+    <div class="slider-group">
+      <div class="slider-item">
+        <label>🔆 明るさ・鮮明さ <span id="chk-brightness">5</span></label>
+        <input type="range" min="1" max="10" value="5" step="1" id="chk-sld-brightness" oninput="updateChkDisplay()">
+        <div class="slider-ends"><span>薄い・モノクロ</span><span>鮮明・リアル</span></div>
+      </div>
+      <div class="slider-item">
+        <label>📐 サイズ <span id="chk-size">5</span></label>
+        <input type="range" min="1" max="10" value="5" step="1" id="chk-sld-size" oninput="updateChkDisplay()">
+        <div class="slider-ends"><span>小さい</span><span>大きい</span></div>
+      </div>
+      <div class="slider-item">
+        <label>📏 距離 <span id="chk-distance">5</span></label>
+        <input type="range" min="1" max="10" value="5" step="1" id="chk-sld-distance" oninput="updateChkDisplay()">
+        <div class="slider-ends"><span>遠い</span><span>すぐ目の前</span></div>
+      </div>
+      <div class="slider-item">
+        <label>🔉 音・声の大きさ <span id="chk-volume">5</span></label>
+        <input type="range" min="1" max="10" value="5" step="1" id="chk-sld-volume" oninput="updateChkDisplay()">
+        <div class="slider-ends"><span>ほぼ無音</span><span>大きく響く</span></div>
+      </div>
+      <div class="slider-item">
+        <label>📍 位置（視野の中） <span id="chk-position">5</span></label>
+        <input type="range" min="1" max="10" value="5" step="1" id="chk-sld-position" oninput="updateChkDisplay()">
+        <div class="slider-ends"><span>端・周辺</span><span>正面・中央</span></div>
+      </div>
+      <div class="slider-item">
+        <label>💓 身体の緊張感 <span id="chk-tension">5</span></label>
+        <input type="range" min="1" max="10" value="5" step="1" id="chk-sld-tension" oninput="updateChkDisplay()">
+        <div class="slider-ends"><span>ゆるい</span><span>強く締まる</span></div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;padding:14px;background:var(--surface2);border-radius:var(--radius-sm);text-align:center">
+      <div style="font-size:12px;color:var(--text-muted)">現在のインパクト</div>
+      <div style="font-size:26px;font-weight:700;color:var(--danger)" id="chk-score-display">—</div>
+    </div>
+
+    <button class="btn btn-primary" style="margin-top:16px" onclick="showSmdSliders()">調整に進む →</button>
+    <button class="btn btn-ghost" style="margin-top:8px" onclick="backToInput()">← 書き直す</button>
+  </div>
+
+  <!-- Step 2: 調整 -->
   <div class="card" id="w3-sliders" style="display:none">
-    <div class="card-title">ステップ 2 — スライダーで変える</div>
-    <p class="score-hint" style="margin-bottom:16px">各スライダーを動かして、嫌なイメージを「小さく・薄く・遠く」していきましょう。</p>
+    <div class="card-title">ステップ 2 — インパクトを弱める</div>
+    <p class="score-hint" style="margin-bottom:16px">各スライダーを動かして、イメージを「小さく・薄く・遠く」していきましょう。</p>
 
     <div class="smd-preview">
       <div class="smd-blob" id="smd-blob"></div>
@@ -709,35 +759,44 @@
 
     <div class="slider-group" style="margin-top:20px">
       <div class="slider-item">
-        <label>🔆 明るさ・鮮明さ <span id="val-brightness">50</span>%</label>
-        <input type="range" min="0" max="100" value="50" id="sld-brightness" oninput="updateSmdPreview()">
-        <div class="slider-ends"><span>薄い・モノクロ</span><span>鮮明・リアル</span></div>
+        <label>🔆 明るさ・鮮明さ <span id="val-brightness">5</span></label>
+        <input type="range" min="1" max="10" value="5" step="1" id="sld-brightness" oninput="updateSmdPreview()">
+        <div class="slider-ends"><span>薄く・モノクロに</span><span>鮮明なまま</span></div>
       </div>
       <div class="slider-item">
-        <label>📐 サイズ <span id="val-size">50</span>%</label>
-        <input type="range" min="0" max="100" value="50" id="sld-size" oninput="updateSmdPreview()">
-        <div class="slider-ends"><span>豆粒ほど小さく</span><span>大きくリアル</span></div>
+        <label>📐 サイズ <span id="val-size">5</span></label>
+        <input type="range" min="1" max="10" value="5" step="1" id="sld-size" oninput="updateSmdPreview()">
+        <div class="slider-ends"><span>豆粒ほど小さく</span><span>大きいまま</span></div>
       </div>
       <div class="slider-item">
-        <label>📏 距離 <span id="val-distance">50</span>%</label>
-        <input type="range" min="0" max="100" value="50" id="sld-distance" oninput="updateSmdPreview()">
-        <div class="slider-ends"><span>遠くへ押しやる</span><span>すぐ目の前</span></div>
+        <label>📏 距離 <span id="val-distance">5</span></label>
+        <input type="range" min="1" max="10" value="5" step="1" id="sld-distance" oninput="updateSmdPreview()">
+        <div class="slider-ends"><span>遠くへ押しやる</span><span>目の前のまま</span></div>
       </div>
       <div class="slider-item">
-        <label>🔉 音量 <span id="val-volume">50</span>%</label>
-        <input type="range" min="0" max="100" value="50" id="sld-volume" oninput="updateSmdPreview()">
-        <div class="slider-ends"><span>聞こえない・無音</span><span>大きく響く</span></div>
+        <label>🔉 音・声の大きさ <span id="val-volume">5</span></label>
+        <input type="range" min="1" max="10" value="5" step="1" id="sld-volume" oninput="updateSmdPreview()">
+        <div class="slider-ends"><span>無音に</span><span>大きいまま</span></div>
+      </div>
+      <div class="slider-item">
+        <label>📍 位置（視野の中） <span id="val-position">5</span></label>
+        <input type="range" min="1" max="10" value="5" step="1" id="sld-position" oninput="updateSmdPreview()">
+        <div class="slider-ends"><span>端に追いやる</span><span>正面のまま</span></div>
+      </div>
+      <div class="slider-item">
+        <label>💓 身体の緊張感 <span id="val-tension">5</span></label>
+        <input type="range" min="1" max="10" value="5" step="1" id="sld-tension" oninput="updateSmdPreview()">
+        <div class="slider-ends"><span>ゆるめる</span><span>緊張したまま</span></div>
       </div>
     </div>
 
     <div style="margin-top:20px;padding:16px;background:var(--surface2);border-radius:var(--radius-sm);text-align:center">
-      <div style="font-size:13px;color:var(--text-muted)">不快感スコア(推定)</div>
-      <div style="font-size:28px;font-weight:700;color:var(--primary)" id="smd-score-display">—</div>
+      <div style="font-size:12px;color:var(--text-muted)">インパクト（調整後）</div>
+      <div style="font-size:26px;font-weight:700;color:var(--primary)" id="smd-score-display">—</div>
     </div>
 
-    <button class="btn btn-primary" style="margin-top:16px" onclick="goToAfterScale()">
-      変化を確認する →
-    </button>
+    <button class="btn btn-primary" style="margin-top:16px" onclick="goToAfterScale()">変化を確認する →</button>
+    <button class="btn btn-ghost" style="margin-top:8px" onclick="backToCheck()">← 現状確認に戻る</button>
   </div>
 
   <button class="btn btn-ghost" onclick="showScreen('screen-menu')">← メニューに戻る</button>
@@ -749,7 +808,7 @@
 <section id="screen-work-4" class="screen">
   <div class="card">
     <div class="card-title">✨ イメージワーク</div>
-    <h2>重たいものを<br>手放してしまおう</h2>
+    <h2>手放せるものは<br>手放してしまおう</h2>
     <p>プレッシャーや不安を、好きな方法で飛ばしましょう。</p>
   </div>
 
@@ -917,6 +976,7 @@
   <button class="btn btn-accent" id="after-complete-btn" onclick="completeSession()">
     セッション完了 ✓
   </button>
+  <button class="btn btn-ghost" onclick="showScreen('screen-menu')">← メニューに戻る</button>
 </section>
 
 <!-- ══════════════════════════════════════
@@ -1206,13 +1266,15 @@ function resetWork(n) {
   }
   if (n === 3) {
     document.getElementById('w3-input-card').style.display = '';
+    document.getElementById('w3-check-card').style.display = 'none';
     document.getElementById('w3-sliders').style.display = 'none';
     document.getElementById('smd-desc').value = '';
-    ['brightness','size','distance','volume'].forEach(k => {
-      document.getElementById(`sld-${k}`).value = 50;
-      document.getElementById(`val-${k}`).textContent = 50;
+    ['brightness','size','distance','volume','position','tension'].forEach(k => {
+      const chk = document.getElementById(`chk-sld-${k}`);
+      const sld = document.getElementById(`sld-${k}`);
+      if (chk) chk.value = 5;
+      if (sld) sld.value = 5;
     });
-    updateSmdPreview();
   }
   if (n === 4) {
     document.getElementById('w4-input-card').style.display = '';
@@ -1405,43 +1467,72 @@ function throwAway() {
 // ═══════════════════════════════════════
 // Work 3: SMD Sliders
 // ═══════════════════════════════════════
-function showSmdSliders() {
+function showSmdCheck() {
   document.getElementById('w3-input-card').style.display = 'none';
+  document.getElementById('w3-check-card').style.display = '';
+  updateChkDisplay();
+}
+
+function backToInput() {
+  document.getElementById('w3-check-card').style.display = 'none';
+  document.getElementById('w3-input-card').style.display = '';
+}
+
+function backToCheck() {
+  document.getElementById('w3-sliders').style.display = 'none';
+  document.getElementById('w3-check-card').style.display = '';
+}
+
+function updateChkDisplay() {
+  ['brightness','size','distance','volume','position','tension'].forEach(k => {
+    const el = document.getElementById(`chk-sld-${k}`);
+    document.getElementById(`chk-${k}`).textContent = el.value;
+    el.style.setProperty('--pct', `${(el.value - 1) / 9 * 100}%`);
+  });
+  const vals = ['brightness','size','distance','volume','position','tension'].map(k =>
+    parseInt(document.getElementById(`chk-sld-${k}`).value));
+  const score = Math.round(vals.reduce((a,b) => a+b, 0) / vals.length * 10) / 10;
+  const scoreEl = document.getElementById('chk-score-display');
+  scoreEl.textContent = score.toFixed(1);
+  scoreEl.style.color = score >= 6 ? 'var(--danger)' : score >= 4 ? 'var(--accent)' : 'var(--success)';
+}
+
+function showSmdSliders() {
+  // Copy check values as starting point for adjustment
+  ['brightness','size','distance','volume','position','tension'].forEach(k => {
+    const chkVal = document.getElementById(`chk-sld-${k}`).value;
+    document.getElementById(`sld-${k}`).value = chkVal;
+  });
+  document.getElementById('w3-check-card').style.display = 'none';
   document.getElementById('w3-sliders').style.display = '';
   updateSmdPreview();
 }
 
 function updateSmdPreview() {
+  ['brightness','size','distance','volume','position','tension'].forEach(k => {
+    const el = document.getElementById(`sld-${k}`);
+    document.getElementById(`val-${k}`).textContent = el.value;
+    el.style.setProperty('--pct', `${(el.value - 1) / 9 * 100}%`);
+  });
+
   const b = parseInt(document.getElementById('sld-brightness').value);
   const s = parseInt(document.getElementById('sld-size').value);
   const d = parseInt(document.getElementById('sld-distance').value);
-  const v = parseInt(document.getElementById('sld-volume').value);
-  document.getElementById('val-brightness').textContent = b;
-  document.getElementById('val-size').textContent = s;
-  document.getElementById('val-distance').textContent = d;
-  document.getElementById('val-volume').textContent = v;
 
-  // Update range track fill
-  ['brightness','size','distance','volume'].forEach(k => {
-    const el = document.getElementById(`sld-${k}`);
-    el.style.setProperty('--pct', `${el.value}%`);
-  });
-
-  // Blob preview
+  // Blob preview (scale 1-10)
   const blob = document.getElementById('smd-blob');
-  const size = Math.max(20, s * 0.8);
-  const opacity = b / 100 * 0.8;
-  const grayness = Math.round(255 * (1 - b/100) + 180 * (b/100));
-  blob.style.width = `${size}px`;
-  blob.style.height = `${size}px`;
-  blob.style.opacity = opacity;
-  blob.style.filter = `blur(${(100-b)/25}px) grayscale(${100-b}%)`;
-  blob.style.transform = `scale(${1 - d/200})`;
+  blob.style.width = `${s * 8}px`;
+  blob.style.height = `${s * 8}px`;
+  blob.style.opacity = (b / 10 * 0.8).toFixed(2);
+  blob.style.filter = `blur(${(10-b)/3}px) grayscale(${(10-b)*10}%)`;
+  blob.style.transform = `scale(${1 - (d-1)/18})`;
 
-  const score = Math.round((b + s + d + v) / 4);
+  const vals = ['brightness','size','distance','volume','position','tension'].map(k =>
+    parseInt(document.getElementById(`sld-${k}`).value));
+  const score = Math.round(vals.reduce((a,b) => a+b, 0) / vals.length * 10) / 10;
   const scoreEl = document.getElementById('smd-score-display');
-  scoreEl.textContent = `${score}%`;
-  scoreEl.style.color = score > 50 ? 'var(--danger)' : 'var(--success)';
+  scoreEl.textContent = score.toFixed(1);
+  scoreEl.style.color = score >= 6 ? 'var(--danger)' : score >= 4 ? 'var(--accent)' : 'var(--success)';
 }
 
 // ═══════════════════════════════════════
@@ -1461,8 +1552,6 @@ const IW_CONFIG = {
 };
 
 function showIwTypeSelect() {
-  const content = document.getElementById('iw-content').value.trim();
-  if (!content) { document.getElementById('iw-content').focus(); return; }
   document.getElementById('w4-input-card').style.display = 'none';
   document.getElementById('w4-type-card').style.display = '';
 }
@@ -1498,7 +1587,7 @@ function buildIwScene(type, label) {
     return `<div style="position:absolute;bottom:0;left:0;right:0;height:80px;background:rgba(40,120,160,0.5);border-radius:0 0 16px 16px"></div>
             <div style="position:absolute;bottom:60px;left:10%;font-size:12px;color:rgba(255,255,255,0.5)">〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜</div>
             <div style="position:absolute;bottom:40px;left:5%;font-size:12px;color:rgba(255,255,255,0.4)">〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜</div>
-            <div class="iw-main-el" id="iw-main" style="bottom:70px;font-size:42px">🍃</div>
+            <div class="iw-main-el" id="iw-main" style="bottom:70px;font-size:63px">🍃</div>
             ${lbl.replace('bottom:94px','bottom:116px')}`;
   }
   if (type === 'homerun') {
@@ -1506,12 +1595,12 @@ function buildIwScene(type, label) {
             <div style="position:absolute;top:20px;right:20px;font-size:20px;opacity:0.4">✨</div>
             <div style="position:absolute;top:50px;left:30px;font-size:14px;opacity:0.3">⭐</div>
             <div style="position:absolute;top:30px;left:50%;font-size:12px;opacity:0.3">✦</div>
-            <div class="iw-main-el" id="iw-main" style="left:20%;font-size:44px">⚾</div>
+            <div class="iw-main-el" id="iw-main" style="left:20%;font-size:66px">⚾</div>
             ${lbl.replace('left:50%','left:20%').replace('translateX(-50%)','translateX(-50%)')}`;
   }
   if (type === 'blossom') {
     return `<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 50% 30%,rgba(255,200,220,0.8) 0%,transparent 70%)"></div>
-            <div class="iw-main-el" id="iw-main" style="font-size:48px">🌸</div>
+            <div class="iw-main-el" id="iw-main" style="font-size:72px">🌸</div>
             ${lbl}`;
   }
   if (type === 'rocket') {
@@ -1521,13 +1610,13 @@ function buildIwScene(type, label) {
               <div style="position:absolute;top:60px;left:40%;color:rgba(255,255,200,0.5);font-size:8px">★</div>
               <div style="position:absolute;top:80px;right:35%;color:rgba(255,255,200,0.3);font-size:12px">★</div>
             </div>
-            <div class="iw-main-el" id="iw-main" style="font-size:52px">🚀</div>
+            <div class="iw-main-el" id="iw-main" style="font-size:78px">🚀</div>
             ${lbl}`;
   }
   if (type === 'ocean') {
     return `<div style="position:absolute;bottom:0;left:0;right:0;height:100px;background:linear-gradient(180deg,rgba(20,80,160,0.7),rgba(10,40,100,0.9));border-radius:0 0 16px 16px"></div>
             <div style="position:absolute;bottom:90px;left:0;right:0;font-size:24px;text-align:center;opacity:0.7;letter-spacing:-4px">🌊🌊🌊🌊🌊</div>
-            <div class="iw-main-el" id="iw-main" style="bottom:110px;font-size:44px">⛵</div>
+            <div class="iw-main-el" id="iw-main" style="bottom:110px;font-size:66px">⛵</div>
             ${lbl.replace('bottom:94px','bottom:154px')}`;
   }
   if (type === 'fireworks') {
@@ -1536,7 +1625,7 @@ function buildIwScene(type, label) {
               <div style="position:absolute;top:45px;right:25%;color:rgba(200,150,255,0.4);font-size:8px">✦</div>
               <div style="position:absolute;top:15px;right:15%;color:rgba(100,220,255,0.4);font-size:10px">✦</div>
             </div>
-            <div class="iw-main-el" id="iw-main" style="font-size:32px">🔥</div>
+            <div class="iw-main-el" id="iw-main" style="font-size:48px">🔥</div>
             ${lbl}`;
   }
   return '';
@@ -1561,7 +1650,7 @@ function releaseIw() {
     document.getElementById('w4-done').style.display = '';
     document.getElementById('w4-done-msg').innerHTML =
       `${doneLines[0]}<br><span style="color:var(--text-muted);font-size:13px">${doneLines[1] || ''}</span>`;
-  }, 2200);
+  }, 3300);
 }
 
 function animEl(id, keyframe, dur, fill='forwards') {
@@ -1574,7 +1663,7 @@ function animBalloon() {
   const m = document.getElementById('iw-main');
   const s = document.getElementById('iw-string');
   const l = document.getElementById('iw-lbl');
-  [m, s, l].forEach(el => { if (el) { el.style.transition = 'bottom 1.6s ease-in, opacity 1.6s ease-in'; } });
+  [m, s, l].forEach(el => { if (el) { el.style.transition = 'bottom 2.4s ease-in, opacity 2.4s ease-in'; } });
   setTimeout(() => {
     if (m) { m.style.bottom = '340px'; m.style.opacity = '0'; }
     if (s) { s.style.bottom = '400px'; s.style.opacity = '0'; }
@@ -1587,7 +1676,7 @@ function animRiver() {
   const l = document.getElementById('iw-lbl');
   [m, l].forEach(el => {
     if (el) {
-      el.style.transition = 'transform 2s ease-in, opacity 2s ease-in';
+      el.style.transition = 'transform 3s ease-in, opacity 3s ease-in';
     }
   });
   setTimeout(() => {
@@ -1601,7 +1690,7 @@ function animHomerun() {
   if (!m) return;
   const scene = document.getElementById('iw-scene');
   const rect = scene.getBoundingClientRect();
-  const dur = 1400;
+  const dur = 2100;
   const startX = rect.width * 0.2;
   const startY = rect.height - 44;
   const endX = rect.width * 0.75;
@@ -1650,7 +1739,7 @@ function animBlossom() {
     const ty = (-Math.sin(rad) * dist) + 'px';
     p.style.cssText = `position:absolute;left:50%;top:50%;font-size:${24+Math.random()*16}px;
       --tx:${tx};--ty:${ty};
-      animation:iwBurstPetal ${900+i*80}ms ease-out ${i*60}ms forwards;
+      animation:iwBurstPetal ${1350+i*120}ms ease-out ${i*90}ms forwards;
       transform:translate(-50%,-50%);`;
     p.textContent = petals[i];
     scene.appendChild(p);
@@ -1662,13 +1751,13 @@ function animBlossom() {
 function animRocket() {
   const m = document.getElementById('iw-main');
   const l = document.getElementById('iw-lbl');
-  if (m) { m.style.animation = 'iwRocketUp 1.6s cubic-bezier(.4,0,.2,1) forwards'; }
-  if (l) { l.style.animation = 'iwRocketUp 1.6s cubic-bezier(.4,0,.2,1) forwards'; }
+  if (m) { m.style.animation = 'iwRocketUp 2.4s cubic-bezier(.4,0,.2,1) forwards'; }
+  if (l) { l.style.animation = 'iwRocketUp 2.4s cubic-bezier(.4,0,.2,1) forwards'; }
   // Fire trail
   const scene = document.getElementById('iw-scene');
   setTimeout(() => {
     const fire = document.createElement('div');
-    fire.style.cssText = 'position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-size:28px;animation:iwRocketUp 1.6s cubic-bezier(.4,0,.2,1) forwards;opacity:0.7';
+    fire.style.cssText = 'position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-size:42px;animation:iwRocketUp 2.4s cubic-bezier(.4,0,.2,1) forwards;opacity:0.7';
     fire.textContent = '🔥';
     scene.appendChild(fire);
   }, 100);
@@ -1677,21 +1766,21 @@ function animRocket() {
 function animOcean() {
   const m = document.getElementById('iw-main');
   const l = document.getElementById('iw-lbl');
-  if (m) { m.style.animation = 'iwSink 1.8s ease-in forwards'; }
-  if (l) { l.style.animation = 'iwSinkLabel 1.8s ease-in forwards'; }
+  if (m) { m.style.animation = 'iwSink 2.7s ease-in forwards'; }
+  if (l) { l.style.animation = 'iwSinkLabel 2.7s ease-in forwards'; }
   // Rising wave overlay
   const scene = document.getElementById('iw-scene');
   const wave = document.createElement('div');
   wave.style.cssText = `position:absolute;bottom:0;left:0;right:0;height:100%;
     background:linear-gradient(180deg,rgba(20,80,160,0) 0%,rgba(10,50,120,0.85) 40%,rgba(5,30,80,0.95) 100%);
-    animation:iwWaveRise 2s ease-out forwards;transform:translateY(100%);border-radius:0 0 16px 16px;`;
+    animation:iwWaveRise 3s ease-out forwards;transform:translateY(100%);border-radius:0 0 16px 16px;`;
   scene.appendChild(wave);
 }
 
 function animFireworks() {
   const m = document.getElementById('iw-main');
   const l = document.getElementById('iw-lbl');
-  if (m) { m.style.animation = 'iwFireworkUp 0.8s ease-in forwards'; }
+  if (m) { m.style.animation = 'iwFireworkUp 1.2s ease-in forwards'; }
   if (l) { l.style.transition = 'opacity 0.3s'; l.style.opacity = '0'; }
   const scene = document.getElementById('iw-scene');
   // Burst after projectile reaches top
@@ -1706,18 +1795,18 @@ function animFireworks() {
       const dist = 70 + Math.random() * 50;
       const tx = (Math.cos(rad) * dist) + 'px';
       const ty = (Math.sin(rad) * dist) + 'px';
-      spark.style.cssText = `position:absolute;left:${cx}px;top:${cy}px;font-size:18px;
+      spark.style.cssText = `position:absolute;left:${cx}px;top:${cy}px;font-size:27px;
         --tx:calc(${tx} - 9px);--ty:calc(${ty} - 9px);
-        animation:iwSpark 1s ease-out forwards;`;
+        animation:iwSpark 1.5s ease-out forwards;`;
       spark.textContent = colors[i % colors.length];
       scene.appendChild(spark);
     }
     // Text flash
     const flash = document.createElement('div');
-    flash.style.cssText = 'position:absolute;left:50%;top:40px;transform:translateX(-50%);font-size:20px;font-weight:800;color:#FFD700;text-shadow:0 0 10px #FFD700;animation:iwStarFade 1.5s ease 0.5s forwards;white-space:nowrap';
+    flash.style.cssText = 'position:absolute;left:50%;top:40px;transform:translateX(-50%);font-size:20px;font-weight:800;color:#FFD700;text-shadow:0 0 10px #FFD700;animation:iwStarFade 2.25s ease 0.5s forwards;white-space:nowrap';
     flash.textContent = '🎆 ドーン！';
     scene.appendChild(flash);
-  }, 850);
+  }, 1275);
 }
 
 // ═══════════════════════════════════════
@@ -2028,7 +2117,7 @@ function showHistory() {
           <div style="font-size:13px;color:var(--text-muted)">${date}</div>
           <div style="display:flex;align-items:center;gap:8px">
             <div class="tag tag-teal">${menuName(s.menu)}</div>
-            <button onclick="deleteSession(${s.ts})" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:16px;line-height:1;padding:2px 4px" title="削除">×</button>
+            <button onclick="deleteSession(${s.ts})" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:18px;line-height:1;padding:2px 4px" title="削除">🗑️</button>
           </div>
         </div>
         <div class="change-indicator" style="padding:12px">
