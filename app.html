@@ -1496,17 +1496,7 @@ function resetWork(n) {
     document.getElementById('iw-content').value = '';
     iwReleased = false;
   }
-  if (n === 5) {
-    ['S','C','O','R','E'].forEach(k => {
-      document.getElementById(`score-${k}`).value = '';
-      document.getElementById(`stab-${k}`).className = 'score-tab';
-      document.getElementById(`spanel-${k}`).className = 'score-panel';
-    });
-    document.getElementById('stab-S').className = 'score-tab active';
-    document.getElementById('spanel-S').className = 'score-panel active';
-    document.getElementById('score-progress').style.width = '20%';
-    document.getElementById('score-summary').style.display = 'none';
-  }
+  // n===5: w5Init() handles its own reset
 }
 
 // ═══════════════════════════════════════
