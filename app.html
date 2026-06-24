@@ -221,8 +221,10 @@
     width: 100%; min-height: 160px;
     border: 2px solid var(--border); border-radius: var(--radius-sm);
     padding: 16px; font-family: var(--font); font-size: 15px;
-    line-height: 1.8; resize: vertical; background: var(--surface);
-    color: var(--text); transition: border-color 0.2s;
+    line-height: 1.8; resize: none; overflow-y: hidden; overflow-x: hidden;
+    background: var(--surface); color: var(--text);
+    transition: border-color 0.2s; box-sizing: border-box;
+    -webkit-appearance: none;
   }
   .detox-textarea:focus { outline: none; border-color: var(--primary); }
   .detox-textarea.listening { border-color: var(--danger); background: #FFF8F8; }
@@ -566,7 +568,10 @@
     </div>
   </div>
 
-  <button class="btn btn-ghost" onclick="showScreen('screen-checkin')">← 戻る</button>
+  <div style="display:flex;gap:10px;align-items:center;justify-content:space-between">
+    <button class="btn btn-ghost" onclick="showScreen('screen-checkin')">← 戻る</button>
+    <button class="btn btn-ghost" style="font-size:13px" onclick="showHistory()">📊 あなたの記録</button>
+  </div>
 </section>
 
 <!-- ══════════════════════════════════════
@@ -647,7 +652,7 @@
 <section id="screen-work-2" class="screen">
   <div class="card">
     <div class="card-title">🗑️ 吐き出しデトックス</div>
-    <h2>頭の中のゴミを<br>全部出してしまおう</h2>
+    <h2>頭の中にあるものを<br>全部出してしまおう</h2>
     <p>評価なし・答えなし。ただ吐き出すだけでOKです。<br>音声入力でもテキストでも。</p>
   </div>
 
@@ -677,13 +682,19 @@
     </div>
   </div>
 
-  <div class="card trash-animation" id="trash-anim">
-    <div class="trash-icon">🗑️</div>
-    <div style="font-size:18px;font-weight:700;color:var(--success)">捨てました。</div>
-    <div style="font-size:14px;color:var(--text-muted);line-height:1.7">
-      頭の中から外に出した瞬間、<br>あなたはもうそれを「持ち歩いていない」のです。<br>少し軽くなりましたか？
-    </div>
-    <button class="btn btn-primary" style="margin-top:8px" onclick="goToAfterScale()">変化を確認する →</button>
+  <!-- Step 2: 視点切り替え -->
+  <div class="card" id="w2-perspective" style="display:none;text-align:center">
+    <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">視点を変えてみましょう</div>
+    <div id="w2-creature-icon" style="font-size:64px;margin:12px 0">🐋</div>
+    <div id="w2-creature-name" style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:12px">クジラ</div>
+    <div id="w2-creature-q" style="font-size:16px;font-weight:600;line-height:1.7;margin-bottom:20px">クジラがこれを見たら、どう思うでしょうか？</div>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">少しだけ眺めてみてください。答えは不要です。</p>
+    <button class="btn btn-primary" onclick="startCreatureAnim()">手放す →</button>
+  </div>
+
+  <!-- Step 3: 生き物アニメーション -->
+  <div id="w2-creature-scene" style="display:none;width:100%;min-height:55vw;position:relative;border-radius:var(--radius);overflow:hidden">
+    <canvas id="w2-canvas" style="position:absolute;top:0;left:0;width:100%;height:100%"></canvas>
   </div>
 
   <div class="flex-row" style="gap:8px">
@@ -842,7 +853,7 @@
     <div class="card-title">ステップ 3 — どうやって手放しますか？</div>
     <div class="iw-type-grid">
       <button class="iw-type-btn" onclick="startIwScene('balloon')"><span class="iw-icon">🎈</span><span class="iw-name">風船で<br>飛ばす</span></button>
-      <button class="iw-type-btn" onclick="startIwScene('river')"><span class="iw-icon">🚣</span><span class="iw-name">川に<br>流す</span></button>
+      <button class="iw-type-btn" onclick="startIwScene('river')"><span class="iw-icon">🌊</span><span class="iw-name">滝へ<br>ダイブ</span></button>
       <button class="iw-type-btn" onclick="startIwScene('homerun')"><span class="iw-icon">⚾</span><span class="iw-name">夜空へ<br>ホームラン</span></button>
       <button class="iw-type-btn" onclick="startIwScene('blossom')"><span class="iw-icon">🌸</span><span class="iw-name">花吹雪で<br>散らす</span></button>
       <button class="iw-type-btn" onclick="startIwScene('rocket')"><span class="iw-icon">🚀</span><span class="iw-name">シャトルで<br>宇宙へ</span></button>
@@ -1054,7 +1065,7 @@
   </div>
 
   <div class="flex-row">
-    <button class="btn btn-primary" onclick="startNewSession()">メニューへ →</button>
+    <button class="btn btn-primary" onclick="showScreen('screen-menu')">メニュー</button>
     <button class="btn btn-ghost" onclick="showHistory()">履歴を見る</button>
   </div>
 </section>
@@ -1111,21 +1122,17 @@
           <div style="width:12px;height:12px;border-radius:50%;background:#5B8FA8;flex-shrink:0"></div>
           <div>
             <div style="font-size:11px;color:var(--text-muted)">今月</div>
-            <div style="font-size:16px;font-weight:700"><span id="ring-month-num">0</span><span style="font-size:11px;color:var(--text-muted)">/30</span></div>
+            <div style="font-size:16px;font-weight:700"><span id="ring-month-num">0</span><span id="ring-month-goal-label" style="font-size:11px;color:var(--text-muted)">/30</span></div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="card" id="wave-graph-card" style="display:none">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <div class="card-title" style="margin:0">過去30日の心の波</div>
-      <div style="display:flex;gap:12px;font-size:11px;color:var(--text-muted)">
-        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:3px;background:var(--danger);border-radius:2px;display:inline-block"></span>前</span>
-        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:3px;background:var(--success);border-radius:2px;display:inline-block"></span>後</span>
-      </div>
+    <!-- Monthly streak dots -->
+    <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px">
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px">継続月数</div>
+      <div id="month-streak-row" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center"></div>
+      <div style="margin-top:8px;font-size:12px;color:var(--text-muted)"><span id="month-streak-count">0</span>ヶ月継続中</div>
     </div>
-    <canvas id="wave-chart" style="width:100%;height:160px"></canvas>
   </div>
   <div style="display:flex;justify-content:flex-end;padding:0 4px 4px">
     <button id="clear-all-btn" class="btn btn-ghost" style="font-size:12px;color:var(--danger);border-color:var(--danger);padding:6px 14px" onclick="clearAllHistory()">すべて削除</button>
@@ -1299,6 +1306,7 @@ function loadRecentHistory() {
   if (!d.sessions || d.sessions.length === 0) return;
   const card = document.getElementById('checkin-history');
   const list = document.getElementById('history-list');
+  if (!card || !list) return;
   card.style.display = '';
   list.innerHTML = '';
   const recent = d.sessions.slice(-3).reverse();
@@ -1341,10 +1349,13 @@ function resetWork(n) {
     breatheRound = 0; breatheRunning = false;
   }
   if (n === 2) {
-    document.getElementById('detox-text').value = '';
+    const detoxTa = document.getElementById('detox-text');
+    detoxTa.value = ''; detoxTa.style.height = '';
     document.getElementById('detox-count').textContent = '0文字';
     document.getElementById('throw-btn').disabled = true;
-    document.getElementById('trash-anim').classList.remove('show');
+    document.getElementById('w2-perspective').style.display = 'none';
+    document.getElementById('w2-creature-scene').style.display = 'none';
+    document.querySelector('#screen-work-2 .card:nth-child(2)').style.display = '';
     if (speechRunning) toggleVoice();
   }
   if (n === 3) {
@@ -1521,8 +1532,17 @@ const detoxArea = () => document.getElementById('detox-text');
 
 detoxArea()?.addEventListener?.('input', updateDetoxCount);
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('detox-text').addEventListener('input', updateDetoxCount);
+  const detoxEl = document.getElementById('detox-text');
+  detoxEl.addEventListener('input', updateDetoxCount);
+  detoxEl.addEventListener('input', autoGrowDetox);
 });
+
+function autoGrowDetox() {
+  const ta = document.getElementById('detox-text');
+  if (!ta) return;
+  ta.style.height = 'auto';
+  ta.style.height = ta.scrollHeight + 'px';
+}
 
 function updateDetoxCount() {
   const txt = document.getElementById('detox-text').value;
@@ -1575,13 +1595,159 @@ function toggleVoice() {
   recognition.start();
 }
 
+const W2_CREATURES = [
+  { icon: '🦭', name: 'マナティー', q: 'マナティーがこれを見たら、どう思うでしょうか？', color: '#7ABFA8', swimDir: 1 },
+  { icon: '🐠', name: 'チンアナゴ', q: 'チンアナゴがこれを見たら、どう思うでしょうか？', color: '#5B8FA8', swimDir: -1 },
+  { icon: '🐋', name: 'クジラ',     q: 'クジラがこれを見たら、どう思うでしょうか？',     color: '#3A6A8A', swimDir: 1 },
+];
+let w2Creature = null;
+
 function throwAway() {
   if (speechRunning) toggleVoice();
-  document.getElementById('detox-text').value = '';
-  updateDetoxCount();
-  const anim = document.getElementById('trash-anim');
-  anim.classList.add('show');
-  anim.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  // Clear text area
+  const ta = document.getElementById('detox-text');
+  ta.value = ''; updateDetoxCount(); autoGrowDetox();
+  // Hide input card, show perspective step
+  document.querySelector('#screen-work-2 .card:nth-child(2)').style.display = 'none';
+  w2Creature = W2_CREATURES[Math.floor(Math.random() * W2_CREATURES.length)];
+  document.getElementById('w2-creature-icon').textContent = w2Creature.icon;
+  document.getElementById('w2-creature-name').textContent = w2Creature.name;
+  document.getElementById('w2-creature-q').textContent = w2Creature.q;
+  const p = document.getElementById('w2-perspective');
+  p.style.display = '';
+  p.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function startCreatureAnim() {
+  document.getElementById('w2-perspective').style.display = 'none';
+  const scene = document.getElementById('w2-creature-scene');
+  scene.style.display = '';
+  scene.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  runCreatureCanvas(w2Creature, () => {
+    scene.style.display = 'none';
+    goToAfterScale();
+  });
+}
+
+function runCreatureCanvas(creature, onDone) {
+  const scene = document.getElementById('w2-creature-scene');
+  const canvas = document.getElementById('w2-canvas');
+  requestAnimationFrame(() => {
+    const dpr = window.devicePixelRatio || 1;
+    const W = scene.clientWidth || 375;
+    const H = Math.round(W * 0.55);
+    scene.style.minHeight = H + 'px';
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+
+    // Ocean background
+    const bg = ctx.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0, '#87CEEB'); bg.addColorStop(0.35, '#5BB8D8');
+    bg.addColorStop(1, '#1A5A8A');
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+
+    // Bubbles
+    const bubbles = Array.from({length:12}, () => ({
+      x: Math.random()*W, y: H + Math.random()*60,
+      r: 3+Math.random()*6, speed: 0.4+Math.random()*0.6
+    }));
+
+    const dir = creature.swimDir; // 1=left→right, -1=right→left
+    const startX = dir > 0 ? -120 : W + 120;
+    const endX   = dir > 0 ? W + 120 : -120;
+    const midX   = W * 0.5;
+    const midY   = H * 0.48;
+    const FONT_SIZE = Math.min(W * 0.22, 90);
+
+    let cx = startX, cy = midY;
+    let phase = 'enter'; // enter → eat → exit
+    let phaseT = 0;
+    const enterDur = 1400, eatDur = 800, exitDur = 1200;
+    let last = null;
+    // "Food" burst particles
+    const particles = [];
+
+    function loop(ts) {
+      if (!last) last = ts;
+      const dt = ts - last; last = ts;
+      phaseT += dt;
+
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+
+      // Bubbles
+      bubbles.forEach(b => {
+        b.y -= b.speed;
+        if (b.y < -20) { b.y = H + 10; b.x = Math.random()*W; }
+        ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI*2);
+        ctx.fillStyle = 'rgba(255,255,255,0.25)'; ctx.fill();
+      });
+
+      if (phase === 'enter') {
+        const t = Math.min(phaseT / enterDur, 1);
+        const ease = 1 - Math.pow(1-t, 3);
+        cx = startX + (midX - startX) * ease;
+        cy = midY + Math.sin(ts * 0.002) * 8;
+        if (t >= 1) { phase = 'eat'; phaseT = 0; }
+      } else if (phase === 'eat') {
+        cx = midX; cy = midY + Math.sin(ts * 0.004) * 6;
+        const t = phaseT / eatDur;
+        // spawn food burst at t=0.3
+        if (t > 0.3 && particles.length === 0) {
+          for (let i = 0; i < 20; i++) {
+            const ang = Math.random() * Math.PI * 2;
+            const spd = 1.5 + Math.random() * 3;
+            particles.push({ x: midX, y: midY, vx: Math.cos(ang)*spd, vy: Math.sin(ang)*spd, alpha: 1, r: 4+Math.random()*8 });
+          }
+        }
+        if (phaseT >= eatDur) { phase = 'exit'; phaseT = 0; }
+      } else if (phase === 'exit') {
+        const t = Math.min(phaseT / exitDur, 1);
+        const ease = t * t;
+        cx = midX + (endX - midX) * ease;
+        cy = midY - H * 0.25 * ease + Math.sin(ts * 0.003) * 6;
+        if (t >= 1) { requestAnimationFrame(() => onDone()); return; }
+      }
+
+      // Particles
+      particles.forEach(p => {
+        p.x += p.vx; p.y += p.vy; p.vy += 0.08; p.alpha -= 0.025;
+        ctx.globalAlpha = Math.max(0, p.alpha);
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+        ctx.fillStyle = creature.color; ctx.fill();
+        ctx.globalAlpha = 1;
+      });
+
+      // Creature emoji
+      ctx.save();
+      ctx.translate(cx, cy);
+      if (dir < 0) ctx.scale(-1, 1); // flip for right-to-left
+      ctx.font = `${FONT_SIZE}px serif`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      // Mouth open during eat phase
+      if (phase === 'eat') {
+        ctx.globalAlpha = 1;
+        ctx.font = `${FONT_SIZE * 1.1}px serif`;
+      }
+      ctx.fillText(creature.icon, 0, 0);
+      ctx.restore();
+
+      // "美味しい！" text during eat
+      if (phase === 'eat' && phaseT > 200) {
+        ctx.globalAlpha = Math.min((phaseT - 200) / 300, 1);
+        ctx.font = `bold ${16}px sans-serif`;
+        ctx.fillStyle = '#fff';
+        ctx.textAlign = 'center';
+        ctx.fillText('パクッ！', midX, midY - FONT_SIZE * 0.7);
+        ctx.globalAlpha = 1;
+      }
+
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+  });
 }
 
 // ═══════════════════════════════════════
@@ -1663,7 +1829,7 @@ let iwCurrentType = 'balloon';
 
 const IW_CONFIG = {
   balloon:   { title:'タップして空へ', hint:'風船をタップすると飛んでいきます', doneMsg:'🎈 飛んでいきました。\n重たかったものが、空の彼方へ。', bg:'linear-gradient(180deg,#87CEEB 0%,#C8E8F8 50%,#E8F4E0 100%)' },
-  river:     { title:'タップして川に流す', hint:'タップすると流れていきます', doneMsg:'🚣 流れていきました。\n大河がすべてを、遠くへと運んでいきます。', bg:'linear-gradient(180deg,#7EC8A0 0%,#3A9A6A 30%,#2878A0 70%,#1A5880 100%)' },
+  river:     { title:'タップして流れに乗る', hint:'タップすると流れに乗って滝へ', doneMsg:'🌊 滝壺へ落ちていきました。\n深い水の底で、静かに溶けていきます。', bg:'linear-gradient(180deg,#4AB878 0%,#2A9860 30%,#1A6888 70%,#0A3858 100%)' },
   homerun:   { title:'タップして夜空へ！', hint:'タップすると星になります', doneMsg:'⭐ 星になりました。\n夜空のどこかで、ずっと輝いています。', bg:'linear-gradient(180deg,#020818 0%,#0A1A40 50%,#1A2A60 100%)' },
   blossom:   { title:'タップして花吹雪に', hint:'タップすると花びらが舞います', doneMsg:'🌸 散っていきました。\n花吹雪のように、軽やかに空へ。', bg:'linear-gradient(180deg,#FFE0EE 0%,#FFF0F8 60%,#FFF8FC 100%)' },
   rocket:    { title:'タップして宇宙へ', hint:'タップするとシャトル発射！', doneMsg:'🚀 宇宙へ飛び立ちました。\nもう重力は関係ありません。', bg:'linear-gradient(180deg,#000010 0%,#030320 40%,#080860 80%,#1040A0 100%)' },
@@ -1672,7 +1838,7 @@ const IW_CONFIG = {
 };
 
 const IW_DONE_DELAY = {
-  balloon: 6500, river: 7500, homerun: 6000,
+  balloon: 6500, river: 8000, homerun: 6000,
   blossom: 5500, rocket: 6500, arrow: 5500, fireworks: 7000
 };
 
@@ -1908,78 +2074,226 @@ function animBalloon() {
 }
 
 // ─── River: winding river on canvas, boat follows bezier path ───────────────
+// ─── River → Waterfall dive ──────────────────────────────────────────────────
 function animRiver() {
   const scene = document.getElementById('iw-scene');
   const canvas = document.getElementById('iw-canvas');
-  const boat = document.getElementById('iw-main');
-  const l = document.getElementById('iw-lbl');
+  const lbl = document.getElementById('iw-lbl');
   if (!canvas) return;
-  if (l) { l.style.transition='opacity 0.5s'; setTimeout(()=>l.style.opacity='0',300); }
+  if (lbl) { lbl.style.transition='opacity 0.4s'; lbl.style.opacity='0'; }
+  const boat = document.getElementById('iw-main');
+  if (boat) boat.style.opacity = '0';
+
   requestAnimationFrame(() => {
     const dpr = window.devicePixelRatio || 1;
     const W = scene.clientWidth || 375, H = scene.clientHeight || 600;
-    canvas.width = W * dpr; canvas.height = H * dpr;
-    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+    canvas.width = W*dpr; canvas.height = H*dpr;
+    canvas.style.width = W+'px'; canvas.style.height = H+'px';
     const ctx = canvas.getContext('2d');
     ctx.scale(dpr, dpr);
 
-    // Draw winding river background
-    function drawRiver() {
-      // Sky / land background
-      const skyGrad = ctx.createLinearGradient(0,0,0,H);
-      skyGrad.addColorStop(0,'#7EC8A0'); skyGrad.addColorStop(0.3,'#5AAA80');
-      skyGrad.addColorStop(0.6,'#3A8A60'); skyGrad.addColorStop(1,'#286040');
-      ctx.fillStyle = skyGrad; ctx.fillRect(0,0,W,H);
+    // ── Layout ──────────────────────────────────────────
+    const CLIFF_Y  = H * 0.42;   // waterfall lip
+    const POOL_Y   = H * 0.72;   // pool surface
+    const FALL_X   = W * 0.5;    // waterfall center X
+    const FALL_W   = W * 0.28;   // waterfall column width
 
-      // River path: bottom-center → right → upper-left (cubic bezier)
-      // P0=bottom, P1=right, P2=upper-left, P3=top-left
-      const p0={x:W*0.5,y:H}, p1={x:W*0.85,y:H*0.65}, p2={x:W*0.2,y:H*0.35}, p3={x:W*0.25,y:0};
-      ctx.beginPath();
-      ctx.moveTo(p0.x, p0.y);
-      ctx.bezierCurveTo(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
-      ctx.lineWidth = W * 0.35; ctx.strokeStyle = '#1A78B0'; ctx.stroke();
-      ctx.lineWidth = W * 0.32; ctx.strokeStyle = '#2A9AD0'; ctx.stroke();
+    // ── Static background layers ──────────────────────
+    function drawBg(mist) {
+      // Sky + forest upper half
+      const topGrad = ctx.createLinearGradient(0,0,0,CLIFF_Y);
+      topGrad.addColorStop(0,'#A8D8B0'); topGrad.addColorStop(1,'#5AAA78');
+      ctx.fillStyle = topGrad; ctx.fillRect(0,0,W,CLIFF_Y);
 
-      // Wave ripples along river
-      ctx.lineWidth = 1.5; ctx.strokeStyle = 'rgba(200,240,255,0.35)';
-      for (let i=0;i<8;i++) {
-        const tRipple = i/8;
-        const rx = cubicBezier(p0.x,p1.x,p2.x,p3.x,tRipple);
-        const ry = cubicBezier(p0.y,p1.y,p2.y,p3.y,tRipple);
+      // River channel across upper section
+      const riverTop = CLIFF_Y*0.3, riverBot = CLIFF_Y*0.85;
+      const riverGrad = ctx.createLinearGradient(0,riverTop,0,riverBot);
+      riverGrad.addColorStop(0,'#5BC8E8'); riverGrad.addColorStop(1,'#2A98C8');
+      ctx.fillStyle = riverGrad;
+      ctx.fillRect(0, riverTop, W, riverBot - riverTop);
+
+      // Cliff face (rock texture)
+      const cliffGrad = ctx.createLinearGradient(0,CLIFF_Y,0,POOL_Y);
+      cliffGrad.addColorStop(0,'#6A5A48'); cliffGrad.addColorStop(1,'#3A2A1A');
+      ctx.fillStyle = cliffGrad;
+      // Left cliff
+      ctx.fillRect(0, CLIFF_Y, FALL_X - FALL_W/2 - 2, POOL_Y - CLIFF_Y);
+      // Right cliff
+      ctx.fillRect(FALL_X + FALL_W/2 + 2, CLIFF_Y, W - FALL_X - FALL_W/2, POOL_Y - CLIFF_Y);
+
+      // Pool (dark water)
+      const poolGrad = ctx.createLinearGradient(0,POOL_Y,0,H);
+      poolGrad.addColorStop(0,'#2A7BA8'); poolGrad.addColorStop(1,'#0A3858');
+      ctx.fillStyle = poolGrad; ctx.fillRect(0, POOL_Y, W, H - POOL_Y);
+
+      // Mist overlay at pool surface
+      if (mist > 0) {
+        const mistGrad = ctx.createRadialGradient(FALL_X, POOL_Y, 0, FALL_X, POOL_Y, W*0.55);
+        mistGrad.addColorStop(0, `rgba(220,240,255,${mist*0.7})`);
+        mistGrad.addColorStop(1, 'rgba(220,240,255,0)');
+        ctx.fillStyle = mistGrad;
+        ctx.fillRect(0, POOL_Y - 30, W, 80);
+      }
+    }
+
+    // ── Waterfall streams (animated) ──────────────────
+    function drawFall(ts) {
+      const speed = (ts * 0.003) % 1;
+      const nStreams = 10;
+      for (let i = 0; i < nStreams; i++) {
+        const fx = FALL_X - FALL_W/2 + (i + 0.5) * FALL_W / nStreams + Math.sin(ts*0.002 + i)*3;
+        const alpha = 0.35 + (i % 2)*0.15;
+        const grad = ctx.createLinearGradient(fx, CLIFF_Y, fx, POOL_Y);
+        grad.addColorStop(0,'rgba(255,255,255,0)');
+        grad.addColorStop(0.2,`rgba(200,235,255,${alpha})`);
+        grad.addColorStop(0.8,`rgba(180,220,255,${alpha})`);
+        grad.addColorStop(1,'rgba(180,220,255,0)');
+        ctx.strokeStyle = grad; ctx.lineWidth = 2 + (i%3);
         ctx.beginPath();
-        ctx.arc(rx + (Math.random()-0.5)*20, ry, 15+Math.random()*8, 0, Math.PI*2);
+        const yOff = ((speed + i*0.08) % 1) * (POOL_Y - CLIFF_Y);
+        ctx.moveTo(fx, CLIFF_Y);
+        ctx.lineTo(fx + Math.sin(i*1.3)*6, CLIFF_Y + yOff);
         ctx.stroke();
       }
+      // Waterfall foam cap at lip
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      ctx.beginPath();
+      ctx.ellipse(FALL_X, CLIFF_Y+4, FALL_W/2+4, 7, 0, 0, Math.PI*2);
+      ctx.fill();
     }
-    drawRiver();
 
-    // Cubic bezier helper
-    function cubicBezier(p0,p1,p2,p3,t) {
-      return (1-t)**3*p0 + 3*(1-t)**2*t*p1 + 3*(1-t)*t**2*p2 + t**3*p3;
+    // ── Ripples in pool ───────────────────────────────
+    const ripples = [];
+    function addRipple() { ripples.push({ r: 5, alpha: 0.8 }); }
+    function drawRipples() {
+      ripples.forEach((rp, i) => {
+        rp.r += 1.5; rp.alpha -= 0.012;
+        ctx.beginPath();
+        ctx.ellipse(FALL_X, POOL_Y + 20, rp.r * 1.6, rp.r * 0.55, 0, 0, Math.PI*2);
+        ctx.strokeStyle = `rgba(160,210,240,${Math.max(0,rp.alpha)})`;
+        ctx.lineWidth = 2; ctx.stroke();
+      });
+      ripples.splice(0, ripples.length, ...ripples.filter(r => r.alpha > 0));
     }
 
-    // Boat path points
-    const bp0={x:W*0.5,y:H*0.9}, bp1={x:W*0.8,y:H*0.65}, bp2={x:W*0.22,y:H*0.35}, bp3={x:W*0.28,y:H*0.05};
-    const dur = 4500;
-    let last = null;
-    function animStep(ts) {
-      if (!last) last = ts;
-      const t = Math.min((ts-last)/dur, 1); // t relative to start
-      const progress = Math.min((ts - last) / dur, 1);
-      const bx = cubicBezier(bp0.x,bp1.x,bp2.x,bp3.x,progress);
-      const by = cubicBezier(bp0.y,bp1.y,bp2.y,bp3.y,progress);
-      const scale = Math.max(0.05, 1 - progress * 0.95);
-      if (boat) {
-        boat.style.left = bx + 'px';
-        boat.style.top = by + 'px';
-        boat.style.fontSize = (60 * scale) + 'px';
-        boat.style.transform = `translate(-50%,-50%)`;
-        boat.style.opacity = scale < 0.08 ? '0' : '1';
+    // ── River wave lines ──────────────────────────────
+    function drawRiverWaves(ts) {
+      const riverMid = CLIFF_Y * 0.55;
+      [0,1,2,3].forEach(i => {
+        const y = riverMid - 20 + i*14 + Math.sin(ts*0.002 + i) * 3;
+        const xOff = (ts * (0.05 + i*0.02)) % (W * 2);
+        ctx.beginPath();
+        ctx.strokeStyle = `rgba(255,255,255,${0.18 - i*0.03})`;
+        ctx.lineWidth = 1.5;
+        ctx.moveTo(-xOff % W, y);
+        for (let x = 0; x < W + 30; x += 30) {
+          ctx.quadraticCurveTo(x + 8, y - 5, x + 16, y);
+          ctx.quadraticCurveTo(x + 24, y + 5, x + 30, y);
+        }
+        ctx.stroke();
+      });
+    }
+
+    // ── Object (leaf/boat) path ───────────────────────
+    // Phase 1: flows left→right in river (2s)
+    // Phase 2: tips over cliff edge (0.4s)
+    // Phase 3: falls with acceleration (1.0s)
+    // Phase 4: splash + ripples (1.2s)
+    // Phase 5: settle (1.5s)
+    const P1=2000, P2=2400, P3=3400, P4=4600, P5=6100;
+    const particles = [];
+
+    function drawObject(ts, elapsed) {
+      let ox, oy, rot = 0, sz = 52, alpha = 1;
+
+      if (elapsed < P1) {
+        // Flow right in river
+        const t = elapsed / P1;
+        const ease = t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+        ox = W*0.06 + (FALL_X - FALL_W/2 - W*0.06 - sz*0.5) * ease;
+        oy = CLIFF_Y * 0.52 + Math.sin(ts*0.002 + t*8) * 6;
+        rot = Math.sin(ts*0.003) * 0.15;
+      } else if (elapsed < P2) {
+        // Tip over edge
+        const t = (elapsed - P1) / (P2 - P1);
+        ox = FALL_X - FALL_W*0.1;
+        oy = CLIFF_Y * 0.52 + (CLIFF_Y - CLIFF_Y*0.52) * t;
+        rot = (Math.PI * 0.5) * t;
+        sz = 52;
+      } else if (elapsed < P3) {
+        // Freefall - accelerating
+        const t = (elapsed - P2) / (P3 - P2);
+        const accel = t * t;
+        ox = FALL_X + Math.sin(t * Math.PI * 1.5) * FALL_W * 0.2;
+        oy = CLIFF_Y + (POOL_Y + 15 - CLIFF_Y) * accel;
+        rot = Math.PI * 0.5 + t * Math.PI * 1.5;
+        sz = 52 + t * 10; // grows as it falls toward viewer
+      } else if (elapsed < P4) {
+        // Splash - hidden, particles only
+        if (particles.length === 0) {
+          addRipple();
+          for (let i = 0; i < 30; i++) {
+            const ang = -Math.PI * 0.5 + (Math.random() - 0.5) * Math.PI;
+            const spd = 2 + Math.random() * 5;
+            particles.push({ x:FALL_X, y:POOL_Y+10, vx:Math.cos(ang)*spd, vy:Math.sin(ang)*spd - 2, alpha:1, r:3+Math.random()*5, c:`rgba(180,225,255,1)` });
+          }
+          // White splash columns
+          for (let i=0;i<8;i++) {
+            const ang = -Math.PI*0.7 + i*(Math.PI*0.4/7);
+            particles.push({ x:FALL_X, y:POOL_Y+5, vx:Math.cos(ang)*3, vy:Math.sin(ang)*6-4, alpha:1, r:6, c:'rgba(255,255,255,0.9)' });
+          }
+        }
+        return; // don't draw object
+      } else {
+        return; // done
       }
-      if (progress < 1) requestAnimationFrame(animStep);
+
+      ctx.save();
+      ctx.translate(ox, oy);
+      ctx.rotate(rot);
+      ctx.globalAlpha = alpha;
+      ctx.font = `${sz}px serif`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('🚣', 0, 0);
+      ctx.restore();
     }
-    // start timing from now
-    requestAnimationFrame(ts => { last = ts; requestAnimationFrame(animStep); });
+
+    function drawParticles() {
+      particles.forEach(p => {
+        p.x += p.vx; p.y += p.vy;
+        p.vy += 0.18; p.vx *= 0.92; p.alpha -= 0.025;
+        ctx.globalAlpha = Math.max(0, p.alpha);
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+        ctx.fillStyle = p.c; ctx.fill();
+        ctx.globalAlpha = 1;
+      });
+      particles.splice(0, particles.length, ...particles.filter(p => p.alpha > 0));
+    }
+
+    // ── Main loop ─────────────────────────────────────
+    let startTs = null, rippleTimer = 0;
+    function loop(ts) {
+      if (!startTs) startTs = ts;
+      const elapsed = ts - startTs;
+      const mist = elapsed > P3 ? Math.min((elapsed - P3) / 1000, 1) : 0;
+
+      drawBg(mist);
+      drawRiverWaves(ts);
+      drawFall(ts);
+      drawRipples();
+
+      // Periodic ripples from waterfall
+      rippleTimer += 16;
+      if (rippleTimer > 400) { rippleTimer = 0; addRipple(); }
+      // Extra ripples after splash
+      if (elapsed > P3 && elapsed < P5 && rippleTimer % 150 === 0) addRipple();
+
+      drawObject(ts, elapsed);
+      drawParticles();
+
+      if (elapsed < P5) requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
   });
 }
 
@@ -2471,113 +2785,99 @@ function clearAllHistory() {
   updateHeader();
 }
 
-function drawWaveChart(sessions) {
-  const card = document.getElementById('wave-graph-card');
-  const canvas = document.getElementById('wave-chart');
-  const now = Date.now();
-  const thirtyDays = 30 * 24 * 60 * 60 * 1000;
-  const recent = sessions.filter(s => now - s.ts < thirtyDays && (s.before != null || s.after != null));
-  if (recent.length < 2) { card.style.display = 'none'; return; }
-  card.style.display = '';
-
-  const dpr = window.devicePixelRatio || 1;
-  const W = canvas.parentElement.clientWidth - 32;
-  const H = 160;
-  canvas.width = W * dpr;
-  canvas.height = H * dpr;
-  canvas.style.width = W + 'px';
-  canvas.style.height = H + 'px';
-  const ctx = canvas.getContext('2d');
-  ctx.scale(dpr, dpr);
-
-  const pad = { top: 12, right: 12, bottom: 24, left: 24 };
-  const gw = W - pad.left - pad.right;
-  const gh = H - pad.top - pad.bottom;
-
-  const sorted = recent.slice().sort((a, b) => a.ts - b.ts);
-  const minTs = sorted[0].ts, maxTs = sorted[sorted.length - 1].ts;
-  const tsRange = maxTs - minTs || 1;
-
-  const xOf = ts => pad.left + ((ts - minTs) / tsRange) * gw;
-  const yOf = v => pad.top + gh - (v / 10) * gh;
-
-  ctx.strokeStyle = 'rgba(0,0,0,0.06)';
-  ctx.lineWidth = 1;
-  [0, 2, 4, 6, 8, 10].forEach(v => {
-    const y = yOf(v);
-    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + gw, y); ctx.stroke();
-    ctx.fillStyle = '#999'; ctx.font = '10px sans-serif'; ctx.textAlign = 'right';
-    ctx.fillText(v, pad.left - 4, y + 3);
-  });
-
-  const drawLine = (points, color, alpha) => {
-    const pts = points.filter(p => p.v != null);
-    if (pts.length < 2) return;
-    ctx.beginPath();
-    ctx.strokeStyle = color; ctx.globalAlpha = alpha; ctx.lineWidth = 2;
-    ctx.lineJoin = 'round'; ctx.lineCap = 'round';
-    pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
-    ctx.stroke();
-    ctx.globalAlpha = 1;
-    pts.forEach(p => {
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 3.5, 0, Math.PI * 2);
-      ctx.fillStyle = color; ctx.globalAlpha = alpha; ctx.fill();
-      ctx.globalAlpha = 1;
-    });
-  };
-
-  const beforePts = sorted.map(s => ({ x: xOf(s.ts), y: yOf(s.before ?? 0), v: s.before }));
-  const afterPts  = sorted.map(s => ({ x: xOf(s.ts), y: yOf(s.after  ?? 0), v: s.after  }));
-  drawLine(beforePts, '#C97B7B', 0.6);
-  drawLine(afterPts,  '#7BAE7F', 0.9);
-
-  ctx.fillStyle = '#aaa'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
-  const tickDates = [sorted[0], sorted[sorted.length - 1]];
-  if (sorted.length > 2) tickDates.splice(1, 0, sorted[Math.floor(sorted.length / 2)]);
-  tickDates.forEach(s => {
-    const d = new Date(s.ts);
-    const label = `${d.getMonth()+1}/${d.getDate()}`;
-    ctx.fillText(label, xOf(s.ts), H - 6);
-  });
-}
 
 function updateHabitRings(sessions) {
   const now = new Date();
   const todayStr = now.toDateString();
-  const startOfWeek = new Date(now); startOfWeek.setDate(now.getDate() - now.getDay());
-  startOfWeek.setHours(0,0,0,0);
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  let dayCount=0, weekCount=0, monthCount=0;
-  (sessions||[]).forEach(s => {
+  // Week: Mon–Sun
+  const startOfWeek = new Date(now);
+  const dow = now.getDay();
+  startOfWeek.setDate(now.getDate() - (dow === 0 ? 6 : dow - 1));
+  startOfWeek.setHours(0, 0, 0, 0);
+
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+
+  // Daily: total sessions today (ring goal=1, but show actual count)
+  let dayCount = 0;
+  // Weekly: distinct days this week with ≥1 session
+  const weekDaySet = new Set();
+  // Monthly: distinct days this month with ≥1 session
+  const monthDaySet = new Set();
+  // All months with any session (for streak)
+  const monthsWithSession = new Set();
+
+  (sessions || []).forEach(s => {
     const d = new Date(s.ts);
-    if (d.toDateString()===todayStr) dayCount++;
-    if (d >= startOfWeek) weekCount++;
-    if (d >= startOfMonth) monthCount++;
+    const key = d.toDateString();
+    if (key === todayStr) dayCount++;
+    if (d >= startOfWeek) weekDaySet.add(key);
+    if (d >= startOfMonth) monthDaySet.add(key);
+    monthsWithSession.add(`${d.getFullYear()}-${String(d.getMonth()).padStart(2,'0')}`);
   });
 
-  const DAY_GOAL=1, WEEK_GOAL=7, MONTH_GOAL=30;
-  const dayR=54, weekR=76, monthR=98;
+  const weekCount  = weekDaySet.size;
+  const monthCount = monthDaySet.size;
 
+  // Consecutive month streak (back from current month)
+  let streak = 0;
+  let check = new Date(now.getFullYear(), now.getMonth(), 1);
+  while (monthsWithSession.has(`${check.getFullYear()}-${String(check.getMonth()).padStart(2,'0')}`)) {
+    streak++;
+    check.setMonth(check.getMonth() - 1);
+  }
+
+  // Animate rings
   const setRing = (id, r, count, goal) => {
-    const circ = 2*Math.PI*r;
-    const pct = Math.min(count/goal, 1);
-    const offset = circ * (1-pct);
+    const circ = 2 * Math.PI * r;
+    const offset = circ * (1 - Math.min(count / goal, 1));
     const el = document.getElementById(id);
-    if (el) { el.style.strokeDasharray=circ; el.style.strokeDashoffset=circ; }
-    // Trigger animation after paint
-    requestAnimationFrame(()=>requestAnimationFrame(()=>{ if(el) el.style.strokeDashoffset=offset; }));
+    if (!el) return;
+    el.style.strokeDasharray = circ;
+    el.style.strokeDashoffset = circ;
+    requestAnimationFrame(() => requestAnimationFrame(() => { el.style.strokeDashoffset = offset; }));
   };
 
-  setRing('ring-day',   dayR,   dayCount,   DAY_GOAL);
-  setRing('ring-week',  weekR,  weekCount,  WEEK_GOAL);
-  setRing('ring-month', monthR, monthCount, MONTH_GOAL);
+  setRing('ring-day',   54, dayCount,   1);
+  setRing('ring-week',  76, weekCount,  7);
+  setRing('ring-month', 98, monthCount, daysInMonth);
 
-  const cn = document.getElementById('ring-center-num');
-  if (cn) cn.textContent = dayCount;
-  const dn=document.getElementById('ring-day-num'), wn=document.getElementById('ring-week-num'), mn=document.getElementById('ring-month-num');
-  if(dn) dn.textContent=dayCount; if(wn) wn.textContent=weekCount; if(mn) mn.textContent=monthCount;
+  // Update labels
+  const q = id => document.getElementById(id);
+  if (q('ring-center-num')) q('ring-center-num').textContent = dayCount;
+  if (q('ring-day-num'))    q('ring-day-num').textContent    = dayCount;
+  if (q('ring-week-num'))   q('ring-week-num').textContent   = weekCount;
+  if (q('ring-month-num'))  q('ring-month-num').textContent  = monthCount;
+  if (q('ring-month-goal-label')) q('ring-month-goal-label').textContent = `/${daysInMonth}`;
+
+  // Month streak dots
+  const row = q('month-streak-row');
+  if (row) {
+    row.innerHTML = '';
+    // Show up to 12 months back
+    const MONTH_NAMES = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2,'0')}`;
+      const hasSession = monthsWithSession.has(key);
+      const isCurrentMonth = i === 0;
+      const dot = document.createElement('div');
+      dot.title = `${d.getFullYear()}年${MONTH_NAMES[d.getMonth()]}`;
+      dot.style.cssText = `
+        width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+        font-size:9px;font-weight:700;flex-shrink:0;
+        background:${hasSession ? (isCurrentMonth ? '#5B8FA8' : 'rgba(91,143,168,0.55)') : 'rgba(0,0,0,0.06)'};
+        color:${hasSession ? '#fff' : 'var(--text-muted)'};
+        border:${isCurrentMonth ? '2px solid #5B8FA8' : '2px solid transparent'};
+        box-shadow:${hasSession ? '0 2px 6px rgba(91,143,168,0.3)' : 'none'};
+      `;
+      dot.textContent = MONTH_NAMES[d.getMonth()];
+      row.appendChild(dot);
+    }
+  }
+
+  if (q('month-streak-count')) q('month-streak-count').textContent = streak;
 }
 
 function showHistory() {
@@ -2587,7 +2887,6 @@ function showHistory() {
   const hasSessions = data.sessions && data.sessions.length > 0;
   document.getElementById('clear-all-btn').style.display = hasSessions ? '' : 'none';
 
-  drawWaveChart(data.sessions || []);
   updateHabitRings(data.sessions || []);
 
   if (!hasSessions) {
