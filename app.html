@@ -206,8 +206,9 @@
     font-size: 18px; font-weight: 700; color: var(--primary);
     transition: transform 4s ease-in-out, opacity 0.3s;
   }
-  .breathe-circle.inhale { transform: scale(1.5); }
-  .breathe-circle.exhale { transform: scale(1.0); }
+  .breathe-circle.inhale { transform: scale(1.5); transition: transform 4s ease-in-out; }
+  .breathe-circle.hold   { transform: scale(1.5); transition: transform 0s; }
+  .breathe-circle.exhale { transform: scale(1.0); transition: transform 8s ease-in-out; }
   .breathe-label { font-size: 24px; font-weight: 700; color: var(--primary); }
   .breathe-timer { font-size: 15px; color: var(--text-muted); }
   .eye-guide { text-align: center; padding: 16px; background: var(--surface2); border-radius: var(--radius-sm); }
@@ -321,18 +322,10 @@
   .cloud { position: absolute; font-size: 36px; opacity: 0.6; }
 
   /* Scene keyframes */
-  @keyframes iwBalloonUp   { to { bottom: 320px; opacity: 0; } }
-  @keyframes iwLeafFlow    { 0%{transform:translateX(-50%) rotate(-10deg);opacity:1} 100%{transform:translateX(180px) translateY(-30px) rotate(30deg);opacity:0} }
-  @keyframes iwLeafLabelFlow { 0%{transform:translateX(-50%);opacity:1} 100%{transform:translateX(180px);opacity:0} }
-  @keyframes iwRocketUp    { 0%{bottom:24px;opacity:1} 100%{bottom:340px;opacity:0} }
-  @keyframes iwSink        { 0%{bottom:24px;opacity:1} 100%{bottom:-60px;opacity:0} }
-  @keyframes iwSinkLabel   { 0%{bottom:94px;opacity:1} 100%{bottom:0px;opacity:0} }
-  @keyframes iwBurstPetal  { 0%{transform:translate(-50%,-50%) scale(1);opacity:1} 100%{transform:translate(var(--tx),var(--ty)) scale(0.5);opacity:0} }
-  @keyframes iwStarPop     { 0%{transform:translateX(-50%) scale(0) rotate(-30deg);opacity:0} 60%{transform:translateX(-50%) scale(1.4) rotate(10deg);opacity:1} 100%{transform:translateX(-50%) scale(1) rotate(0deg);opacity:1} }
-  @keyframes iwStarFade    { to { opacity: 0; transform: translateX(-50%) scale(2); } }
-  @keyframes iwWaveRise    { from { transform: translateY(100%); } to { transform: translateY(0); } }
-  @keyframes iwFireworkUp  { 0%{bottom:10px;opacity:1} 100%{bottom:180px;opacity:0.6} }
-  @keyframes iwSpark       { 0%{transform:translate(-50%,-50%) scale(0);opacity:1} 100%{transform:translate(var(--tx),var(--ty)) scale(1);opacity:0} }
+  @keyframes iwStarPop  { 0%{transform:translate(-50%,-50%) scale(0) rotate(-30deg);opacity:0} 60%{transform:translate(-50%,-50%) scale(1.4) rotate(10deg);opacity:1} 100%{transform:translate(-50%,-50%) scale(1) rotate(0deg);opacity:1} }
+  @keyframes iwStarFade { to { opacity: 0; transform: translate(-50%,-50%) scale(2.5); } }
+  @keyframes iwArrowFly { 0%{left:-10%;opacity:1} 100%{left:65%;opacity:1} }
+  @keyframes iwPetalBurst { 0%{transform:translate(-50%,-50%) scale(1);opacity:1} 100%{transform:translate(var(--px),var(--py)) scale(0.2) rotate(var(--pr));opacity:0} }
 
   /* Work 5 — SCORE */
   .score-nav { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -518,7 +511,6 @@
   <button class="btn btn-primary" id="checkin-next">
     メニューを選ぶ →
   </button>
-  <button class="btn btn-ghost" onclick="showScreen('screen-top')">← トップへ戻る</button>
 </section>
 
 <!-- ══════════════════════════════════════
@@ -589,18 +581,19 @@
 
   <div class="card" id="w1-breathe">
     <div class="card-title">ステップ 1 — 深呼吸</div>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">無理のない範囲で、ゆっくり試してみましょう。</p>
     <div style="display:flex;justify-content:center;gap:0;margin-bottom:20px">
-      <div id="rhythm-inhale" style="flex:4;text-align:center;padding:8px 4px;border-radius:8px 0 0 8px;background:var(--surface2);transition:background 0.3s">
-        <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px">吸う</div>
-        <div style="font-size:18px;font-weight:700;color:var(--primary)">4</div>
+      <div id="rhythm-inhale" style="flex:4;text-align:center;padding:10px 4px;border-radius:8px 0 0 8px;background:var(--surface2);transition:background 0.3s">
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">吸って</div>
+        <div style="font-size:22px;font-weight:700;color:var(--primary)">4</div>
       </div>
-      <div id="rhythm-hold" style="flex:4;text-align:center;padding:8px 4px;border-left:1px solid var(--border);border-right:1px solid var(--border);background:var(--surface2);transition:background 0.3s">
-        <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px">止める</div>
-        <div style="font-size:18px;font-weight:700;color:var(--primary)">4</div>
+      <div id="rhythm-hold" style="flex:4;text-align:center;padding:10px 4px;border-left:1px solid var(--border);border-right:1px solid var(--border);background:var(--surface2);transition:background 0.3s">
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">優しく止めて</div>
+        <div style="font-size:22px;font-weight:700;color:var(--primary)">4</div>
       </div>
-      <div id="rhythm-exhale" style="flex:8;text-align:center;padding:8px 4px;border-radius:0 8px 8px 0;background:var(--surface2);transition:background 0.3s">
-        <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px">吐く</div>
-        <div style="font-size:18px;font-weight:700;color:var(--primary)">8</div>
+      <div id="rhythm-exhale" style="flex:8;text-align:center;padding:10px 4px;border-radius:0 8px 8px 0;background:var(--surface2);transition:background 0.3s">
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">吐いて</div>
+        <div style="font-size:22px;font-weight:700;color:var(--primary)">8</div>
       </div>
     </div>
     <div class="breathe-circle-wrap">
@@ -612,15 +605,25 @@
   </div>
 
   <div class="card" id="w1-eye" style="display:none">
-    <div class="card-title">ステップ 2 — 遠くを見る</div>
-    <p style="margin-bottom:16px">遠くを見ると、目のピントが切り替わり、思考の「スタック」が解除されます。</p>
+    <div class="card-title">ステップ 2 — フォーカスを変える</div>
+    <p style="margin-bottom:16px;font-size:13px;color:var(--text-muted)">意識を今の思考から離して、別のものに向けてみましょう。</p>
     <div class="eye-guide">
-      <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px">各ステップで3〜5秒、じっくり見てください</div>
-      <div id="eye-step" style="font-size:28px;margin:16px 0">👆</div>
-      <div id="eye-desc" style="font-size:15px;font-weight:600;color:var(--primary)">上を見る</div>
-      <div id="eye-progress" style="font-size:13px;color:var(--text-muted);margin-top:8px">1 / 8</div>
+      <div id="eye-step" style="font-size:36px;margin:12px 0">👆</div>
+      <div id="eye-desc" style="font-size:15px;font-weight:600;color:var(--primary);line-height:1.6">上を見る</div>
+      <div id="eye-progress" style="font-size:12px;color:var(--text-muted);margin-top:10px">1 / 9</div>
     </div>
     <button class="btn btn-primary" style="margin-top:16px" id="eye-next-btn" onclick="nextEyeStep()">次へ →</button>
+  </div>
+
+  <div class="card" id="w1-move" style="display:none">
+    <div class="card-title">ステップ 3 — 身体を動かす</div>
+    <p style="margin-bottom:16px;font-size:13px;color:var(--text-muted)">体を少し動かすと、脳のモードが切り替わります。無理のない範囲でどうぞ。</p>
+    <div class="eye-guide" style="padding:20px 16px">
+      <div id="move-icon" style="font-size:48px;margin-bottom:12px">🙆</div>
+      <div id="move-desc" style="font-size:16px;font-weight:600;color:var(--primary);line-height:1.6"></div>
+    </div>
+    <button class="btn btn-ghost" style="margin-top:12px;width:100%" onclick="nextMoveStep()">別の動きを試す 🔄</button>
+    <button class="btn btn-primary" style="margin-top:10px" onclick="finishBreakState()">完了 ✓</button>
   </div>
 
   <div class="card" id="w1-done" style="display:none">
@@ -632,7 +635,10 @@
     <button class="btn btn-primary" style="margin-top:16px" onclick="goToAfterScale()">変化を確認する →</button>
   </div>
 
-  <button class="btn btn-ghost" onclick="showScreen('screen-menu')">← メニューに戻る</button>
+  <div class="flex-row" style="gap:8px">
+    <button class="btn btn-ghost" style="flex:1" onclick="goBack()">前へ</button>
+    <button class="btn btn-ghost" style="flex:1" onclick="showScreen('screen-menu')">メニュー</button>
+  </div>
 </section>
 
 <!-- ══════════════════════════════════════
@@ -680,7 +686,10 @@
     <button class="btn btn-primary" style="margin-top:8px" onclick="goToAfterScale()">変化を確認する →</button>
   </div>
 
-  <button class="btn btn-ghost" onclick="showScreen('screen-menu')">← メニューに戻る</button>
+  <div class="flex-row" style="gap:8px">
+    <button class="btn btn-ghost" style="flex:1" onclick="goBack()">前へ</button>
+    <button class="btn btn-ghost" style="flex:1" onclick="showScreen('screen-menu')">メニュー</button>
+  </div>
 </section>
 
 <!-- ══════════════════════════════════════
@@ -799,7 +808,10 @@
     <button class="btn btn-ghost" style="margin-top:8px" onclick="backToCheck()">← 現状確認に戻る</button>
   </div>
 
-  <button class="btn btn-ghost" onclick="showScreen('screen-menu')">← メニューに戻る</button>
+  <div class="flex-row" style="gap:8px">
+    <button class="btn btn-ghost" style="flex:1" onclick="goBack()">前へ</button>
+    <button class="btn btn-ghost" style="flex:1" onclick="showScreen('screen-menu')">メニュー</button>
+  </div>
 </section>
 
 <!-- ══════════════════════════════════════
@@ -808,27 +820,34 @@
 <section id="screen-work-4" class="screen">
   <div class="card">
     <div class="card-title">✨ イメージワーク</div>
-    <h2>手放せるものは<br>手放してしまおう</h2>
-    <p>プレッシャーや不安を、好きな方法で飛ばしましょう。</p>
+    <h2>手放せるものは<br>手放してしまいましょう</h2>
+    <p>プレッシャーや不安があれば、好きな方法でリリースすることができます。</p>
   </div>
 
   <div class="card" id="w4-input-card">
     <div class="card-title">ステップ 1 — 何を手放しますか？</div>
-    <p class="score-hint">今のプレッシャー・不安・怒り・焦りを一言で書いてください。</p>
+    <p class="score-hint">今、もやもや・イライラ・ハラハラ・ドキドキなどを感じていれば、言葉にしてみてください。</p>
     <textarea class="smd-image-desc" id="iw-content" rows="2" placeholder="例：明日の締め切りへの恐怖、〇〇さんへの怒り…" style="min-height:80px"></textarea>
+    <button class="btn btn-primary" style="margin-top:14px" onclick="showIwGift()">次へ →</button>
+  </div>
+
+  <div class="card" id="w4-gift-card" style="display:none">
+    <div class="card-title">ステップ 2 — 気づきとギフト</div>
+    <p class="score-hint">このことがあなたに届けてくれた気づきは何ですか？<br>もし何かしらのギフトが隠れているとすれば、何でしょうか。</p>
+    <textarea class="smd-image-desc" id="iw-gift" rows="3" placeholder="例：自分が本当は○○を大切にしていると気づいた…" style="min-height:90px"></textarea>
     <button class="btn btn-primary" style="margin-top:14px" onclick="showIwTypeSelect()">次へ →</button>
   </div>
 
   <div class="card" id="w4-type-card" style="display:none">
-    <div class="card-title">ステップ 2 — どうやって手放しますか？</div>
+    <div class="card-title">ステップ 3 — どうやって手放しますか？</div>
     <div class="iw-type-grid">
       <button class="iw-type-btn" onclick="startIwScene('balloon')"><span class="iw-icon">🎈</span><span class="iw-name">風船で<br>飛ばす</span></button>
-      <button class="iw-type-btn" onclick="startIwScene('river')"><span class="iw-icon">🍃</span><span class="iw-name">川に<br>流す</span></button>
-      <button class="iw-type-btn" onclick="startIwScene('homerun')"><span class="iw-icon">⚾</span><span class="iw-name">ホームラン<br>で星に</span></button>
-      <button class="iw-type-btn" onclick="startIwScene('blossom')"><span class="iw-icon">🌸</span><span class="iw-name">花びらで<br>散らす</span></button>
-      <button class="iw-type-btn" onclick="startIwScene('rocket')"><span class="iw-icon">🚀</span><span class="iw-name">ロケットで<br>宇宙へ</span></button>
-      <button class="iw-type-btn" onclick="startIwScene('ocean')"><span class="iw-icon">🌊</span><span class="iw-name">海に<br>飲み込む</span></button>
-      <button class="iw-type-btn" onclick="startIwScene('fireworks')"><span class="iw-icon">🎆</span><span class="iw-name">打ち上げ<br>花火に</span></button>
+      <button class="iw-type-btn" onclick="startIwScene('river')"><span class="iw-icon">🚣</span><span class="iw-name">川に<br>流す</span></button>
+      <button class="iw-type-btn" onclick="startIwScene('homerun')"><span class="iw-icon">⚾</span><span class="iw-name">夜空へ<br>ホームラン</span></button>
+      <button class="iw-type-btn" onclick="startIwScene('blossom')"><span class="iw-icon">🌸</span><span class="iw-name">花吹雪で<br>散らす</span></button>
+      <button class="iw-type-btn" onclick="startIwScene('rocket')"><span class="iw-icon">🚀</span><span class="iw-name">シャトルで<br>宇宙へ</span></button>
+      <button class="iw-type-btn" onclick="startIwScene('arrow')"><span class="iw-icon">🏹</span><span class="iw-name">弓矢で<br>破裂</span></button>
+      <button class="iw-type-btn" onclick="startIwScene('fireworks')"><span class="iw-icon">🎆</span><span class="iw-name">花火で<br>打ち上げる</span></button>
     </div>
   </div>
 
@@ -848,7 +867,10 @@
     <button class="btn btn-primary" style="margin-top:16px" onclick="goToAfterScale()">変化を確認する →</button>
   </div>
 
-  <button class="btn btn-ghost" onclick="showScreen('screen-menu')">← メニューに戻る</button>
+  <div class="flex-row" style="gap:8px">
+    <button class="btn btn-ghost" style="flex:1" onclick="goBack()">前へ</button>
+    <button class="btn btn-ghost" style="flex:1" onclick="showScreen('screen-menu')">メニュー</button>
+  </div>
 </section>
 
 <!-- ══════════════════════════════════════
@@ -916,7 +938,10 @@
     <button class="btn btn-primary" style="margin-top:16px" onclick="goToAfterScale()">変化を確認する →</button>
   </div>
 
-  <button class="btn btn-ghost" onclick="showScreen('screen-menu')">← メニューに戻る</button>
+  <div class="flex-row" style="gap:8px">
+    <button class="btn btn-ghost" style="flex:1" onclick="goBack()">前へ</button>
+    <button class="btn btn-ghost" style="flex:1" onclick="showScreen('screen-menu')">メニュー</button>
+  </div>
 </section>
 
 <!-- ══════════════════════════════════════
@@ -974,7 +999,10 @@
   <button class="btn btn-accent" id="after-complete-btn" onclick="completeSession()">
     セッション完了 ✓
   </button>
-  <button class="btn btn-ghost" onclick="showScreen('screen-menu')">← メニューに戻る</button>
+  <div class="flex-row" style="gap:8px">
+    <button class="btn btn-ghost" style="flex:1" onclick="goBack()">前へ</button>
+    <button class="btn btn-ghost" style="flex:1" onclick="showScreen('screen-menu')">メニュー</button>
+  </div>
 </section>
 
 <!-- ══════════════════════════════════════
@@ -1039,6 +1067,56 @@
     <div class="card-title">セッション履歴</div>
     <h2>あなたの記録</h2>
   </div>
+
+  <!-- Habit Tracker Rings -->
+  <div class="card" id="habit-ring-card">
+    <div class="card-title" style="margin-bottom:16px">習慣トラッカー</div>
+    <div style="display:flex;justify-content:center;align-items:center;gap:0">
+      <svg id="habit-svg" viewBox="0 0 220 220" width="220" height="220" style="overflow:visible">
+        <!-- Month ring (outer) -->
+        <circle cx="110" cy="110" r="98" fill="none" stroke="rgba(91,143,168,0.12)" stroke-width="16"/>
+        <circle id="ring-month" cx="110" cy="110" r="98" fill="none" stroke="#5B8FA8" stroke-width="16"
+          stroke-linecap="round" stroke-dasharray="616" stroke-dashoffset="616" transform="rotate(-90 110 110)"
+          style="transition:stroke-dashoffset 1s ease-out"/>
+        <!-- Week ring (middle) -->
+        <circle cx="110" cy="110" r="76" fill="none" stroke="rgba(90,180,120,0.12)" stroke-width="16"/>
+        <circle id="ring-week" cx="110" cy="110" r="76" fill="none" stroke="#5AB478" stroke-width="16"
+          stroke-linecap="round" stroke-dasharray="477" stroke-dashoffset="477" transform="rotate(-90 110 110)"
+          style="transition:stroke-dashoffset 1s ease-out 0.2s"/>
+        <!-- Day ring (inner) -->
+        <circle cx="110" cy="110" r="54" fill="none" stroke="rgba(255,160,60,0.12)" stroke-width="16"/>
+        <circle id="ring-day" cx="110" cy="110" r="54" fill="none" stroke="#FFA03C" stroke-width="16"
+          stroke-linecap="round" stroke-dasharray="339" stroke-dashoffset="339" transform="rotate(-90 110 110)"
+          style="transition:stroke-dashoffset 1s ease-out 0.4s"/>
+        <!-- Center text -->
+        <text id="ring-center-num" x="110" y="105" text-anchor="middle" font-size="28" font-weight="700" fill="var(--text)">0</text>
+        <text x="110" y="126" text-anchor="middle" font-size="11" fill="var(--text-muted)">今日</text>
+      </svg>
+      <div style="margin-left:20px;display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:12px;height:12px;border-radius:50%;background:#FFA03C;flex-shrink:0"></div>
+          <div>
+            <div style="font-size:11px;color:var(--text-muted)">今日</div>
+            <div style="font-size:16px;font-weight:700"><span id="ring-day-num">0</span><span style="font-size:11px;color:var(--text-muted)">/1</span></div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:12px;height:12px;border-radius:50%;background:#5AB478;flex-shrink:0"></div>
+          <div>
+            <div style="font-size:11px;color:var(--text-muted)">今週</div>
+            <div style="font-size:16px;font-weight:700"><span id="ring-week-num">0</span><span style="font-size:11px;color:var(--text-muted)">/7</span></div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:12px;height:12px;border-radius:50%;background:#5B8FA8;flex-shrink:0"></div>
+          <div>
+            <div style="font-size:11px;color:var(--text-muted)">今月</div>
+            <div style="font-size:16px;font-weight:700"><span id="ring-month-num">0</span><span style="font-size:11px;color:var(--text-muted)">/30</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="card" id="wave-graph-card" style="display:none">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
       <div class="card-title" style="margin:0">過去30日の心の波</div>
@@ -1084,10 +1162,16 @@ let state = {
 // ═══════════════════════════════════════
 // Screen Navigation
 // ═══════════════════════════════════════
+let _prevScreenId = null;
 function showScreen(id) {
+  const cur = document.querySelector('.screen.active');
+  if (cur && cur.id !== id) _prevScreenId = cur.id;
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   const el = document.getElementById(id);
   if (el) { el.classList.add('active'); el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+}
+function goBack() {
+  if (_prevScreenId) showScreen(_prevScreenId);
 }
 
 // ═══════════════════════════════════════
@@ -1248,6 +1332,7 @@ function resetWork(n) {
   if (n === 1) {
     document.getElementById('w1-breathe').style.display = '';
     document.getElementById('w1-eye').style.display = 'none';
+    document.getElementById('w1-move').style.display = 'none';
     document.getElementById('w1-done').style.display = 'none';
     document.getElementById('breathe-start-btn').style.display = '';
     document.getElementById('breathe-circle').textContent = '準備';
@@ -1343,18 +1428,20 @@ function doBreatheRound() {
     return iv;
   };
 
-  // Inhale 4s
+  // Inhale 4s — circle expands
   highlight('rhythm-inhale');
-  label.textContent = '吸う…'; circle.classList.add('inhale');
+  label.textContent = '吸う…';
+  circle.classList.remove('hold','exhale'); circle.classList.add('inhale');
   countUp(4, () => {
-    circle.classList.remove('inhale');
-    // Hold 4s
+    // Hold 4s — circle stays large
     highlight('rhythm-hold');
     label.textContent = '止める…'; circle.textContent = '1';
+    circle.classList.remove('inhale'); circle.classList.add('hold');
     countUp(4, () => {
-      // Exhale 8s
+      // Exhale 8s — circle shrinks slowly
       highlight('rhythm-exhale');
-      label.textContent = '吐く…'; circle.classList.add('exhale');
+      label.textContent = '吐く…';
+      circle.classList.remove('hold'); circle.classList.add('exhale');
       countUp(8, () => {
         circle.classList.remove('exhale');
         highlight('');
@@ -1365,12 +1452,15 @@ function doBreatheRound() {
 }
 
 const eyeSteps = [
-  { icon: '🏔️', desc: 'できるだけ遠くを見る\n窓の外・壁の向こうをイメージして' },
-  { icon: '☁️', desc: '空や天井の遠い一点を\nぼんやり眺める' },
+  { icon: '🏔️', desc: 'できるだけ遠くを見てください\n窓の外・壁の向こうをイメージして' },
+  { icon: '☁️', desc: '空や天井の遠い一点を\nぼんやり眺めてみましょう' },
   { icon: '🌅', desc: '視線を水平線のはるか先へ\n地平線・海の向こうをイメージして' },
-  { icon: '🌿', desc: '部屋の中で一番遠い角を\nゆっくり見る' },
-  { icon: '✨', desc: '遠くの光や明るい点を\n3秒間じっと見つめる' },
-  { icon: '🌊', desc: '目を閉じて\n広い海の水平線をイメージする' },
+  { icon: '🍽️', desc: 'あなたの好きな食べ物を\nイメージできますか？\n色・形・香り・味まで思い浮かべてみてください' },
+  { icon: '🎵', desc: 'あなたの好きな音楽、または\n好きな役者さんのイチオシのセリフを\n頭の中で思い浮かべてみましょう' },
+  { icon: '🌿', desc: '部屋の中で一番遠い角を\nゆっくり見てみましょう' },
+  { icon: '😌', desc: 'あなたのイチオシのリラックス方法は\n何ですか？\nその場面を頭の中でイメージしてみてください' },
+  { icon: '✨', desc: '遠くの光や明るい点を\n3秒間じっと見つめてください' },
+  { icon: '🌊', desc: '目を閉じて\n広い海の水平線をイメージしましょう' },
 ];
 let eyeStep = 0;
 
@@ -1380,15 +1470,47 @@ function showEyeStep() {
   document.getElementById('eye-desc').innerHTML = s.desc.replace(/\n/g, '<br>');
   document.getElementById('eye-progress').textContent = `${eyeStep+1} / ${eyeSteps.length}`;
   const btn = document.getElementById('eye-next-btn');
-  btn.textContent = eyeStep < eyeSteps.length - 1 ? '次へ →' : '完了 ✓';
+  btn.textContent = eyeStep < eyeSteps.length - 1 ? '次へ →' : '身体を動かす →';
 }
 
 function nextEyeStep() {
   eyeStep++;
   if (eyeStep >= eyeSteps.length) {
     document.getElementById('w1-eye').style.display = 'none';
-    document.getElementById('w1-done').style.display = '';
+    showMoveStep();
   } else { showEyeStep(); }
+}
+
+const moveSteps = [
+  { icon: '🙆', desc: '両手を上に伸ばして\n大きく背伸びをしてみましょう' },
+  { icon: '👂', desc: '耳たぶを優しく\nくるくると揉んでみてください\n体がほぐれていきます' },
+  { icon: '🚶', desc: '隣の部屋まで\nゆっくり歩いてみましょう\n場所を変えると気持ちも変わります' },
+  { icon: '💃', desc: '好きな音楽をイメージしながら\n体を少しだけ揺らしてみましょう\n踊るように動いてもOK' },
+  { icon: '🦸', desc: '胸を張って、両手を腰に当てて\nヒーローのポーズを3秒！\n自信がじわっと湧いてきます' },
+  { icon: '🤸', desc: '首をゆっくり左右に\n傾けて、肩の力を抜きましょう\n緊張がほぐれていきます' },
+];
+let moveIdx = 0;
+
+function showMoveStep() {
+  moveIdx = Math.floor(Math.random() * moveSteps.length);
+  const m = moveSteps[moveIdx];
+  document.getElementById('move-icon').textContent = m.icon;
+  document.getElementById('move-desc').innerHTML = m.desc.replace(/\n/g, '<br>');
+  document.getElementById('w1-move').style.display = '';
+}
+
+function nextMoveStep() {
+  let next;
+  do { next = Math.floor(Math.random() * moveSteps.length); } while (next === moveIdx && moveSteps.length > 1);
+  moveIdx = next;
+  const m = moveSteps[moveIdx];
+  document.getElementById('move-icon').textContent = m.icon;
+  document.getElementById('move-desc').innerHTML = m.desc.replace(/\n/g, '<br>');
+}
+
+function finishBreakState() {
+  document.getElementById('w1-move').style.display = 'none';
+  document.getElementById('w1-done').style.display = '';
 }
 
 // ═══════════════════════════════════════
@@ -1540,17 +1662,27 @@ let iwReleased = false;
 let iwCurrentType = 'balloon';
 
 const IW_CONFIG = {
-  balloon:   { title:'タップして空へ飛ばす', hint:'風船をタップすると飛んでいきます', doneMsg:'🎈 飛んでいきました。\n重たかったものが、空の向こうへ。', bg:'linear-gradient(180deg,#C8E8F8 0%,#EEF5E8 100%)' },
-  river:     { title:'タップして川に流す',   hint:'タップすると流れていきます',        doneMsg:'🍃 流れていきました。\n川はすべてを飲み込んで、海へと運びます。', bg:'linear-gradient(180deg,#A0D0C0 0%,#4A9AB0 60%,#2A6880 100%)' },
-  homerun:   { title:'タップしてホームラン！', hint:'タップすると星になります',          doneMsg:'⭐ 星になりました。\n夜空のどこかで、ずっと輝いています。', bg:'linear-gradient(180deg,#0A0A2A 0%,#1A2A6A 60%,#2A3A8A 100%)' },
-  blossom:   { title:'タップして花を散らす', hint:'タップすると花びらが散ります',       doneMsg:'🌸 散っていきました。\n花びらのように、軽やかに。', bg:'linear-gradient(180deg,#FFE8F0 0%,#FFF4F8 100%)' },
-  rocket:    { title:'タップして宇宙へ飛ばす', hint:'タップするとロケット発射！',        doneMsg:'🚀 宇宙へ飛び立ちました。\nもう重力は関係ありません。', bg:'linear-gradient(180deg,#000010 0%,#040430 35%,#0A3080 75%,#2060A8 100%)' },
-  ocean:     { title:'タップして海へ沈める', hint:'タップすると波が飲み込みます',       doneMsg:'🌊 海が飲み込みました。\n深い海の底で、静かに溶けていきます。', bg:'linear-gradient(180deg,#90C8E0 0%,#2860A0 50%,#102860 100%)' },
-  fireworks: { title:'タップして打ち上げる', hint:'タップすると花火が上がります',       doneMsg:'🎆 打ち上がりました！\nパーン！と空に弾けて、消えていきました。', bg:'linear-gradient(180deg,#060620 0%,#100840 50%,#1A0A60 100%)' },
+  balloon:   { title:'タップして空へ', hint:'風船をタップすると飛んでいきます', doneMsg:'🎈 飛んでいきました。\n重たかったものが、空の彼方へ。', bg:'linear-gradient(180deg,#87CEEB 0%,#C8E8F8 50%,#E8F4E0 100%)' },
+  river:     { title:'タップして川に流す', hint:'タップすると流れていきます', doneMsg:'🚣 流れていきました。\n大河がすべてを、遠くへと運んでいきます。', bg:'linear-gradient(180deg,#7EC8A0 0%,#3A9A6A 30%,#2878A0 70%,#1A5880 100%)' },
+  homerun:   { title:'タップして夜空へ！', hint:'タップすると星になります', doneMsg:'⭐ 星になりました。\n夜空のどこかで、ずっと輝いています。', bg:'linear-gradient(180deg,#020818 0%,#0A1A40 50%,#1A2A60 100%)' },
+  blossom:   { title:'タップして花吹雪に', hint:'タップすると花びらが舞います', doneMsg:'🌸 散っていきました。\n花吹雪のように、軽やかに空へ。', bg:'linear-gradient(180deg,#FFE0EE 0%,#FFF0F8 60%,#FFF8FC 100%)' },
+  rocket:    { title:'タップして宇宙へ', hint:'タップするとシャトル発射！', doneMsg:'🚀 宇宙へ飛び立ちました。\nもう重力は関係ありません。', bg:'linear-gradient(180deg,#000010 0%,#030320 40%,#080860 80%,#1040A0 100%)' },
+  arrow:     { title:'タップして狙いを定める', hint:'タップすると矢が放たれます', doneMsg:'💥 パン！と弾けました。\n一瞬にして、消えていきました。', bg:'linear-gradient(180deg,#87CEEB 0%,#C8E8F8 60%,#E0F0E8 100%)' },
+  fireworks: { title:'タップして打ち上げる', hint:'タップすると花火が上がります', doneMsg:'🎆 打ち上がりました！\nドーン！と大きく空に弾けて、消えていきました。', bg:'#02020A' },
 };
 
-function showIwTypeSelect() {
+const IW_DONE_DELAY = {
+  balloon: 6500, river: 7500, homerun: 6000,
+  blossom: 5500, rocket: 6500, arrow: 5500, fireworks: 7000
+};
+
+function showIwGift() {
   document.getElementById('w4-input-card').style.display = 'none';
+  document.getElementById('w4-gift-card').style.display = '';
+}
+
+function showIwTypeSelect() {
+  document.getElementById('w4-gift-card').style.display = 'none';
   document.getElementById('w4-type-card').style.display = '';
 }
 
@@ -1572,59 +1704,57 @@ function startIwScene(type) {
 }
 
 function buildIwScene(type, label) {
-  const lbl = `<div class="iw-label-el" id="iw-lbl">${label}</div>`;
+  const lbl = label ? `<div class="iw-label-el" id="iw-lbl">${label}</div>` : '';
   if (type === 'balloon') {
-    return `<div class="cloud" style="top:28px;left:18px;font-size:26px;opacity:.6">☁️</div>
-            <div class="cloud" style="top:44px;right:28px;font-size:18px;opacity:.5">☁️</div>
-            <div class="cloud" style="top:16px;left:52%;font-size:14px;opacity:.4">☁️</div>
-            <div class="iw-main-el" id="iw-main">🎈</div>
-            <div style="position:absolute;bottom:84px;left:calc(50% + 10px);width:2px;height:36px;background:rgba(0,0,0,0.18);transition:none" id="iw-string"></div>
+    return `<div style="position:absolute;top:10%;left:8%;font-size:30px;opacity:.5">☁️</div>
+            <div style="position:absolute;top:5%;right:12%;font-size:20px;opacity:.4">☁️</div>
+            <div style="position:absolute;top:18%;left:55%;font-size:24px;opacity:.35">☁️</div>
+            <div style="position:absolute;top:28%;right:8%;font-size:16px;opacity:.3">☁️</div>
+            <div id="iw-main" style="position:absolute;left:50%;bottom:12%;transform:translateX(-50%);font-size:120px;line-height:1;transition:none">🎈</div>
             ${lbl}`;
   }
   if (type === 'river') {
-    return `<div style="position:absolute;bottom:0;left:0;right:0;height:80px;background:rgba(40,120,160,0.5);border-radius:0 0 16px 16px"></div>
-            <div style="position:absolute;bottom:60px;left:10%;font-size:12px;color:rgba(255,255,255,0.5)">〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜</div>
-            <div style="position:absolute;bottom:40px;left:5%;font-size:12px;color:rgba(255,255,255,0.4)">〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜〜</div>
-            <div class="iw-main-el" id="iw-main" style="bottom:70px;font-size:63px">🍃</div>
-            ${lbl.replace('bottom:94px','bottom:116px')}`;
+    return `<canvas id="iw-canvas" style="position:absolute;top:0;left:0;width:100%;height:100%"></canvas>
+            <div id="iw-main" style="position:absolute;font-size:60px;line-height:1;pointer-events:none">🚣</div>
+            ${lbl}`;
   }
   if (type === 'homerun') {
-    return `<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 50% 110%,rgba(60,80,160,0.6) 0%,transparent 70%)"></div>
-            <div style="position:absolute;top:20px;right:20px;font-size:20px;opacity:0.4">✨</div>
-            <div style="position:absolute;top:50px;left:30px;font-size:14px;opacity:0.3">⭐</div>
-            <div style="position:absolute;top:30px;left:50%;font-size:12px;opacity:0.3">✦</div>
-            <div class="iw-main-el" id="iw-main" style="left:20%;font-size:66px">⚾</div>
-            ${lbl.replace('left:50%','left:20%').replace('translateX(-50%)','translateX(-50%)')}`;
+    // night sky with many stars
+    const stars = Array.from({length:30},(_,i)=>{
+      const x=Math.random()*100, y=Math.random()*85;
+      const s=6+Math.random()*12, op=0.3+Math.random()*0.6;
+      return `<div style="position:absolute;left:${x}%;top:${y}%;font-size:${s}px;opacity:${op}">★</div>`;
+    }).join('');
+    return `${stars}
+            <div id="iw-main" style="position:absolute;left:50%;bottom:8%;transform:translateX(-50%);font-size:110px;line-height:1">⚾</div>
+            ${lbl}`;
   }
   if (type === 'blossom') {
-    return `<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 50% 30%,rgba(255,200,220,0.8) 0%,transparent 70%)"></div>
-            <div class="iw-main-el" id="iw-main" style="font-size:72px">🌸</div>
+    return `<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 50% 50%,rgba(255,180,210,0.6) 0%,transparent 70%)"></div>
+            <div id="iw-main" style="position:absolute;left:50%;top:45%;transform:translate(-50%,-50%);font-size:140px;line-height:1">🌸</div>
             ${lbl}`;
   }
   if (type === 'rocket') {
-    return `<div style="position:absolute;top:0;left:0;right:0;bottom:0">
-              <div style="position:absolute;top:20px;left:15%;color:rgba(255,255,200,0.6);font-size:10px">★</div>
-              <div style="position:absolute;top:40px;right:20%;color:rgba(255,255,200,0.4);font-size:14px">★</div>
-              <div style="position:absolute;top:60px;left:40%;color:rgba(255,255,200,0.5);font-size:8px">★</div>
-              <div style="position:absolute;top:80px;right:35%;color:rgba(255,255,200,0.3);font-size:12px">★</div>
-            </div>
-            <div class="iw-main-el" id="iw-main" style="font-size:78px">🚀</div>
+    const stars = Array.from({length:25},(_,i)=>{
+      const x=Math.random()*100, y=Math.random()*90;
+      const s=6+Math.random()*10, op=0.3+Math.random()*0.5;
+      return `<div style="position:absolute;left:${x}%;top:${y}%;font-size:${s}px;opacity:${op};color:#FFF8CC">★</div>`;
+    }).join('');
+    return `${stars}
+            <div id="iw-exhaust" style="position:absolute;left:50%;bottom:6%;transform:translateX(-50%);font-size:60px;opacity:0">🔥</div>
+            <div id="iw-main" style="position:absolute;left:50%;bottom:12%;transform:translateX(-50%);font-size:110px;line-height:1">🚀</div>
             ${lbl}`;
   }
-  if (type === 'ocean') {
-    return `<div style="position:absolute;bottom:0;left:0;right:0;height:100px;background:linear-gradient(180deg,rgba(20,80,160,0.7),rgba(10,40,100,0.9));border-radius:0 0 16px 16px"></div>
-            <div style="position:absolute;bottom:90px;left:0;right:0;font-size:24px;text-align:center;opacity:0.7;letter-spacing:-4px">🌊🌊🌊🌊🌊</div>
-            <div class="iw-main-el" id="iw-main" style="bottom:110px;font-size:66px">⛵</div>
-            ${lbl.replace('bottom:94px','bottom:154px')}`;
+  if (type === 'arrow') {
+    return `<div style="position:absolute;top:10%;left:8%;font-size:28px;opacity:.5">☁️</div>
+            <div style="position:absolute;top:5%;right:10%;font-size:20px;opacity:.4">☁️</div>
+            <div id="iw-balloon" style="position:absolute;right:15%;top:35%;font-size:110px;line-height:1">🎈</div>
+            <div id="iw-bow" style="position:absolute;left:6%;top:50%;transform:translateY(-50%);font-size:80px">🏹</div>
+            <div id="iw-arrow" style="position:absolute;left:-10%;top:50%;transform:translateY(-50%);font-size:40px;opacity:0">➡️</div>
+            ${lbl}`;
   }
   if (type === 'fireworks') {
-    return `<div style="position:absolute;top:0;left:0;right:0;bottom:0">
-              <div style="position:absolute;top:25px;left:20%;color:rgba(255,200,100,0.4);font-size:12px">✦</div>
-              <div style="position:absolute;top:45px;right:25%;color:rgba(200,150,255,0.4);font-size:8px">✦</div>
-              <div style="position:absolute;top:15px;right:15%;color:rgba(100,220,255,0.4);font-size:10px">✦</div>
-            </div>
-            <div class="iw-main-el" id="iw-main" style="font-size:48px">🔥</div>
-            ${lbl}`;
+    return `<canvas id="iw-canvas" style="position:absolute;top:0;left:0;width:100%;height:100%"></canvas>`;
   }
   return '';
 }
@@ -1634,177 +1764,496 @@ function releaseIw() {
   iwReleased = true;
   const cfg = IW_CONFIG[iwCurrentType];
 
+  iwSound(iwCurrentType);
   if (iwCurrentType === 'balloon')   animBalloon();
   else if (iwCurrentType === 'river')     animRiver();
   else if (iwCurrentType === 'homerun')   animHomerun();
   else if (iwCurrentType === 'blossom')   animBlossom();
   else if (iwCurrentType === 'rocket')    animRocket();
-  else if (iwCurrentType === 'ocean')     animOcean();
+  else if (iwCurrentType === 'arrow')     animArrow();
   else if (iwCurrentType === 'fireworks') animFireworks();
 
   const doneLines = cfg.doneMsg.split('\n');
+  const delay = IW_DONE_DELAY[iwCurrentType] || 6000;
   setTimeout(() => {
     document.getElementById('w4-scene').style.display = 'none';
     document.getElementById('w4-done').style.display = '';
     document.getElementById('w4-done-msg').innerHTML =
       `${doneLines[0]}<br><span style="color:var(--text-muted);font-size:13px">${doneLines[1] || ''}</span>`;
-  }, 3300);
+  }, delay);
 }
 
-function animEl(id, keyframe, dur, fill='forwards') {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.style.animation = `${keyframe} ${dur}ms ease-in ${fill}`;
+// ═══════════════════════════════════════
+// Sound Effects (Web Audio API)
+// ═══════════════════════════════════════
+let _audioCtx = null;
+function getACtx() {
+  if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return _audioCtx;
 }
-
-function animBalloon() {
-  const m = document.getElementById('iw-main');
-  const s = document.getElementById('iw-string');
-  const l = document.getElementById('iw-lbl');
-  [m, s, l].forEach(el => { if (el) { el.style.transition = 'bottom 2.4s ease-in, opacity 2.4s ease-in'; } });
-  setTimeout(() => {
-    if (m) { m.style.bottom = '340px'; m.style.opacity = '0'; }
-    if (s) { s.style.bottom = '400px'; s.style.opacity = '0'; }
-    if (l) { l.style.bottom = '310px'; l.style.opacity = '0'; }
-  }, 50);
+function playTone(freq, type, start, dur, volStart, volEnd, ctx) {
+  const o=ctx.createOscillator(), g=ctx.createGain();
+  o.type=type; o.frequency.setValueAtTime(freq, ctx.currentTime+start);
+  g.gain.setValueAtTime(volStart, ctx.currentTime+start);
+  g.gain.linearRampToValueAtTime(volEnd, ctx.currentTime+start+dur);
+  o.connect(g); g.connect(ctx.destination);
+  o.start(ctx.currentTime+start); o.stop(ctx.currentTime+start+dur+0.05);
 }
-
-function animRiver() {
-  const m = document.getElementById('iw-main');
-  const l = document.getElementById('iw-lbl');
-  [m, l].forEach(el => {
-    if (el) {
-      el.style.transition = 'transform 3s ease-in, opacity 3s ease-in';
+function playNoise(start, dur, vol, ctx) {
+  const buf=ctx.createBuffer(1,ctx.sampleRate*dur,ctx.sampleRate);
+  const d=buf.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1);
+  const src=ctx.createBufferSource(), g=ctx.createGain(), f=ctx.createBiquadFilter();
+  f.type='bandpass'; f.frequency.value=800; f.Q.value=0.5;
+  g.gain.setValueAtTime(vol, ctx.currentTime+start);
+  g.gain.linearRampToValueAtTime(0, ctx.currentTime+start+dur);
+  src.buffer=buf; src.connect(f); f.connect(g); g.connect(ctx.destination);
+  src.start(ctx.currentTime+start);
+}
+function iwSound(type) {
+  try {
+    const ctx = getACtx();
+    if (type==='balloon') {
+      // gentle ascending whoosh
+      playTone(220,  'sine',   0,    2.5, 0.3, 0,   ctx);
+      playTone(440,  'sine',   0.3,  2.0, 0.15,0,   ctx);
+      playTone(660,  'sine',   0.8,  1.5, 0.08,0,   ctx);
+      playNoise(0, 2.5, 0.04, ctx);
+    } else if (type==='river') {
+      // flowing water: band-pass noise + low hum
+      playNoise(0,   5,   0.12, ctx);
+      playTone(120,  'sine',  0, 5, 0.08, 0.04, ctx);
+      playTone(200,  'sine',  0.5, 4, 0.05, 0, ctx);
+    } else if (type==='homerun') {
+      // crack! + ascending whistle + sparkle
+      playNoise(0, 0.12, 0.6, ctx);
+      playTone(200, 'sawtooth', 0, 0.1, 0.5, 0, ctx);
+      const o=ctx.createOscillator(), g=ctx.createGain();
+      o.type='sine'; o.frequency.setValueAtTime(300, ctx.currentTime+0.1);
+      o.frequency.linearRampToValueAtTime(1800, ctx.currentTime+2.0);
+      g.gain.setValueAtTime(0.25, ctx.currentTime+0.1);
+      g.gain.linearRampToValueAtTime(0, ctx.currentTime+2.2);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(ctx.currentTime+0.1); o.stop(ctx.currentTime+2.3);
+      // twinkle
+      [0,0.2,0.4].forEach(d=>playTone(2000+Math.random()*500,'sine',2.0+d,0.3,0.1,0,ctx));
+    } else if (type==='blossom') {
+      // cascade of chimes
+      const notes=[523,659,784,1047,1319];
+      notes.forEach((f,i)=>{ playTone(f,'sine',i*0.12,1.2,0.18,0,ctx); });
+      notes.slice().reverse().forEach((f,i)=>{ playTone(f,'sine',0.6+i*0.1,1.0,0.1,0,ctx); });
+    } else if (type==='rocket') {
+      // deep rumble + whoosh
+      playTone(60,'sawtooth',0,3.5,0.4,0,ctx);
+      playTone(90,'square',  0,3.5,0.2,0,ctx);
+      playNoise(0, 3.5, 0.15, ctx);
+      const o=ctx.createOscillator(), g=ctx.createGain();
+      o.type='sawtooth'; o.frequency.setValueAtTime(80,ctx.currentTime);
+      o.frequency.linearRampToValueAtTime(40,ctx.currentTime+3.5);
+      g.gain.setValueAtTime(0.3,ctx.currentTime); g.gain.linearRampToValueAtTime(0,ctx.currentTime+3.5);
+      o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+3.6);
+    } else if (type==='arrow') {
+      // twang + silence + POP
+      playNoise(0, 0.08, 0.5, ctx);
+      playTone(300,'sawtooth',0,0.08,0.4,0,ctx);
+      playTone(150,'sine',    0,0.3, 0.3,0,ctx); // bow resonance
+      // pop at impact ~0.9s
+      playNoise(0.85, 0.15, 0.7, ctx);
+      playTone(80,'sawtooth',0.85,0.12,0.6,0,ctx);
+      [1,2,3].forEach(i=>playTone(600+i*200,'sine',0.88+i*0.06,0.2,0.15,0,ctx));
+    } else if (type==='fireworks') {
+      // whistle up + massive BOOM + crackle
+      const o=ctx.createOscillator(), g=ctx.createGain();
+      o.type='sine'; o.frequency.setValueAtTime(400,ctx.currentTime);
+      o.frequency.linearRampToValueAtTime(2000,ctx.currentTime+0.9);
+      g.gain.setValueAtTime(0.2,ctx.currentTime); g.gain.linearRampToValueAtTime(0,ctx.currentTime+0.9);
+      o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+1.0);
+      // BOOM
+      playTone(50,'sawtooth',1.0,0.6,0.8,0,ctx);
+      playTone(80,'sine',    1.0,0.8,0.6,0,ctx);
+      playNoise(1.0, 0.5, 0.5, ctx);
+      // crackle
+      for(let i=0;i<12;i++) playTone(1000+Math.random()*2000,'sine',1.0+i*0.12,0.15,0.12,0,ctx);
     }
-  });
-  setTimeout(() => {
-    if (m) { m.style.transform = 'translateX(220px) translateY(-20px) rotate(30deg)'; m.style.opacity = '0'; }
-    if (l) { l.style.transform = 'translateX(160px)'; l.style.opacity = '0'; }
-  }, 50);
+  } catch(e) {}
 }
 
-function animHomerun() {
-  const m = document.getElementById('iw-main');
-  if (!m) return;
+// ─── Balloon: large → small, rises to top ───────────────────────────────────
+function animBalloon() {
   const scene = document.getElementById('iw-scene');
-  const rect = scene.getBoundingClientRect();
-  const dur = 2100;
-  const startX = rect.width * 0.2;
-  const startY = rect.height - 44;
-  const endX = rect.width * 0.75;
-  const endY = 30;
-  const peakY = -60;
+  const m = document.getElementById('iw-main');
+  const l = document.getElementById('iw-lbl');
+  if (!m) return;
+  const H = scene.clientHeight;
+  const dur = 3500;
   let start = null;
-  m.style.transition = 'none';
-  m.style.bottom = 'auto';
-  m.style.top = startY + 'px';
-  m.style.left = startX + 'px';
-  m.style.transform = 'none';
-
+  const startBottom = H * 0.12;
+  m.style.bottom = startBottom + 'px';
+  m.style.left = '50%';
+  m.style.transform = 'translateX(-50%)';
+  if (l) { l.style.transition = 'opacity 0.5s'; setTimeout(() => l.style.opacity='0', 400); }
   function step(ts) {
     if (!start) start = ts;
     const t = Math.min((ts - start) / dur, 1);
     const ease = t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
-    const x = startX + (endX - startX) * ease;
-    const y = startY + (endY - startY) * ease - 4 * (startY - peakY) * ease * (1 - ease);
-    m.style.left = x + 'px';
-    m.style.top = y + 'px';
-    m.style.fontSize = (44 + t * 12) + 'px';
-    if (t < 1) { requestAnimationFrame(step); }
-    else {
-      m.textContent = '⭐';
-      m.style.animation = 'iwStarPop 0.5s ease forwards';
-      setTimeout(() => { m.style.animation = 'iwStarFade 0.8s ease 0.6s forwards'; }, 0);
-    }
+    const curBottom = startBottom + (H * 1.1 - startBottom) * ease;
+    const scale = Math.max(0, 1 - ease);
+    const drift = Math.sin(t * Math.PI * 3) * 18;
+    m.style.bottom = curBottom + 'px';
+    m.style.fontSize = (120 * scale) + 'px';
+    m.style.transform = `translateX(calc(-50% + ${drift}px))`;
+    m.style.opacity = scale < 0.08 ? '0' : '1';
+    if (t < 1) requestAnimationFrame(step);
   }
-  const lbl = document.getElementById('iw-lbl');
-  if (lbl) { lbl.style.transition = 'opacity 0.5s'; lbl.style.opacity = '0'; }
   requestAnimationFrame(step);
 }
 
+// ─── River: winding river on canvas, boat follows bezier path ───────────────
+function animRiver() {
+  const scene = document.getElementById('iw-scene');
+  const canvas = document.getElementById('iw-canvas');
+  const boat = document.getElementById('iw-main');
+  const l = document.getElementById('iw-lbl');
+  if (!canvas) return;
+  if (l) { l.style.transition='opacity 0.5s'; setTimeout(()=>l.style.opacity='0',300); }
+  requestAnimationFrame(() => {
+    const dpr = window.devicePixelRatio || 1;
+    const W = scene.clientWidth || 375, H = scene.clientHeight || 600;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+
+    // Draw winding river background
+    function drawRiver() {
+      // Sky / land background
+      const skyGrad = ctx.createLinearGradient(0,0,0,H);
+      skyGrad.addColorStop(0,'#7EC8A0'); skyGrad.addColorStop(0.3,'#5AAA80');
+      skyGrad.addColorStop(0.6,'#3A8A60'); skyGrad.addColorStop(1,'#286040');
+      ctx.fillStyle = skyGrad; ctx.fillRect(0,0,W,H);
+
+      // River path: bottom-center → right → upper-left (cubic bezier)
+      // P0=bottom, P1=right, P2=upper-left, P3=top-left
+      const p0={x:W*0.5,y:H}, p1={x:W*0.85,y:H*0.65}, p2={x:W*0.2,y:H*0.35}, p3={x:W*0.25,y:0};
+      ctx.beginPath();
+      ctx.moveTo(p0.x, p0.y);
+      ctx.bezierCurveTo(p1.x, p1.y, p2.x, p2.y, p3.x, p3.y);
+      ctx.lineWidth = W * 0.35; ctx.strokeStyle = '#1A78B0'; ctx.stroke();
+      ctx.lineWidth = W * 0.32; ctx.strokeStyle = '#2A9AD0'; ctx.stroke();
+
+      // Wave ripples along river
+      ctx.lineWidth = 1.5; ctx.strokeStyle = 'rgba(200,240,255,0.35)';
+      for (let i=0;i<8;i++) {
+        const tRipple = i/8;
+        const rx = cubicBezier(p0.x,p1.x,p2.x,p3.x,tRipple);
+        const ry = cubicBezier(p0.y,p1.y,p2.y,p3.y,tRipple);
+        ctx.beginPath();
+        ctx.arc(rx + (Math.random()-0.5)*20, ry, 15+Math.random()*8, 0, Math.PI*2);
+        ctx.stroke();
+      }
+    }
+    drawRiver();
+
+    // Cubic bezier helper
+    function cubicBezier(p0,p1,p2,p3,t) {
+      return (1-t)**3*p0 + 3*(1-t)**2*t*p1 + 3*(1-t)*t**2*p2 + t**3*p3;
+    }
+
+    // Boat path points
+    const bp0={x:W*0.5,y:H*0.9}, bp1={x:W*0.8,y:H*0.65}, bp2={x:W*0.22,y:H*0.35}, bp3={x:W*0.28,y:H*0.05};
+    const dur = 4500;
+    let last = null;
+    function animStep(ts) {
+      if (!last) last = ts;
+      const t = Math.min((ts-last)/dur, 1); // t relative to start
+      const progress = Math.min((ts - last) / dur, 1);
+      const bx = cubicBezier(bp0.x,bp1.x,bp2.x,bp3.x,progress);
+      const by = cubicBezier(bp0.y,bp1.y,bp2.y,bp3.y,progress);
+      const scale = Math.max(0.05, 1 - progress * 0.95);
+      if (boat) {
+        boat.style.left = bx + 'px';
+        boat.style.top = by + 'px';
+        boat.style.fontSize = (60 * scale) + 'px';
+        boat.style.transform = `translate(-50%,-50%)`;
+        boat.style.opacity = scale < 0.08 ? '0' : '1';
+      }
+      if (progress < 1) requestAnimationFrame(animStep);
+    }
+    // start timing from now
+    requestAnimationFrame(ts => { last = ts; requestAnimationFrame(animStep); });
+  });
+}
+
+// ─── Homerun: night sky, arc from bottom to upper-right, becomes star ────────
+function animHomerun() {
+  const m = document.getElementById('iw-main');
+  if (!m) return;
+  const scene = document.getElementById('iw-scene');
+  const W = scene.clientWidth, H = scene.clientHeight;
+  const dur = 2800;
+  const startX = W * 0.5, startY = H * 0.88;
+  const endX = W * 0.85, endY = H * 0.06;
+  let start = null;
+  m.style.position = 'absolute';
+  m.style.left = startX + 'px'; m.style.top = startY + 'px';
+  m.style.transform = 'translate(-50%,-50%)';
+  m.style.fontSize = '110px';
+  const lbl = document.getElementById('iw-lbl');
+  if (lbl) { lbl.style.transition='opacity 0.3s'; lbl.style.opacity='0'; }
+
+  // motion trail
+  const trails = [];
+  for (let i=0;i<8;i++) {
+    const tr = document.createElement('div');
+    tr.style.cssText='position:absolute;pointer-events:none;transform:translate(-50%,-50%)';
+    tr.textContent='⚾'; scene.appendChild(tr); trails.push(tr);
+  }
+
+  function step(ts) {
+    if (!start) start = ts;
+    const t = Math.min((ts-start)/dur, 1);
+    const ease = 1 - (1-t)*(1-t);
+    const x = startX + (endX-startX)*ease;
+    // arc: parabola peaking at top-right
+    const arcY = startY + (endY-startY)*ease - H*0.25*4*ease*(1-ease);
+    const scale = Math.max(0.05, 1 - t*0.92);
+    m.style.left=x+'px'; m.style.top=arcY+'px';
+    m.style.fontSize=(110*scale)+'px';
+    trails.forEach((tr,i)=>{
+      const tp=Math.max(0,t-(i+1)*0.05);
+      const ease2=1-(1-tp)*(1-tp);
+      const tx2=startX+(endX-startX)*ease2;
+      const ty2=startY+(endY-startY)*ease2-H*0.25*4*ease2*(1-ease2);
+      const sc2=Math.max(0.02,1-tp*0.92);
+      tr.style.left=tx2+'px'; tr.style.top=ty2+'px';
+      tr.style.fontSize=(110*sc2)+'px';
+      tr.style.opacity=tp>0?(0.35-i*0.04).toString():'0';
+    });
+    if (t < 1) { requestAnimationFrame(step); }
+    else {
+      trails.forEach(tr=>tr.remove());
+      m.textContent='⭐';
+      m.style.fontSize='90px';
+      m.style.animation='iwStarPop 0.7s ease forwards';
+      setTimeout(()=>{ m.style.animation='iwStarFade 1.5s ease 0.8s forwards'; }, 0);
+    }
+  }
+  requestAnimationFrame(step);
+}
+
+// ─── Blossom: one large flower → burst petals fill screen (花吹雪) ──────────
 function animBlossom() {
   const m = document.getElementById('iw-main');
   if (!m) return;
   const scene = document.getElementById('iw-scene');
-  m.style.display = 'none';
-  const petals = ['🌸','🌷','🌺','🌼','🌸','🌷','🌺','🌸'];
-  const angles = [0, 45, 90, 135, 180, 225, 270, 315];
-  angles.forEach((deg, i) => {
+  const W = scene.clientWidth, H = scene.clientHeight;
+  const cx = W/2, cy = H*0.45;
+
+  // Flash the big flower
+  m.style.transition = 'transform 0.15s ease-out, opacity 0.2s';
+  m.style.transform = 'translate(-50%,-50%) scale(1.3)';
+  setTimeout(() => { m.style.opacity='0'; m.style.transform='translate(-50%,-50%) scale(2)'; }, 150);
+
+  const petalEmojis = ['🌸','🌸','🌺','🌷','🌸','🌸','🌺','🌷','🌸','🌸'];
+  const totalPetals = 50;
+  for (let i=0; i<totalPetals; i++) {
     const p = document.createElement('div');
-    const rad = deg * Math.PI / 180;
-    const dist = 80 + Math.random() * 60;
-    const tx = Math.cos(rad) * dist + 'px';
-    const ty = (-Math.sin(rad) * dist) + 'px';
-    p.style.cssText = `position:absolute;left:50%;top:50%;font-size:${24+Math.random()*16}px;
-      --tx:${tx};--ty:${ty};
-      animation:iwBurstPetal ${1350+i*120}ms ease-out ${i*90}ms forwards;
-      transform:translate(-50%,-50%);`;
-    p.textContent = petals[i];
+    const angle = Math.random() * Math.PI * 2;
+    const dist = (0.3 + Math.random() * 0.7) * Math.max(W, H) * 0.7;
+    const px = Math.cos(angle) * dist + 'px';
+    const py = Math.sin(angle) * dist + 'px';
+    const rot = (Math.random()-0.5)*720 + 'deg';
+    const sz = 20 + Math.random() * 36;
+    const delay = Math.random() * 400;
+    const dur2 = 1200 + Math.random() * 800;
+    p.style.cssText = `position:absolute;left:${cx}px;top:${cy}px;
+      font-size:${sz}px;transform:translate(-50%,-50%);pointer-events:none;
+      --px:${px};--py:${py};--pr:${rot};
+      animation:iwPetalBurst ${dur2}ms cubic-bezier(.2,.8,.3,1) ${delay}ms forwards;`;
+    p.textContent = petalEmojis[i % petalEmojis.length];
     scene.appendChild(p);
-  });
+  }
   const lbl = document.getElementById('iw-lbl');
-  if (lbl) { lbl.style.transition = 'opacity 0.5s'; setTimeout(() => lbl.style.opacity = '0', 300); }
+  if (lbl) { lbl.style.transition='opacity 0.3s'; lbl.style.opacity='0'; }
 }
 
+// ─── Rocket: space shuttle launches from bottom, scales to zero ──────────────
 function animRocket() {
   const m = document.getElementById('iw-main');
-  const l = document.getElementById('iw-lbl');
-  if (m) { m.style.animation = 'iwRocketUp 2.4s cubic-bezier(.4,0,.2,1) forwards'; }
-  if (l) { l.style.animation = 'iwRocketUp 2.4s cubic-bezier(.4,0,.2,1) forwards'; }
-  // Fire trail
+  const exhaust = document.getElementById('iw-exhaust');
   const scene = document.getElementById('iw-scene');
-  setTimeout(() => {
-    const fire = document.createElement('div');
-    fire.style.cssText = 'position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-size:42px;animation:iwRocketUp 2.4s cubic-bezier(.4,0,.2,1) forwards;opacity:0.7';
-    fire.textContent = '🔥';
-    scene.appendChild(fire);
-  }, 100);
-}
+  const H = scene.clientHeight;
+  if (!m) return;
+  const lbl = document.getElementById('iw-lbl');
+  if (lbl) { lbl.style.transition='opacity 0.4s'; lbl.style.opacity='0'; }
+  const dur = 3500;
+  let start = null;
+  const startBottom = H * 0.12;
+  if (exhaust) { exhaust.style.opacity='0.9'; exhaust.style.bottom = '3%'; }
 
-function animOcean() {
-  const m = document.getElementById('iw-main');
-  const l = document.getElementById('iw-lbl');
-  if (m) { m.style.animation = 'iwSink 2.7s ease-in forwards'; }
-  if (l) { l.style.animation = 'iwSinkLabel 2.7s ease-in forwards'; }
-  // Rising wave overlay
-  const scene = document.getElementById('iw-scene');
-  const wave = document.createElement('div');
-  wave.style.cssText = `position:absolute;bottom:0;left:0;right:0;height:100%;
-    background:linear-gradient(180deg,rgba(20,80,160,0) 0%,rgba(10,50,120,0.85) 40%,rgba(5,30,80,0.95) 100%);
-    animation:iwWaveRise 3s ease-out forwards;transform:translateY(100%);border-radius:0 0 16px 16px;`;
-  scene.appendChild(wave);
-}
-
-function animFireworks() {
-  const m = document.getElementById('iw-main');
-  const l = document.getElementById('iw-lbl');
-  if (m) { m.style.animation = 'iwFireworkUp 1.2s ease-in forwards'; }
-  if (l) { l.style.transition = 'opacity 0.3s'; l.style.opacity = '0'; }
-  const scene = document.getElementById('iw-scene');
-  // Burst after projectile reaches top
-  setTimeout(() => {
-    const colors = ['🔴','🟡','🔵','🟢','🟠','🟣','⚪','🔶'];
-    const cx = scene.clientWidth / 2;
-    const cy = 70;
-    for (let i = 0; i < 12; i++) {
-      const spark = document.createElement('div');
-      const deg = (i / 12) * 360;
-      const rad = deg * Math.PI / 180;
-      const dist = 70 + Math.random() * 50;
-      const tx = (Math.cos(rad) * dist) + 'px';
-      const ty = (Math.sin(rad) * dist) + 'px';
-      spark.style.cssText = `position:absolute;left:${cx}px;top:${cy}px;font-size:27px;
-        --tx:calc(${tx} - 9px);--ty:calc(${ty} - 9px);
-        animation:iwSpark 1.5s ease-out forwards;`;
-      spark.textContent = colors[i % colors.length];
-      scene.appendChild(spark);
+  function step(ts) {
+    if (!start) start = ts;
+    const t = Math.min((ts-start)/dur, 1);
+    const ease = t*t; // accelerate
+    const curBottom = startBottom + H * 0.9 * ease;
+    const scale = Math.max(0.02, 1 - ease*0.98);
+    m.style.bottom = curBottom + 'px';
+    m.style.fontSize = (110 * scale) + 'px';
+    m.style.left = '50%'; m.style.transform = 'translateX(-50%)';
+    m.style.opacity = scale < 0.05 ? '0' : '1';
+    if (exhaust) {
+      exhaust.style.bottom = (curBottom - 60*scale) + 'px';
+      exhaust.style.fontSize = (60*scale) + 'px';
+      exhaust.style.opacity = scale < 0.05 ? '0' : '0.85';
     }
-    // Text flash
-    const flash = document.createElement('div');
-    flash.style.cssText = 'position:absolute;left:50%;top:40px;transform:translateX(-50%);font-size:20px;font-weight:800;color:#FFD700;text-shadow:0 0 10px #FFD700;animation:iwStarFade 2.25s ease 0.5s forwards;white-space:nowrap';
-    flash.textContent = '🎆 ドーン！';
-    scene.appendChild(flash);
-  }, 1275);
+    // flame trail particles
+    if (t < 0.8 && Math.random() < 0.4) {
+      const flame = document.createElement('div');
+      const curLeft = scene.clientWidth / 2;
+      flame.style.cssText = `position:absolute;left:${curLeft + (Math.random()-0.5)*20}px;
+        bottom:${curBottom-20}px;font-size:${20+Math.random()*20}px;
+        pointer-events:none;opacity:0.7;transition:opacity 0.4s,bottom 0.4s`;
+      flame.textContent = '🔥';
+      scene.appendChild(flame);
+      setTimeout(()=>{ flame.style.opacity='0'; flame.style.bottom=(parseFloat(flame.style.bottom)-30)+'px'; },50);
+      setTimeout(()=>flame.remove(), 500);
+    }
+    if (t < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+// ─── Arrow: bow shoots arrow, balloon pops ───────────────────────────────────
+function animArrow() {
+  const balloon = document.getElementById('iw-balloon');
+  const bow = document.getElementById('iw-bow');
+  const arrow = document.getElementById('iw-arrow');
+  const scene = document.getElementById('iw-scene');
+  const lbl = document.getElementById('iw-lbl');
+  if (lbl) { lbl.style.transition='opacity 0.3s'; lbl.style.opacity='0'; }
+
+  // Step 1: bow pulls back (slight shake)
+  if (bow) { bow.style.transition='transform 0.3s'; bow.style.transform='translateY(-50%) translateX(10px)'; }
+  setTimeout(() => {
+    if (bow) bow.style.transform='translateY(-50%) translateX(-5px)';
+  }, 300);
+
+  // Step 2: arrow flies
+  setTimeout(() => {
+    if (arrow) {
+      arrow.style.opacity='1';
+      arrow.style.animation='iwArrowFly 0.5s linear forwards';
+    }
+    if (bow) { bow.style.transition='opacity 0.3s'; bow.style.opacity='0'; }
+  }, 400);
+
+  // Step 3: balloon pops
+  setTimeout(() => {
+    if (balloon) balloon.style.opacity='0';
+    if (arrow) arrow.style.opacity='0';
+    // pop particles
+    const bRect = balloon.getBoundingClientRect();
+    const sRect = scene.getBoundingClientRect();
+    const cx = bRect.left - sRect.left + bRect.width/2;
+    const cy = bRect.top - sRect.top + bRect.height/2;
+    const colors=['#FF4444','#FF8800','#FFDD00','#FF6688','#FF2255'];
+    for (let i=0;i<30;i++) {
+      const p = document.createElement('div');
+      const angle=Math.random()*Math.PI*2;
+      const dist=40+Math.random()*100;
+      const tx=Math.cos(angle)*dist, ty=Math.sin(angle)*dist;
+      p.style.cssText=`position:absolute;left:${cx}px;top:${cy}px;width:8px;height:8px;
+        border-radius:50%;background:${colors[i%colors.length]};pointer-events:none;
+        transition:transform 0.7s ease-out,opacity 0.6s ease-in 0.1s`;
+      scene.appendChild(p);
+      setTimeout(()=>{ p.style.transform=`translate(${tx}px,${ty}px)`; p.style.opacity='0'; },20);
+      setTimeout(()=>p.remove(), 800);
+    }
+    // pop text
+    const pop = document.createElement('div');
+    pop.style.cssText=`position:absolute;left:${cx}px;top:${cy}px;transform:translate(-50%,-50%);
+      font-size:60px;pointer-events:none;animation:iwStarPop 0.5s ease forwards`;
+    pop.textContent='💥';
+    scene.appendChild(pop);
+    setTimeout(()=>{ pop.style.transition='opacity 0.8s'; pop.style.opacity='0'; }, 600);
+    setTimeout(()=>pop.remove(), 1500);
+  }, 900);
+}
+
+// ─── Fireworks: single HUGE burst ────────────────────────────────────────────
+function animFireworks() {
+  const scene = document.getElementById('iw-scene');
+  const canvas = document.getElementById('iw-canvas');
+  if (!canvas) return;
+  requestAnimationFrame(() => {
+    const dpr = window.devicePixelRatio || 1;
+    const W = scene.clientWidth || 375, H = scene.clientHeight || 600;
+    canvas.width = W*dpr; canvas.height = H*dpr;
+    canvas.style.width=W+'px'; canvas.style.height=H+'px';
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+
+    const BURST_COLORS = ['#FF3366','#FF8800','#FFDD00','#00EEFF','#AA44FF','#FF66CC','#44FF99','#FFFFFF'];
+    let phase = 'rise', riseT = 0;
+    const bx = W*0.5, by = H*0.18;
+    const riseDur = 1000;
+    let curX=W*0.5, curY=H;
+    const sparks = [];
+
+    function initBurst() {
+      const n = 80; // many sparks for huge burst
+      for (let i=0;i<n;i++) {
+        const angle = (i/n)*Math.PI*2 + Math.random()*0.15;
+        const speed = 4 + Math.random()*5;
+        const color = BURST_COLORS[Math.floor(Math.random()*BURST_COLORS.length)];
+        sparks.push({ x:bx, y:by, vx:Math.cos(angle)*speed, vy:Math.sin(angle)*speed,
+          color, alpha:1, len:20+Math.random()*20 });
+      }
+      // inner bright ring
+      for (let i=0;i<30;i++) {
+        const angle=(i/30)*Math.PI*2;
+        sparks.push({ x:bx, y:by, vx:Math.cos(angle)*2, vy:Math.sin(angle)*2,
+          color:'#FFFFFF', alpha:1, len:14 });
+      }
+    }
+
+    let last=null;
+    function loop(ts) {
+      if (!last) last=ts;
+      const dt=ts-last; last=ts;
+      ctx.fillStyle='rgba(2,2,20,0.18)';
+      ctx.fillRect(0,0,W,H);
+
+      if (phase==='rise') {
+        riseT+=dt;
+        const prog=Math.min(riseT/riseDur,1);
+        curX=W*0.5+(bx-W*0.5)*prog;
+        curY=H-(H-by)*prog;
+        // draw shell
+        ctx.beginPath(); ctx.arc(curX,curY,5,0,Math.PI*2);
+        ctx.fillStyle='#FFEE88'; ctx.shadowColor='#FFEE88'; ctx.shadowBlur=16; ctx.fill(); ctx.shadowBlur=0;
+        // trail
+        ctx.beginPath(); ctx.moveTo(W*0.5,H); ctx.lineTo(curX,curY);
+        ctx.strokeStyle='rgba(255,220,100,0.25)'; ctx.lineWidth=3; ctx.stroke();
+        if (prog>=1) { phase='burst'; initBurst(); }
+      } else {
+        sparks.forEach(s=>{
+          s.x+=s.vx*dt*0.085; s.y+=s.vy*dt*0.085;
+          s.vy+=0.06; s.alpha-=0.005;
+          s.vx*=0.975; s.vy*=0.975;
+          ctx.save();
+          ctx.globalAlpha=Math.max(0,s.alpha);
+          ctx.beginPath(); ctx.moveTo(s.x,s.y);
+          ctx.lineTo(s.x-s.vx*s.len*0.4,s.y-s.vy*s.len*0.4);
+          ctx.strokeStyle=s.color; ctx.lineWidth=3;
+          ctx.shadowColor=s.color; ctx.shadowBlur=10; ctx.stroke();
+          ctx.restore();
+        });
+        sparks.splice(0,sparks.length,...sparks.filter(s=>s.alpha>0.01));
+      }
+      if (phase==='rise' || sparks.length>0) requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+  });
 }
 
 // ═══════════════════════════════════════
@@ -2093,6 +2542,44 @@ function drawWaveChart(sessions) {
   });
 }
 
+function updateHabitRings(sessions) {
+  const now = new Date();
+  const todayStr = now.toDateString();
+  const startOfWeek = new Date(now); startOfWeek.setDate(now.getDate() - now.getDay());
+  startOfWeek.setHours(0,0,0,0);
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  let dayCount=0, weekCount=0, monthCount=0;
+  (sessions||[]).forEach(s => {
+    const d = new Date(s.ts);
+    if (d.toDateString()===todayStr) dayCount++;
+    if (d >= startOfWeek) weekCount++;
+    if (d >= startOfMonth) monthCount++;
+  });
+
+  const DAY_GOAL=1, WEEK_GOAL=7, MONTH_GOAL=30;
+  const dayR=54, weekR=76, monthR=98;
+
+  const setRing = (id, r, count, goal) => {
+    const circ = 2*Math.PI*r;
+    const pct = Math.min(count/goal, 1);
+    const offset = circ * (1-pct);
+    const el = document.getElementById(id);
+    if (el) { el.style.strokeDasharray=circ; el.style.strokeDashoffset=circ; }
+    // Trigger animation after paint
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{ if(el) el.style.strokeDashoffset=offset; }));
+  };
+
+  setRing('ring-day',   dayR,   dayCount,   DAY_GOAL);
+  setRing('ring-week',  weekR,  weekCount,  WEEK_GOAL);
+  setRing('ring-month', monthR, monthCount, MONTH_GOAL);
+
+  const cn = document.getElementById('ring-center-num');
+  if (cn) cn.textContent = dayCount;
+  const dn=document.getElementById('ring-day-num'), wn=document.getElementById('ring-week-num'), mn=document.getElementById('ring-month-num');
+  if(dn) dn.textContent=dayCount; if(wn) wn.textContent=weekCount; if(mn) mn.textContent=monthCount;
+}
+
 function showHistory() {
   const data = loadData();
   const container = document.getElementById('history-cards');
@@ -2101,6 +2588,7 @@ function showHistory() {
   document.getElementById('clear-all-btn').style.display = hasSessions ? '' : 'none';
 
   drawWaveChart(data.sessions || []);
+  updateHabitRings(data.sessions || []);
 
   if (!hasSessions) {
     container.innerHTML = '<div class="card"><p style="text-align:center;color:var(--text-muted)">まだ記録がありません</p></div>';
