@@ -641,7 +641,7 @@
   </div>
 
   <div class="flex-row" style="gap:8px">
-    <button class="btn btn-ghost" style="flex:1" onclick="goBack()">前へ</button>
+    <button class="btn btn-ghost" style="flex:1" onclick="goBack()">← 戻る</button>
     <button class="btn btn-ghost" style="flex:1" onclick="showScreen('screen-menu')">メニュー</button>
   </div>
 </section>
@@ -697,7 +697,7 @@
   </div>
 
   <div class="flex-row" style="gap:8px">
-    <button class="btn btn-ghost" style="flex:1" onclick="goBack()">前へ</button>
+    <button class="btn btn-ghost" style="flex:1" onclick="goBack()">← 戻る</button>
     <button class="btn btn-ghost" style="flex:1" onclick="showScreen('screen-menu')">メニュー</button>
   </div>
 </section>
@@ -819,7 +819,7 @@
   </div>
 
   <div class="flex-row" style="gap:8px">
-    <button class="btn btn-ghost" style="flex:1" onclick="goBack()">前へ</button>
+    <button class="btn btn-ghost" style="flex:1" onclick="goBack()">← 戻る</button>
     <button class="btn btn-ghost" style="flex:1" onclick="showScreen('screen-menu')">メニュー</button>
   </div>
 </section>
@@ -856,7 +856,7 @@
       <button class="iw-type-btn" onclick="startIwScene('homerun')"><span class="iw-icon">⚾</span><span class="iw-name">夜空へ<br>ホームラン</span></button>
       <button class="iw-type-btn" onclick="startIwScene('blossom')"><span class="iw-icon">🌸</span><span class="iw-name">花吹雪で<br>散らす</span></button>
       <button class="iw-type-btn" onclick="startIwScene('rocket')"><span class="iw-icon">🚀</span><span class="iw-name">シャトルで<br>宇宙へ</span></button>
-      <button class="iw-type-btn" onclick="startIwScene('arrow')"><span class="iw-icon">🏹</span><span class="iw-name">弓矢で<br>破裂</span></button>
+      <button class="iw-type-btn" onclick="startIwScene('arrow')"><span class="iw-icon">🏹</span><span class="iw-name">会心の<br>一撃</span></button>
       <button class="iw-type-btn" onclick="startIwScene('fireworks')"><span class="iw-icon">🎆</span><span class="iw-name">花火で<br>打ち上げる</span></button>
     </div>
   </div>
@@ -878,7 +878,7 @@
   </div>
 
   <div class="flex-row" style="gap:8px">
-    <button class="btn btn-ghost" style="flex:1" onclick="goBack()">前へ</button>
+    <button class="btn btn-ghost" style="flex:1" onclick="goBackIw()">← 戻る</button>
     <button class="btn btn-ghost" style="flex:1" onclick="showScreen('screen-menu')">メニュー</button>
   </div>
 </section>
@@ -949,7 +949,7 @@
   </div>
 
   <div class="flex-row" style="gap:8px">
-    <button class="btn btn-ghost" style="flex:1" onclick="goBack()">前へ</button>
+    <button class="btn btn-ghost" style="flex:1" onclick="goBack()">← 戻る</button>
     <button class="btn btn-ghost" style="flex:1" onclick="showScreen('screen-menu')">メニュー</button>
   </div>
 </section>
@@ -1010,8 +1010,8 @@
     セッション完了 ✓
   </button>
   <div class="flex-row" style="gap:8px">
-    <button class="btn btn-ghost" style="flex:1" onclick="goBack()">前へ</button>
-    <button class="btn btn-ghost" style="flex:1" onclick="showScreen('screen-menu')">メニュー</button>
+    <button class="btn btn-ghost" style="flex:1" onclick="goBack()">← 戻る</button>
+    <button class="btn btn-primary" style="flex:1" onclick="startNewSession()">メニューを選ぶ</button>
   </div>
 </section>
 
@@ -1064,8 +1064,8 @@
   </div>
 
   <div class="flex-row">
+    <button class="btn btn-ghost" onclick="showHistory()">← 戻る</button>
     <button class="btn btn-primary" onclick="showScreen('screen-menu')">メニュー</button>
-    <button class="btn btn-ghost" onclick="showHistory()">履歴を見る</button>
   </div>
 </section>
 
@@ -1138,8 +1138,8 @@
   </div>
   <div id="history-cards"></div>
   <div class="flex-row">
-    <button class="btn btn-primary" onclick="startNewSession()">メニューを選ぶ →</button>
     <button class="btn btn-ghost" onclick="showScreen('screen-exit')">← 戻る</button>
+    <button class="btn btn-primary" onclick="startNewSession()">メニュー</button>
   </div>
 </section>
 
@@ -1178,6 +1178,25 @@ function showScreen(id) {
 }
 function goBack() {
   if (_prevScreenId) showScreen(_prevScreenId);
+}
+
+function goBackIw() {
+  const scene     = document.getElementById('w4-scene');
+  const typeCard  = document.getElementById('w4-type-card');
+  const giftCard  = document.getElementById('w4-gift-card');
+  const inputCard = document.getElementById('w4-input-card');
+  if (scene && scene.style.display !== 'none') {
+    scene.style.display = 'none';
+    typeCard.style.display = '';
+  } else if (typeCard && typeCard.style.display !== 'none') {
+    typeCard.style.display = 'none';
+    giftCard.style.display = '';
+  } else if (giftCard && giftCard.style.display !== 'none') {
+    giftCard.style.display = 'none';
+    inputCard.style.display = '';
+  } else {
+    goBack();
+  }
 }
 
 // ═══════════════════════════════════════
@@ -1832,13 +1851,13 @@ const IW_CONFIG = {
   homerun:   { title:'タップして夜空へ！', hint:'タップすると星になります', doneMsg:'⭐ 星になりました。\n夜空のどこかで、ずっと輝いています。', bg:'linear-gradient(180deg,#020818 0%,#0A1A40 50%,#1A2A60 100%)' },
   blossom:   { title:'タップして花吹雪に', hint:'タップすると花びらが舞います', doneMsg:'🌸 散っていきました。\n花吹雪のように、軽やかに空へ。', bg:'linear-gradient(180deg,#FFE0EE 0%,#FFF0F8 60%,#FFF8FC 100%)' },
   rocket:    { title:'タップして宇宙へ', hint:'タップするとシャトル発射！', doneMsg:'🚀 宇宙へ飛び立ちました。\nもう重力は関係ありません。', bg:'linear-gradient(180deg,#000010 0%,#030320 40%,#080860 80%,#1040A0 100%)' },
-  arrow:     { title:'タップして狙いを定める', hint:'タップすると矢が放たれます', doneMsg:'💥 パン！と弾けました。\n一瞬にして、消えていきました。', bg:'linear-gradient(180deg,#87CEEB 0%,#C8E8F8 60%,#E0F0E8 100%)' },
+  arrow:     { title:'タップして会心の一撃', hint:'タップすると矢が放たれます', doneMsg:'💥 会心の一撃！\nすべて、消えていきました。', bg:'linear-gradient(180deg,#87CEEB 0%,#B8D8F0 50%,#D8EEF8 100%)' },
   fireworks: { title:'タップして打ち上げる', hint:'タップすると花火が上がります', doneMsg:'🎆 打ち上がりました！\nドーン！と大きく空に弾けて、消えていきました。', bg:'#02020A' },
 };
 
 const IW_DONE_DELAY = {
   balloon: 6500, river: 8000, homerun: 6000,
-  blossom: 5500, rocket: 6500, arrow: 5500, fireworks: 7000
+  blossom: 5500, rocket: 6500, arrow: 7500, fireworks: 7000
 };
 
 function showIwGift() {
@@ -1880,7 +1899,7 @@ function buildIwScene(type, label) {
   }
   if (type === 'river') {
     return `<canvas id="iw-canvas" style="position:absolute;top:0;left:0;width:100%;height:100%"></canvas>
-            <div id="iw-main" style="position:absolute;font-size:60px;line-height:1;pointer-events:none">🚣</div>
+            <div id="iw-main" style="position:absolute;font-size:60px;line-height:1;pointer-events:none;opacity:0"></div>
             ${lbl}`;
   }
   if (type === 'homerun') {
@@ -1911,12 +1930,7 @@ function buildIwScene(type, label) {
             ${lbl}`;
   }
   if (type === 'arrow') {
-    return `<div style="position:absolute;top:10%;left:8%;font-size:28px;opacity:.5">☁️</div>
-            <div style="position:absolute;top:5%;right:10%;font-size:20px;opacity:.4">☁️</div>
-            <div id="iw-balloon" style="position:absolute;right:15%;top:35%;font-size:110px;line-height:1">🎈</div>
-            <div id="iw-bow" style="position:absolute;left:6%;top:50%;transform:translateY(-50%);font-size:80px">🏹</div>
-            <div id="iw-arrow" style="position:absolute;left:-10%;top:50%;transform:translateY(-50%);font-size:40px;opacity:0">➡️</div>
-            ${lbl}`;
+    return `<canvas id="iw-canvas" style="position:absolute;top:0;left:0;width:100%;height:100%"></canvas>${lbl}`;
   }
   if (type === 'fireworks') {
     return `<canvas id="iw-canvas" style="position:absolute;top:0;left:0;width:100%;height:100%"></canvas>`;
@@ -2074,7 +2088,9 @@ function animBalloon() {
 
 // ─── River: winding river on canvas, boat follows bezier path ───────────────
 // ─── River → Waterfall dive ──────────────────────────────────────────────────
+let iwLeafText = '';
 function animRiver() {
+  iwLeafText = (document.getElementById('iw-content')?.value || '').trim().slice(0, 20);
   const scene = document.getElementById('iw-scene');
   const canvas = document.getElementById('iw-canvas');
   const lbl = document.getElementById('iw-lbl');
@@ -2247,13 +2263,29 @@ function animRiver() {
         return; // done
       }
 
+      // Draw leaf with text
+      const leafW = sz * 1.1, leafH = sz * 0.55;
       ctx.save();
       ctx.translate(ox, oy);
       ctx.rotate(rot);
       ctx.globalAlpha = alpha;
-      ctx.font = `${sz}px serif`;
+      // Leaf body
+      ctx.beginPath();
+      ctx.ellipse(0, 0, leafW/2, leafH/2, 0, 0, Math.PI*2);
+      ctx.fillStyle='#5BB87A'; ctx.fill();
+      ctx.strokeStyle='#3A8A50'; ctx.lineWidth=1.5; ctx.stroke();
+      // Midrib
+      ctx.beginPath(); ctx.moveTo(-leafW/2+2, 0); ctx.lineTo(leafW/2-2, 0);
+      ctx.strokeStyle='#3A8A50'; ctx.lineWidth=1; ctx.stroke();
+      // Text on leaf
+      const fontSize = Math.max(8, Math.min(11, sz*0.22));
+      ctx.font = `bold ${fontSize}px sans-serif`;
+      ctx.fillStyle = 'rgba(255,255,255,0.9)';
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText('🚣', 0, 0);
+      ctx.save(); ctx.rotate(-rot); // keep text readable
+      const displayText = iwLeafText.length > 10 ? iwLeafText.slice(0,9)+'…' : iwLeafText;
+      ctx.fillText(displayText, 0, 0);
+      ctx.restore();
       ctx.restore();
     }
 
@@ -2267,6 +2299,16 @@ function animRiver() {
         ctx.globalAlpha = 1;
       });
       particles.splice(0, particles.length, ...particles.filter(p => p.alpha > 0));
+    }
+
+    function drawRainbow(alpha) {
+      const colors=['rgba(255,0,0,','rgba(255,140,0,','rgba(255,230,0,','rgba(0,200,80,','rgba(30,120,255,','rgba(160,0,220,'];
+      const cx2=W/2, cy2=H+H*0.3;
+      colors.forEach((c,i)=>{
+        const r2=H*0.65+i*18;
+        ctx.beginPath(); ctx.arc(cx2,cy2,r2,Math.PI,0);
+        ctx.strokeStyle=c+alpha+')'; ctx.lineWidth=14; ctx.stroke();
+      });
     }
 
     // ── Main loop ─────────────────────────────────────
@@ -2290,6 +2332,13 @@ function animRiver() {
       drawObject(ts, elapsed);
       drawParticles();
 
+      // Rainbow afterglow
+      if (elapsed > P4) {
+        const t = Math.min((elapsed - P4) / 2000, 1);
+        const a = t * (1 - Math.max(0,(elapsed-P5+1500)/1500)) * 0.35;
+        if (a > 0) drawRainbow(a);
+      }
+
       if (elapsed < P5) requestAnimationFrame(loop);
     }
     requestAnimationFrame(loop);
@@ -2306,48 +2355,60 @@ function animHomerun() {
   const startX = W * 0.5, startY = H * 0.88;
   const endX = W * 0.85, endY = H * 0.06;
   let start = null;
-  m.style.position = 'absolute';
-  m.style.left = startX + 'px'; m.style.top = startY + 'px';
-  m.style.transform = 'translate(-50%,-50%)';
-  m.style.fontSize = '110px';
+  const BALL_R = 37; // 2/3 of original ~55px radius
   const lbl = document.getElementById('iw-lbl');
   if (lbl) { lbl.style.transition='opacity 0.3s'; lbl.style.opacity='0'; }
+  if (m) m.style.opacity='0'; // hide emoji, use canvas
 
-  // motion trail
-  const trails = [];
-  for (let i=0;i<8;i++) {
-    const tr = document.createElement('div');
-    tr.style.cssText='position:absolute;pointer-events:none;transform:translate(-50%,-50%)';
-    tr.textContent='⚾'; scene.appendChild(tr); trails.push(tr);
+  // Use canvas overlay for baseball drawing
+  let cvs = scene.querySelector('canvas');
+  if (!cvs) { cvs = document.createElement('canvas'); cvs.style.cssText='position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none'; scene.appendChild(cvs); }
+  const dpr = window.devicePixelRatio||1;
+  cvs.width=W*dpr; cvs.height=H*dpr; cvs.style.width=W+'px'; cvs.style.height=H+'px';
+  const ctx=cvs.getContext('2d'); ctx.scale(dpr,dpr);
+
+  function drawBall(x,y,r,alpha) {
+    if(r<1)return;
+    ctx.globalAlpha=alpha;
+    // White body
+    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+    ctx.fillStyle='#F8F8F0'; ctx.fill();
+    ctx.strokeStyle='rgba(180,180,180,0.5)'; ctx.lineWidth=0.5; ctx.stroke();
+    // Red stitches
+    ctx.strokeStyle='#CC2200'; ctx.lineWidth=Math.max(0.8,r*0.06);
+    // Left stitch arc
+    ctx.beginPath(); ctx.arc(x-r*0.28, y, r*0.55, -0.6, 0.6); ctx.stroke();
+    // Right stitch arc
+    ctx.beginPath(); ctx.arc(x+r*0.28, y, r*0.55, Math.PI-0.6, Math.PI+0.6); ctx.stroke();
+    // Stitch dots
+    ctx.fillStyle='#CC2200';
+    [[-0.05,-0.28],[0.05,-0.18],[-0.05,0.18],[0.05,0.28]].forEach(([dx,dy])=>{
+      ctx.beginPath(); ctx.arc(x+dx*r*2.5, y+dy*r*2.5, Math.max(0.8,r*0.07),0,Math.PI*2); ctx.fill();
+    });
+    ctx.globalAlpha=1;
   }
 
+  const trailHist=[];
   function step(ts) {
     if (!start) start = ts;
     const t = Math.min((ts-start)/dur, 1);
-    const ease = 1 - (1-t)*(1-t);
+    const ease = 1-(1-t)*(1-t);
     const x = startX + (endX-startX)*ease;
-    // arc: parabola peaking at top-right
     const arcY = startY + (endY-startY)*ease - H*0.25*4*ease*(1-ease);
-    const scale = Math.max(0.05, 1 - t*0.92);
-    m.style.left=x+'px'; m.style.top=arcY+'px';
-    m.style.fontSize=(110*scale)+'px';
-    trails.forEach((tr,i)=>{
-      const tp=Math.max(0,t-(i+1)*0.05);
-      const ease2=1-(1-tp)*(1-tp);
-      const tx2=startX+(endX-startX)*ease2;
-      const ty2=startY+(endY-startY)*ease2-H*0.25*4*ease2*(1-ease2);
-      const sc2=Math.max(0.02,1-tp*0.92);
-      tr.style.left=tx2+'px'; tr.style.top=ty2+'px';
-      tr.style.fontSize=(110*sc2)+'px';
-      tr.style.opacity=tp>0?(0.35-i*0.04).toString():'0';
-    });
+    const scale = Math.max(0.02, 1-t*0.96);
+    trailHist.push({x,y:arcY,r:BALL_R*scale});
+    if(trailHist.length>10) trailHist.shift();
+
+    ctx.clearRect(0,0,W,H);
+    // Trail
+    trailHist.forEach((p,i)=>{ drawBall(p.x,p.y,p.r,(i+1)/trailHist.length*0.25); });
+    // Ball
+    drawBall(x,arcY,BALL_R*scale,1);
+
     if (t < 1) { requestAnimationFrame(step); }
     else {
-      trails.forEach(tr=>tr.remove());
-      m.textContent='⭐';
-      m.style.fontSize='90px';
-      m.style.animation='iwStarPop 0.7s ease forwards';
-      setTimeout(()=>{ m.style.animation='iwStarFade 1.5s ease 0.8s forwards'; }, 0);
+      ctx.clearRect(0,0,W,H);
+      if(m){ m.textContent='⭐'; m.style.opacity='1'; m.style.left=endX+'px'; m.style.top=endY+'px'; m.style.fontSize='60px'; m.style.animation='iwStarPop 0.7s ease forwards'; setTimeout(()=>{ m.style.animation='iwStarFade 1.5s ease 0.8s forwards'; },0); }
     }
   }
   requestAnimationFrame(step);
@@ -2400,8 +2461,8 @@ function animRocket() {
   if (lbl) { lbl.style.transition='opacity 0.4s'; lbl.style.opacity='0'; }
   const dur = 3500;
   let start = null;
-  const startBottom = H * 0.12;
-  if (exhaust) { exhaust.style.opacity='0.9'; exhaust.style.bottom = '3%'; }
+  const startBottom = 0;
+  if (exhaust) { exhaust.style.opacity='0.9'; exhaust.style.bottom = '0px'; }
 
   function step(ts) {
     if (!start) start = ts;
@@ -2435,61 +2496,194 @@ function animRocket() {
   requestAnimationFrame(step);
 }
 
-// ─── Arrow: bow shoots arrow, balloon pops ───────────────────────────────────
+// ─── Arrow: arrow flies up from bottom, balloon pops at top (canvas) ─────────
 function animArrow() {
-  const balloon = document.getElementById('iw-balloon');
-  const bow = document.getElementById('iw-bow');
-  const arrow = document.getElementById('iw-arrow');
   const scene = document.getElementById('iw-scene');
+  const canvas = document.getElementById('iw-canvas');
   const lbl = document.getElementById('iw-lbl');
-  if (lbl) { lbl.style.transition='opacity 0.3s'; lbl.style.opacity='0'; }
+  if (!canvas) return;
+  if (lbl) { lbl.style.transition='opacity 0.4s'; lbl.style.opacity='0'; }
 
-  // Step 1: bow pulls back (slight shake)
-  if (bow) { bow.style.transition='transform 0.3s'; bow.style.transform='translateY(-50%) translateX(10px)'; }
-  setTimeout(() => {
-    if (bow) bow.style.transform='translateY(-50%) translateX(-5px)';
-  }, 300);
+  requestAnimationFrame(() => {
+    const dpr = window.devicePixelRatio || 1;
+    const W = scene.clientWidth || 375, H = scene.clientHeight || 500;
+    canvas.width = W*dpr; canvas.height = H*dpr;
+    canvas.style.width = W+'px'; canvas.style.height = H+'px';
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
 
-  // Step 2: arrow flies
-  setTimeout(() => {
-    if (arrow) {
-      arrow.style.opacity='1';
-      arrow.style.animation='iwArrowFly 0.5s linear forwards';
+    // Layout
+    const balloonX = W * 0.5, balloonY = H * 0.2, balloonR = Math.min(W,H)*0.13;
+    const arrowStartX = W * 0.5, arrowStartY = H * 0.95;
+    const arrowEndX = balloonX, arrowEndY = balloonY + balloonR;
+
+    // Phases (ms)
+    const CHARGE = 600, FLY = 500, HIT = 100, BURST = 1500, LINGER = 3000;
+    const T_FLY   = CHARGE;
+    const T_HIT   = T_FLY + FLY;
+    const T_BURST = T_HIT + HIT;
+    const T_DONE  = T_BURST + BURST + LINGER;
+
+    // Particles at burst
+    const parts = [];
+    let burstTriggered = false;
+
+    function spawnBurst() {
+      const colors = ['#FF2244','#FF6600','#FFDD00','#FF88AA','#FF4400','#FFFFFF','#FFB800'];
+      // Big burst
+      for (let i=0;i<60;i++) {
+        const ang = Math.random()*Math.PI*2;
+        const spd = 2 + Math.random()*7;
+        parts.push({ x:balloonX, y:balloonY, vx:Math.cos(ang)*spd, vy:Math.sin(ang)*spd,
+          r: 4+Math.random()*8, alpha:1, color:colors[i%colors.length], gravity:0.12 });
+      }
+      // Ribbon streamers
+      for (let i=0;i<20;i++) {
+        const ang = -Math.PI/2 + (Math.random()-0.5)*Math.PI*1.5;
+        const spd = 3+Math.random()*5;
+        parts.push({ x:balloonX, y:balloonY, vx:Math.cos(ang)*spd, vy:Math.sin(ang)*spd,
+          r:3, alpha:1, color:'#FF4488', gravity:0.05, streak:true });
+      }
     }
-    if (bow) { bow.style.transition='opacity 0.3s'; bow.style.opacity='0'; }
-  }, 400);
 
-  // Step 3: balloon pops
-  setTimeout(() => {
-    if (balloon) balloon.style.opacity='0';
-    if (arrow) arrow.style.opacity='0';
-    // pop particles
-    const bRect = balloon.getBoundingClientRect();
-    const sRect = scene.getBoundingClientRect();
-    const cx = bRect.left - sRect.left + bRect.width/2;
-    const cy = bRect.top - sRect.top + bRect.height/2;
-    const colors=['#FF4444','#FF8800','#FFDD00','#FF6688','#FF2255'];
-    for (let i=0;i<30;i++) {
-      const p = document.createElement('div');
-      const angle=Math.random()*Math.PI*2;
-      const dist=40+Math.random()*100;
-      const tx=Math.cos(angle)*dist, ty=Math.sin(angle)*dist;
-      p.style.cssText=`position:absolute;left:${cx}px;top:${cy}px;width:8px;height:8px;
-        border-radius:50%;background:${colors[i%colors.length]};pointer-events:none;
-        transition:transform 0.7s ease-out,opacity 0.6s ease-in 0.1s`;
-      scene.appendChild(p);
-      setTimeout(()=>{ p.style.transform=`translate(${tx}px,${ty}px)`; p.style.opacity='0'; },20);
-      setTimeout(()=>p.remove(), 800);
+    function drawBg() {
+      const g = ctx.createLinearGradient(0,0,0,H);
+      g.addColorStop(0,'#87CEEB'); g.addColorStop(0.5,'#B8D8F0'); g.addColorStop(1,'#D8EEF8');
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+      // Clouds
+      [[W*0.15,H*0.1,28],[W*0.72,H*0.08,22],[W*0.88,H*0.25,18]].forEach(([cx,cy,r])=>{
+        ctx.fillStyle='rgba(255,255,255,0.7)';
+        ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(cx+r*0.7,cy+r*0.2,r*0.75,0,Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(cx-r*0.6,cy+r*0.15,r*0.7,0,Math.PI*2); ctx.fill();
+      });
     }
-    // pop text
-    const pop = document.createElement('div');
-    pop.style.cssText=`position:absolute;left:${cx}px;top:${cy}px;transform:translate(-50%,-50%);
-      font-size:60px;pointer-events:none;animation:iwStarPop 0.5s ease forwards`;
-    pop.textContent='💥';
-    scene.appendChild(pop);
-    setTimeout(()=>{ pop.style.transition='opacity 0.8s'; pop.style.opacity='0'; }, 600);
-    setTimeout(()=>pop.remove(), 1500);
-  }, 900);
+
+    function drawBalloon(alpha) {
+      ctx.globalAlpha = alpha;
+      // Balloon body
+      const bg = ctx.createRadialGradient(balloonX-balloonR*0.3, balloonY-balloonR*0.3, 1, balloonX, balloonY, balloonR);
+      bg.addColorStop(0,'#FF6688'); bg.addColorStop(0.6,'#EE2255'); bg.addColorStop(1,'#CC0033');
+      ctx.beginPath(); ctx.arc(balloonX, balloonY, balloonR, 0, Math.PI*2);
+      ctx.fillStyle=bg; ctx.fill();
+      // Highlight
+      ctx.beginPath(); ctx.arc(balloonX-balloonR*0.28, balloonY-balloonR*0.28, balloonR*0.22, 0, Math.PI*2);
+      ctx.fillStyle='rgba(255,255,255,0.45)'; ctx.fill();
+      // String
+      ctx.beginPath(); ctx.moveTo(balloonX, balloonY+balloonR);
+      ctx.quadraticCurveTo(balloonX+12, balloonY+balloonR+30, balloonX-4, balloonY+balloonR+60);
+      ctx.strokeStyle='rgba(200,200,200,0.8)'; ctx.lineWidth=1.5; ctx.stroke();
+      ctx.globalAlpha=1;
+    }
+
+    function drawArrow(t) {
+      // t: 0=bottom, 1=balloon
+      const x = arrowStartX + (arrowEndX-arrowStartX)*t;
+      const y = arrowStartY + (arrowEndY-arrowStartY)*t;
+      const angle = -Math.PI/2; // straight up
+      ctx.save();
+      ctx.translate(x,y); ctx.rotate(angle);
+      // Shaft
+      ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0,50);
+      ctx.strokeStyle='#8B6914'; ctx.lineWidth=3; ctx.stroke();
+      // Head
+      ctx.beginPath(); ctx.moveTo(0,-2); ctx.lineTo(-7,16); ctx.lineTo(7,16);
+      ctx.closePath(); ctx.fillStyle='#4A4A4A'; ctx.fill();
+      // Feathers
+      ctx.beginPath(); ctx.moveTo(0,48); ctx.lineTo(-8,62); ctx.moveTo(0,48); ctx.lineTo(8,62);
+      ctx.strokeStyle='#CC6600'; ctx.lineWidth=2.5; ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawBow(chargeT) {
+      // chargeT: 0=idle, 1=fully drawn
+      const bx = W*0.5, by = H*0.88;
+      ctx.save(); ctx.translate(bx, by);
+      // Bow arc
+      ctx.beginPath();
+      ctx.arc(0, 0, 30+chargeT*8, -Math.PI*0.85, Math.PI*0.85);
+      ctx.strokeStyle='#8B4513'; ctx.lineWidth=4; ctx.stroke();
+      // String (pulled back in center)
+      const pull = chargeT * 18;
+      ctx.beginPath();
+      ctx.moveTo(0+30*Math.cos(-Math.PI*0.85), 30*Math.sin(-Math.PI*0.85));
+      ctx.quadraticCurveTo(-pull, 0, 0+30*Math.cos(Math.PI*0.85), 30*Math.sin(Math.PI*0.85));
+      ctx.strokeStyle='#D2B48C'; ctx.lineWidth=2; ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawAfterGlow(progress) {
+      // Faint shimmer where balloon was
+      const r = balloonR * (1 + progress * 2);
+      const g2 = ctx.createRadialGradient(balloonX, balloonY, 0, balloonX, balloonY, r);
+      g2.addColorStop(0, `rgba(255,220,230,${0.4*(1-progress)})`);
+      g2.addColorStop(1, 'rgba(255,220,230,0)');
+      ctx.fillStyle=g2; ctx.fillRect(0,0,W,H);
+    }
+
+    let startTs = null;
+    function loop(ts) {
+      if (!startTs) startTs = ts;
+      const elapsed = ts - startTs;
+      ctx.clearRect(0,0,W,H);
+      drawBg();
+
+      if (elapsed < T_FLY) {
+        // Charging bow
+        const t = elapsed / CHARGE;
+        drawBalloon(1);
+        drawBow(t);
+        // Arrow nocked at bow
+        drawArrow(0);
+
+      } else if (elapsed < T_HIT) {
+        // Arrow flying upward
+        const t = (elapsed - T_FLY) / FLY;
+        const ease = 1-(1-t)*(1-t);
+        drawBalloon(1);
+        drawArrow(ease);
+
+      } else if (elapsed < T_BURST) {
+        // Impact frame
+        drawBalloon(0.3);
+
+      } else {
+        // Burst phase
+        if (!burstTriggered) { burstTriggered=true; spawnBurst(); }
+        const t = (elapsed - T_BURST) / (BURST + LINGER);
+        // After-glow
+        drawAfterGlow(Math.min(t*2,1));
+        // Particles
+        parts.forEach(p => {
+          p.x += p.vx; p.y += p.vy; p.vy += p.gravity; p.vx *= 0.97; p.alpha -= 0.012;
+          if (p.alpha <= 0) return;
+          ctx.globalAlpha = Math.max(0,p.alpha);
+          if (p.streak) {
+            ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(p.x-p.vx*4,p.y-p.vy*4);
+            ctx.strokeStyle=p.color; ctx.lineWidth=p.r; ctx.stroke();
+          } else {
+            ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+            ctx.fillStyle=p.color; ctx.fill();
+          }
+          ctx.globalAlpha=1;
+        });
+
+        // "空" — empty space text lingers
+        if (t > 0.4) {
+          const a = Math.min((t-0.4)*2.5, 1) * (1 - Math.max(0,(t-0.85)*6.5));
+          ctx.globalAlpha = Math.max(0,a);
+          ctx.font = `bold ${Math.round(W*0.07)}px sans-serif`;
+          ctx.fillStyle = 'rgba(120,120,140,1)';
+          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText('— ただ、何もない —', W/2, H*0.22);
+          ctx.globalAlpha=1;
+        }
+      }
+
+      if (elapsed < T_DONE) requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+  });
 }
 
 // ─── Fireworks: single HUGE burst ────────────────────────────────────────────
