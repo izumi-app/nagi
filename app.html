@@ -329,26 +329,50 @@
   @keyframes iwArrowFly { 0%{left:-10%;opacity:1} 100%{left:65%;opacity:1} }
   @keyframes iwPetalBurst { 0%{transform:translate(-50%,-50%) scale(1);opacity:1} 100%{transform:translate(var(--px),var(--py)) scale(0.2) rotate(var(--pr));opacity:0} }
 
-  /* Work 5 — SCORE */
-  .score-nav { display: flex; gap: 6px; flex-wrap: wrap; }
-  .score-tab {
-    padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600;
-    border: 2px solid var(--border); background: var(--surface);
-    cursor: pointer; color: var(--text-muted); transition: all 0.2s;
-  }
-  .score-tab.active { background: var(--primary); border-color: var(--primary); color: #fff; }
-  .score-tab.done { background: var(--success); border-color: var(--success); color: #fff; }
-  .score-panel { display: none; flex-direction: column; gap: 16px; }
-  .score-panel.active { display: flex; }
-  .score-question { font-size: 15px; font-weight: 600; line-height: 1.6; margin-bottom: 4px; }
-  .score-hint { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 8px; }
+  /* Work 5 — 思考の網ほどき */
   .score-textarea {
-    width: 100%; min-height: 100px;
+    width: 100%; min-height: 100px; box-sizing: border-box;
     border: 2px solid var(--border); border-radius: var(--radius-sm);
     padding: 14px; font-family: var(--font); font-size: 14px;
     line-height: 1.8; resize: vertical; background: var(--surface); color: var(--text);
   }
   .score-textarea:focus { outline: none; border-color: var(--primary); }
+
+  /* Creature chips */
+  .w5-creature-chip {
+    text-align: center; padding: 10px 14px; border-radius: 12px;
+    background: var(--surface2); min-width: 60px;
+  }
+
+  /* SCORE map (cross layout) */
+  .w5-map-grid {
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    padding: 8px 0;
+  }
+  .w5-map-row-mid { display: flex; align-items: center; gap: 10px; width: 100%; justify-content: center; }
+  .w5-map-node {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 10px 12px; border-radius: 14px; border: 2px solid var(--border);
+    background: var(--surface2); min-width: 80px; text-align: center; cursor: pointer;
+    transition: all 0.2s; position: relative;
+  }
+  .w5-node-label { font-size: 11px; font-weight: 700; margin-top: 4px; color: var(--text-muted); }
+  .w5-node-current { border-color: var(--primary); background: rgba(92,138,175,0.10); min-width: 92px; }
+  .w5-node-ideal   { border-color: #5B8F5B; background: rgba(91,143,91,0.10); }
+  .w5-node-cause   { border-color: #999; }
+  .w5-node-resource{ border-color: #8F5B2A; background: rgba(143,91,42,0.08); }
+  .w5-node-effect  { border-color: #5B5B8F; background: rgba(91,91,143,0.08); }
+  .w5-node-active  { box-shadow: 0 0 0 3px var(--primary); }
+  .w5-node-done    { opacity: 0.55; }
+
+  /* Overview items */
+  .w5-overview-item {
+    display: flex; align-items: flex-start; gap: 12px; padding: 12px;
+    border-radius: 10px; background: var(--surface2); margin-bottom: 10px; cursor: pointer;
+    border: 2px solid transparent; transition: border-color 0.2s;
+  }
+  .w5-overview-item:hover { border-color: var(--primary); }
+  .w5-overview-item.w5-revisit { border-color: var(--primary); }
 
   /* ── After scale & baby steps ── */
   .change-indicator {
@@ -560,7 +584,7 @@
     <div class="menu-card" onclick="selectMenu(5)">
       <div class="menu-icon" style="background:rgba(91,143,168,0.12)">🗺️</div>
       <div class="menu-info">
-        <h3>海図モデル</h3>
+        <h3>思考の網ほどき</h3>
         <p>現在地と次の一歩を構造的に整理する</p>
       </div>
       <span class="menu-tag" id="tag-5" style="display:none">おすすめ</span>
@@ -883,71 +907,124 @@
 </section>
 
 <!-- ══════════════════════════════════════
-     SCREEN W5: SCORE Model
+     SCREEN W5: 思考の網ほどき
 ════════════════════════════════════════ -->
 <section id="screen-work-5" class="screen">
-  <div class="card">
-    <div class="card-title">🗺️ 海図モデル</div>
-    <h2>現在地と次の一歩を<br>構造的に整理する</h2>
-    <p>5つの質問に短く答えるだけで、頭の中が地図になります。</p>
-  </div>
 
-  <div class="card">
-    <div class="score-nav" style="margin-bottom:16px">
-      <button class="score-tab active" id="stab-S" onclick="switchScore('S')">S 状況</button>
-      <button class="score-tab" id="stab-C" onclick="switchScore('C')">C 原因</button>
-      <button class="score-tab" id="stab-O" onclick="switchScore('O')">O 目標</button>
-      <button class="score-tab" id="stab-R" onclick="switchScore('R')">R リソース</button>
-      <button class="score-tab" id="stab-E" onclick="switchScore('E')">E 効果</button>
+  <!-- Phase 1: Intro + net canvas -->
+  <div id="w5-phase-intro">
+    <div class="card">
+      <div class="card-title">🕸️ 思考の網ほどき</div>
+      <h2>絡まった思考をほどいて、<br>仕分けて、眺めてみる</h2>
+      <p style="color:var(--text-muted);font-size:14px;line-height:1.8">頭の中の絡まりを、そっとほぐしていきましょう。<br>5つの視点で整理していきます。</p>
     </div>
-
-    <div class="progress-track" style="margin-bottom:20px">
-      <div class="progress-fill" id="score-progress" style="width:20%"></div>
+    <div class="card" style="padding:0;overflow:hidden;min-height:220px;position:relative">
+      <canvas id="w5-net-canvas" style="width:100%;display:block"></canvas>
     </div>
-
-    <div class="score-panel active" id="spanel-S">
-      <div class="score-question">📍 今、何が問題になっていますか？</div>
-      <div class="score-hint">状況を客観的に一言で。「〜が〜な状態」という形でOKです。</div>
-      <textarea class="score-textarea" id="score-S" placeholder="例：案件が重なって締め切りが3つ重複している状態"></textarea>
-      <button class="btn btn-primary" onclick="nextScore('C')">次へ →</button>
-    </div>
-
-    <div class="score-panel" id="spanel-C">
-      <div class="score-question">🔍 なぜそうなっていると思いますか？</div>
-      <div class="score-hint">分析より直感で。思い当たることを書いてみてください。</div>
-      <textarea class="score-textarea" id="score-C" placeholder="例：仕事を断れなかった、見積もりが甘かった…"></textarea>
-      <button class="btn btn-primary" onclick="nextScore('O')">次へ →</button>
-    </div>
-
-    <div class="score-panel" id="spanel-O">
-      <div class="score-question">🎯 本当はどんな状態になりたいですか？</div>
-      <div class="score-hint">理想の状態を。「〜できている状態」「〜な自分」という形でも。</div>
-      <textarea class="score-textarea" id="score-O" placeholder="例：1つのことに集中して、落ち着いて仕事できている状態"></textarea>
-      <button class="btn btn-primary" onclick="nextScore('R')">次へ →</button>
-    </div>
-
-    <div class="score-panel" id="spanel-R">
-      <div class="score-question">💪 今、使えるリソース・強みは何ですか？</div>
-      <div class="score-hint">スキル・人脈・時間・経験など。小さくてもOKです。</div>
-      <textarea class="score-textarea" id="score-R" placeholder="例：明日午前は空いている、〇〇さんに相談できる…"></textarea>
-      <button class="btn btn-primary" onclick="nextScore('E')">次へ →</button>
-    </div>
-
-    <div class="score-panel" id="spanel-E">
-      <div class="score-question">✨ 解決したら何が変わりますか？</div>
-      <div class="score-hint">未来の自分はどんな気持ち・状態になっていますか？</div>
-      <textarea class="score-textarea" id="score-E" placeholder="例：週末ゆっくり休める、自信を持って仕事できている…"></textarea>
-      <button class="btn btn-success" onclick="completeSCORE()">整理完了 ✓</button>
+    <div style="padding:0 0 16px">
+      <button class="btn btn-primary" style="width:100%" onclick="w5Untangle()">ほぐしてみる →</button>
     </div>
   </div>
 
-  <div class="card" id="score-summary" style="display:none">
-    <div class="card-title">あなたの現在地マップ</div>
-    <div id="score-summary-content"></div>
-    <button class="btn btn-primary" style="margin-top:16px" onclick="goToAfterScale()">変化を確認する →</button>
+  <!-- Phase 2: Reveal creatures -->
+  <div id="w5-phase-reveal" style="display:none">
+    <div class="card" style="text-align:center">
+      <p style="font-size:14px;color:var(--text-muted);margin-bottom:20px">網の中から、5つの視点が出てきました</p>
+      <div id="w5-creatures" style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:20px">
+        <div class="w5-creature-chip" id="wc-S" style="opacity:0;transition:opacity 0.5s">
+          <div style="font-size:36px">🦀</div><div style="font-size:11px;margin-top:4px;font-weight:700;color:var(--primary)">現状</div>
+        </div>
+        <div class="w5-creature-chip" id="wc-C" style="opacity:0;transition:opacity 0.5s 0.2s">
+          <div style="font-size:36px">🐙</div><div style="font-size:11px;margin-top:4px;font-weight:700;color:var(--text-muted)">原因</div>
+        </div>
+        <div class="w5-creature-chip" id="wc-O" style="opacity:0;transition:opacity 0.5s 0.4s">
+          <div style="font-size:36px">🐬</div><div style="font-size:11px;margin-top:4px;font-weight:700;color:#5B8F5B">理想</div>
+        </div>
+        <div class="w5-creature-chip" id="wc-R" style="opacity:0;transition:opacity 0.5s 0.6s">
+          <div style="font-size:36px">🦞</div><div style="font-size:11px;margin-top:4px;font-weight:700;color:#8F5B2A">リソース</div>
+        </div>
+        <div class="w5-creature-chip" id="wc-E" style="opacity:0;transition:opacity 0.5s 0.8s">
+          <div style="font-size:36px">🐡</div><div style="font-size:11px;margin-top:4px;font-weight:700;color:#5B5B8F">結果</div>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="w5-reveal-next" style="opacity:0;transition:opacity 0.5s 1.2s;width:100%" onclick="w5ShowMap()">配置を確認する →</button>
+    </div>
   </div>
 
-  <div class="flex-row" style="gap:8px">
+  <!-- Phase 3: SCORE map -->
+  <div id="w5-phase-map" style="display:none">
+    <div class="card">
+      <p style="font-size:13px;color:var(--text-muted);text-align:center;margin-bottom:16px">この5つの視点を順番に探求していきます</p>
+      <div class="w5-map-grid">
+        <div class="w5-map-node w5-node-ideal" id="wmap-O">
+          <div style="font-size:28px">🐬</div>
+          <div class="w5-node-label">理想・目標</div>
+        </div>
+        <div class="w5-map-row-mid">
+          <div class="w5-map-node w5-node-effect" id="wmap-E">
+            <div style="font-size:28px">🐡</div>
+            <div class="w5-node-label">結果の影響</div>
+          </div>
+          <div class="w5-map-node w5-node-current w5-node-active" id="wmap-S">
+            <div style="font-size:32px">🦀</div>
+            <div class="w5-node-label" style="font-weight:700">現状</div>
+          </div>
+          <div class="w5-map-node w5-node-resource" id="wmap-R">
+            <div style="font-size:28px">🦞</div>
+            <div class="w5-node-label">リソース</div>
+          </div>
+        </div>
+        <div class="w5-map-node w5-node-cause" id="wmap-C">
+          <div style="font-size:28px">🐙</div>
+          <div class="w5-node-label">原因</div>
+        </div>
+      </div>
+      <button class="btn btn-primary" style="width:100%;margin-top:16px" onclick="w5StartQuestions()">探求をはじめる →</button>
+    </div>
+  </div>
+
+  <!-- Phase 4: Question flow -->
+  <div id="w5-phase-questions" style="display:none">
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <div id="w5-q-icon" style="font-size:32px"></div>
+        <div>
+          <div id="w5-q-label" style="font-size:11px;font-weight:700;color:var(--primary)"></div>
+          <div id="w5-q-step" style="font-size:12px;color:var(--text-muted)"></div>
+        </div>
+      </div>
+      <div class="progress-track" style="margin-bottom:20px">
+        <div class="progress-fill" id="w5-progress" style="width:20%"></div>
+      </div>
+      <div id="w5-q-question" style="font-size:16px;font-weight:700;line-height:1.6;margin-bottom:8px"></div>
+      <div id="w5-q-hint" style="font-size:13px;color:var(--text-muted);margin-bottom:14px;line-height:1.7"></div>
+      <textarea id="w5-q-textarea" class="score-textarea" style="min-height:90px" placeholder=""></textarea>
+      <button class="btn btn-primary" style="width:100%;margin-top:12px" onclick="w5NextQuestion()">次へ →</button>
+    </div>
+  </div>
+
+  <!-- Phase 5: Overview -->
+  <div id="w5-phase-overview" style="display:none">
+    <div class="card">
+      <div class="card-title">🔭 全体を眺める</div>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">ほどけた5つの視点です。もう一度探りたいものがあれば選んでください。</p>
+      <div id="w5-overview-list"></div>
+      <button class="btn btn-primary" style="width:100%;margin-top:16px" onclick="w5ShowBabyStep()">ベイビーステップへ →</button>
+    </div>
+  </div>
+
+  <!-- Phase 6: Baby step -->
+  <div id="w5-phase-baby" style="display:none">
+    <div class="card">
+      <div class="card-title">👶 最小の一歩</div>
+      <p style="font-size:14px;color:var(--text-muted);margin-bottom:16px;line-height:1.8">5つの視点で整理できました。<br>今日できる、<strong>最も小さな一歩</strong>は何ですか？</p>
+      <div id="w5-baby-context" style="background:var(--surface2);border-radius:10px;padding:14px;margin-bottom:16px;font-size:13px;line-height:1.8"></div>
+      <textarea id="w5-baby-textarea" class="score-textarea" placeholder="例：明日の朝、5分だけ〇〇をやってみる"></textarea>
+      <button class="btn btn-success" style="width:100%;margin-top:12px" onclick="w5Complete()">完了する ✓</button>
+    </div>
+  </div>
+
+  <div class="flex-row" style="gap:8px;margin-top:8px">
     <button class="btn btn-ghost" style="flex:1" onclick="goBack()">← 戻る</button>
     <button class="btn btn-ghost" style="flex:1" onclick="showScreen('screen-menu')">メニュー</button>
   </div>
@@ -1174,6 +1251,7 @@ function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   const el = document.getElementById(id);
   if (el) { el.classList.add('active'); el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  if (id === 'screen-work-5') w5Init();
 }
 function goBack() {
   if (_prevScreenId) showScreen(_prevScreenId);
@@ -1340,7 +1418,7 @@ function loadRecentHistory() {
 }
 
 function menuName(n) {
-  return ['','ブレークステート','デトックス','五感チューニング','イメージワーク','海図モデル'][n] || '—';
+  return ['','ブレークステート','デトックス','五感チューニング','イメージワーク','思考の網ほどき'][n] || '—';
 }
 
 // ═══════════════════════════════════════
@@ -2802,47 +2880,206 @@ function animFireworks() {
 }
 
 // ═══════════════════════════════════════
-// Work 5: SCORE
 // ═══════════════════════════════════════
-const scoreOrder = ['S','C','O','R','E'];
-let currentScore = 'S';
+// Work 5: 思考の網ほどき
+// ═══════════════════════════════════════
+const W5_NODES = [
+  { key:'S', icon:'🦀', label:'現状',      color:'var(--primary)',
+    q:'今、頭の中で一番絡まっているものは何ですか？',
+    hint:'状況を言葉にするだけでOK。良い・悪いは関係ありません。', ph:'例：案件が重なって、何から手をつければいいかわからない状態' },
+  { key:'C', icon:'🐙', label:'原因',      color:'#888',
+    q:'なぜそうなっていると思いますか？',
+    hint:'分析より直感で。思い当たることを書いてみてください。', ph:'例：仕事を断れなかった、見積もりが甘かった…' },
+  { key:'O', icon:'🐬', label:'理想・目標', color:'#5B8F5B',
+    q:'本当はどんな状態になりたいですか？',
+    hint:'「〜できている状態」「〜な自分」という形でも。', ph:'例：1つのことに集中して、落ち着いて仕事できている' },
+  { key:'R', icon:'🦞', label:'リソース',   color:'#8F5B2A',
+    q:'今、使えるものや強みは何ですか？',
+    hint:'スキル・人脈・時間・経験など。小さなものでもOK。', ph:'例：明日午前は空いている、〇〇さんに相談できる' },
+  { key:'E', icon:'🐡', label:'結果の影響', color:'#5B5B8F',
+    q:'解決したら、あなたや周りにどんな変化が起きますか？',
+    hint:'未来の自分はどんな気持ち・状態になっていますか？', ph:'例：週末ゆっくり休める、チームが安心して動ける' },
+];
+let w5Answers = {S:'',C:'',O:'',R:'',E:''};
+let w5QIdx = 0; // 現在の質問インデックス (0〜4)
 
-function switchScore(key) {
-  scoreOrder.forEach(k => {
-    document.getElementById(`spanel-${k}`).className = 'score-panel';
-    const tab = document.getElementById(`stab-${k}`);
-    if (!tab.classList.contains('done')) tab.className = 'score-tab';
+// ── Phase 1: Net canvas animation ────────────────────────────────
+function w5DrawNet() {
+  const canvas = document.getElementById('w5-net-canvas');
+  if (!canvas) return;
+  const W = canvas.parentElement.clientWidth || 340;
+  const H = 200;
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = W*dpr; canvas.height = H*dpr;
+  canvas.style.height = H+'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  // Background
+  ctx.fillStyle = '#F0EBE3';
+  ctx.fillRect(0,0,W,H);
+
+  // Draw tangled net lines
+  ctx.strokeStyle = 'rgba(120,100,70,0.55)';
+  const pts = [];
+  for(let i=0;i<20;i++) pts.push({x:20+Math.random()*(W-40), y:15+Math.random()*(H-30)});
+  for(let i=0;i<pts.length;i++){
+    for(let j=i+1;j<pts.length;j++){
+      if(Math.random()<0.35){
+        ctx.lineWidth = 0.8+Math.random()*1.2;
+        ctx.beginPath(); ctx.moveTo(pts[i].x, pts[i].y);
+        const cx1=pts[i].x+(pts[j].x-pts[i].x)*0.3+(Math.random()-0.5)*60;
+        const cy1=pts[i].y+(pts[j].y-pts[i].y)*0.3+(Math.random()-0.5)*60;
+        ctx.quadraticCurveTo(cx1, cy1, pts[j].x, pts[j].y); ctx.stroke();
+      }
+    }
+  }
+  // Knot dots
+  pts.forEach(p=>{
+    if(Math.random()<0.5){
+      ctx.beginPath(); ctx.arc(p.x,p.y,2.5+Math.random()*2,0,Math.PI*2);
+      ctx.fillStyle=`rgba(140,110,70,${0.5+Math.random()*0.4})`; ctx.fill();
+    }
   });
-  document.getElementById(`spanel-${key}`).className = 'score-panel active';
-  document.getElementById(`stab-${key}`).classList.add('active');
-  currentScore = key;
+  // Stuck items (small icons as text)
+  const items = ['💬','😤','📅','😰','🌀','📋','💭'];
+  ctx.font = '18px sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  items.forEach((ic,i)=>{
+    const px = 30+i*(W-60)/6 + (Math.random()-0.5)*20;
+    const py = 30 + Math.random()*(H-60);
+    ctx.globalAlpha = 0.7+Math.random()*0.3;
+    ctx.fillText(ic, px, py);
+  });
+  ctx.globalAlpha=1;
+  // Label
+  ctx.font = '13px sans-serif'; ctx.fillStyle='rgba(120,100,70,0.7)';
+  ctx.textAlign='center';
+  ctx.fillText('頭の中の絡まり', W/2, H-14);
 }
 
-function nextScore(next) {
-  document.getElementById(`stab-${currentScore}`).className = 'score-tab done';
-  const pct = (scoreOrder.indexOf(next)+1) / scoreOrder.length * 100;
-  document.getElementById('score-progress').style.width = `${pct}%`;
-  switchScore(next);
+// ── Phase 2: Untangle → show creatures ────────────────────────────
+function w5Untangle() {
+  document.getElementById('w5-phase-intro').style.display = 'none';
+  document.getElementById('w5-phase-reveal').style.display = '';
+  // Stagger creature fade-in
+  setTimeout(()=>{
+    ['S','C','O','R','E'].forEach((k,i)=>{
+      setTimeout(()=>{ document.getElementById('wc-'+k).style.opacity='1'; },i*220);
+    });
+    setTimeout(()=>{ document.getElementById('w5-reveal-next').style.opacity='1'; }, 1200);
+  }, 50);
 }
 
-function completeSCORE() {
+// ── Phase 3: Show SCORE map ───────────────────────────────────────
+function w5ShowMap() {
+  document.getElementById('w5-phase-reveal').style.display = 'none';
+  document.getElementById('w5-phase-map').style.display = '';
+}
+
+// ── Phase 4: Questions ────────────────────────────────────────────
+function w5StartQuestions() {
+  w5QIdx = 0;
+  w5Answers = {S:'',C:'',O:'',R:'',E:''};
+  document.getElementById('w5-phase-map').style.display = 'none';
+  document.getElementById('w5-phase-questions').style.display = '';
+  w5RenderQuestion();
+}
+
+function w5RenderQuestion() {
+  const node = W5_NODES[w5QIdx];
+  const pct = (w5QIdx+1)/W5_NODES.length*100;
+  document.getElementById('w5-q-icon').textContent = node.icon;
+  document.getElementById('w5-q-label').textContent = node.label;
+  document.getElementById('w5-q-step').textContent = `${w5QIdx+1} / ${W5_NODES.length}`;
+  document.getElementById('w5-progress').style.width = pct+'%';
+  document.getElementById('w5-q-question').textContent = node.q;
+  document.getElementById('w5-q-hint').textContent = node.hint;
+  const ta = document.getElementById('w5-q-textarea');
+  ta.placeholder = node.ph;
+  ta.value = w5Answers[node.key] || '';
+  ta.focus();
+}
+
+function w5NextQuestion() {
+  const node = W5_NODES[w5QIdx];
+  w5Answers[node.key] = document.getElementById('w5-q-textarea').value.trim();
+  if(w5QIdx < W5_NODES.length-1){
+    w5QIdx++;
+    w5RenderQuestion();
+  } else {
+    w5ShowOverview();
+  }
+}
+
+// ── Phase 5: Overview ─────────────────────────────────────────────
+function w5ShowOverview() {
+  document.getElementById('w5-phase-questions').style.display = 'none';
+  document.getElementById('w5-phase-overview').style.display = '';
+  const list = document.getElementById('w5-overview-list');
+  list.innerHTML = W5_NODES.map(n=>`
+    <div class="w5-overview-item" onclick="w5Revisit('${n.key}',this)">
+      <div style="font-size:26px;flex-shrink:0">${n.icon}</div>
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:700;color:${n.color};margin-bottom:3px">${n.label}</div>
+        <div style="font-size:13px;line-height:1.7;color:var(--text)">${w5Answers[n.key]||'<span style="color:var(--text-muted)">（未記入）</span>'}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function w5Revisit(key, el) {
+  // Toggle re-explore selection
+  const allItems = document.querySelectorAll('.w5-overview-item');
+  allItems.forEach(i=>i.classList.remove('w5-revisit'));
+  el.classList.add('w5-revisit');
+  // Jump to that question
+  w5QIdx = W5_NODES.findIndex(n=>n.key===key);
+  document.getElementById('w5-phase-overview').style.display = 'none';
+  document.getElementById('w5-phase-questions').style.display = '';
+  document.getElementById('w5-q-textarea').value = w5Answers[key] || '';
+  // Override next button to return to overview
+  w5RenderQuestion();
+  const btn = document.getElementById('w5-phase-questions').querySelector('button');
+  btn.textContent = '更新して戻る ✓';
+  btn.onclick = function(){
+    w5Answers[key] = document.getElementById('w5-q-textarea').value.trim();
+    btn.textContent = '次へ →'; btn.onclick = w5NextQuestion;
+    // Decide: if this was the last node, go overview again; else advance
+    w5QIdx = W5_NODES.length - 1; // force overview next
+    w5ShowOverview();
+  };
+}
+
+// ── Phase 6: Baby step ───────────────────────────────────────────
+function w5ShowBabyStep() {
+  document.getElementById('w5-phase-overview').style.display = 'none';
+  document.getElementById('w5-phase-baby').style.display = '';
+  // Context: show goal + resource as summary
+  const O = w5Answers.O || '（未記入）', R = w5Answers.R || '（未記入）';
+  document.getElementById('w5-baby-context').innerHTML =
+    `<div style="margin-bottom:8px"><span style="font-size:11px;font-weight:700;color:#5B8F5B">🐬 理想</span><br>${O}</div>` +
+    `<div><span style="font-size:11px;font-weight:700;color:#8F5B2A">🦞 リソース</span><br>${R}</div>`;
+  document.getElementById('w5-baby-textarea').focus();
+}
+
+function w5Complete() {
   const data = loadData();
   data.scoreCompletes = (data.scoreCompletes || 0) + 1;
   saveData(data);
+  goToAfterScale();
+}
 
-  scoreOrder.forEach(k => document.getElementById(`stab-${k}`).className = 'score-tab done');
-  document.getElementById('score-progress').style.width = '100%';
-
-  // Build summary
-  const labels = {S:'📍 状況',C:'🔍 原因',O:'🎯 目標',R:'💪 リソース',E:'✨ 効果'};
-  let html = '';
-  scoreOrder.forEach(k => {
-    const val = document.getElementById(`score-${k}`).value.trim();
-    if (val) html += `<div style="margin-bottom:14px"><div style="font-size:12px;font-weight:700;color:var(--primary);margin-bottom:4px">${labels[k]}</div><div style="font-size:14px;line-height:1.7;background:var(--surface2);padding:12px;border-radius:8px">${val}</div></div>`;
+// ── Init net on screen show ───────────────────────────────────────
+function w5Init() {
+  // Reset all phases
+  document.getElementById('w5-phase-intro').style.display = '';
+  ['reveal','map','questions','overview','baby'].forEach(p=>{
+    document.getElementById('w5-phase-'+p).style.display = 'none';
   });
-  document.getElementById('score-summary-content').innerHTML = html;
-  document.getElementById('score-summary').style.display = '';
-  document.getElementById('score-summary').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  w5Answers = {S:'',C:'',O:'',R:'',E:''};
+  w5QIdx = 0;
+  setTimeout(w5DrawNet, 50);
 }
 
 // ═══════════════════════════════════════
