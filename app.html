@@ -501,7 +501,7 @@
         <path d="M0,94 Q30,90 60,94 Q90,98 120,94 L120,120 L0,120 Z" fill="rgba(255,255,255,0.08)"/>
       </svg>
     </div>
-    <p style="font-size:22px;font-weight:700;color:var(--primary);line-height:1.7;letter-spacing:0.02em;margin-bottom:48px">波だった心が凪いで<br>軽くなる</p>
+    <p style="font-size:22px;font-weight:700;color:var(--primary);line-height:1.7;letter-spacing:0.02em;margin-bottom:48px">波だった<br>心が凪いで<br>軽くなる</p>
     <button class="btn btn-primary" style="width:100%;max-width:280px;font-size:17px;padding:16px" onclick="showScreen('screen-checkin')">はじめる</button>
   </div>
 </section>
@@ -676,17 +676,12 @@
   <div class="card">
     <div class="card-title">🗑️ 吐き出しデトックス</div>
     <h2>頭の中にあるものを<br>全部出してしまおう</h2>
-    <p>評価なし・答えなし。ただ吐き出すだけでOKです。<br>音声入力でもテキストでも。</p>
+    <p>評価なし・答えなし。ただ吐き出すだけでOKです。</p>
   </div>
 
+  <!-- Step 1: 入力 -->
   <div class="card" id="w2-input-card">
     <p style="font-size:14px;color:var(--text-muted);margin-bottom:12px;line-height:1.7">頭の中が空になるまで、全部吐き出してみましょう。<br>誰にも見せません。評価もしません。</p>
-    <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
-      <button class="voice-btn" id="voice-btn" onclick="toggleVoice()">
-        <span class="mic-dot" id="mic-dot"></span>
-        <span id="voice-label">🎤 音声入力</span>
-      </button>
-    </div>
     <div class="detox-area">
       <textarea class="detox-textarea" id="detox-text" placeholder="ここに頭の中を全部吐き出してください。
 
@@ -704,18 +699,45 @@
     </div>
   </div>
 
-  <!-- Step 2: 視点切り替え -->
+  <!-- Step 2: 俯瞰 -->
+  <div class="card" id="w2-overview" style="display:none">
+    <div style="font-size:12px;font-weight:700;color:var(--primary);margin-bottom:10px">✍️ あなたはこんなことを言葉にしました</div>
+    <div id="w2-overview-text" style="font-size:14px;line-height:1.9;background:var(--surface2);border-radius:10px;padding:16px;white-space:pre-wrap;max-height:220px;overflow-y:auto;color:var(--text)"></div>
+    <p style="font-size:13px;color:var(--text-muted);margin-top:14px;margin-bottom:0;line-height:1.8">改めて眺めてみて、どうですか。<br>どんな気持ちになりましたか。</p>
+    <button class="btn btn-primary" style="width:100%;margin-top:16px" onclick="w2ToCreature()">次へ →</button>
+  </div>
+
+  <!-- Step 3: 視点切り替え -->
   <div class="card" id="w2-perspective" style="display:none;text-align:center">
     <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px">視点を変えてみましょう</div>
     <div id="w2-creature-icon" style="font-size:64px;margin:12px 0">🐋</div>
     <div id="w2-creature-name" style="font-size:13px;font-weight:700;color:var(--primary);margin-bottom:12px">クジラ</div>
-    <div id="w2-creature-q" style="font-size:16px;font-weight:600;line-height:1.7;margin-bottom:20px">クジラがこれを見たら、どう思うでしょうか？</div>
-    <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">少しだけ眺めてみてください。答えは不要です。</p>
-    <button class="btn btn-primary" onclick="startCreatureAnim()">手放す →</button>
+    <div id="w2-creature-q" style="font-size:16px;font-weight:600;line-height:1.7;margin-bottom:16px">クジラがこれを見たら、どう思うでしょうか？</div>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:24px">少しだけ眺めてみてください。答えは不要です。</p>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+      <div style="position:relative;width:120px;height:120px">
+        <svg width="120" height="120" style="position:absolute;top:0;left:0;pointer-events:none;transform:rotate(-90deg)">
+          <circle cx="60" cy="60" r="54" fill="none" stroke="var(--border)" stroke-width="5"/>
+          <circle id="hold-ring" cx="60" cy="60" r="54" fill="none" stroke="var(--primary)" stroke-width="5"
+                  stroke-dasharray="339" stroke-dashoffset="339" stroke-linecap="round"/>
+        </svg>
+        <button id="release-btn"
+          style="position:absolute;top:8px;left:8px;width:104px;height:104px;border-radius:50%;
+                 background:var(--primary);color:#fff;border:none;cursor:pointer;
+                 font-size:15px;font-weight:700;line-height:1.3;
+                 -webkit-tap-highlight-color:transparent;user-select:none;touch-action:none"
+          onmousedown="holdStart()" ontouchstart="holdStart(event)"
+          onmouseup="holdCancel()" onmouseleave="holdCancel()"
+          ontouchend="holdCancel()" ontouchcancel="holdCancel()">
+          手放す
+        </button>
+      </div>
+      <div style="font-size:12px;color:var(--text-muted)">長押しで手放す</div>
+    </div>
   </div>
 
-  <!-- Step 3: 生き物アニメーション -->
-  <div id="w2-creature-scene" style="display:none;width:100%;min-height:55vw;position:relative;border-radius:var(--radius);overflow:hidden">
+  <!-- Step 4: 生き物アニメーション -->
+  <div id="w2-creature-scene" style="display:none;width:100%;min-height:60vw;position:relative;border-radius:var(--radius);overflow:hidden">
     <canvas id="w2-canvas" style="position:absolute;top:0;left:0;width:100%;height:100%"></canvas>
   </div>
 
@@ -1448,10 +1470,11 @@ function resetWork(n) {
     detoxTa.value = ''; detoxTa.style.height = '';
     document.getElementById('detox-count').textContent = '0文字';
     document.getElementById('throw-btn').disabled = true;
+    document.getElementById('w2-overview').style.display = 'none';
     document.getElementById('w2-perspective').style.display = 'none';
     document.getElementById('w2-creature-scene').style.display = 'none';
     document.getElementById('w2-input-card').style.display = '';
-    if (speechRunning) toggleVoice();
+    w2UserText = ''; holdCancel();
   }
   if (n === 3) {
     document.getElementById('w3-input-card').style.display = '';
@@ -1691,29 +1714,57 @@ function toggleVoice() {
 }
 
 const W2_CREATURES = [
-  { icon: '🦭', name: 'マナティー', q: 'マナティーがこれを見たら、どう思うでしょうか？', color: '#7ABFA8', swimDir: 1 },
+  { icon: '🐬', name: 'イルカ',     q: 'イルカがこれを見たら、どう思うでしょうか？',     color: '#7ABFA8', swimDir: 1 },
   { icon: '🐠', name: 'チンアナゴ', q: 'チンアナゴがこれを見たら、どう思うでしょうか？', color: '#5B8FA8', swimDir: -1 },
   { icon: '🐋', name: 'クジラ',     q: 'クジラがこれを見たら、どう思うでしょうか？',     color: '#3A6A8A', swimDir: 1 },
 ];
 let w2Creature = null;
+let w2UserText = '';
+let holdTimer = null;
 
 function throwAway() {
-  if (speechRunning) toggleVoice();
-  // Clear text area
+  const ta = document.getElementById('detox-text');
+  w2UserText = ta.value.trim();
+  document.getElementById('w2-input-card').style.display = 'none';
+  document.getElementById('w2-overview-text').textContent = w2UserText;
+  const ov = document.getElementById('w2-overview');
+  ov.style.display = '';
+  ov.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function w2ToCreature() {
+  // Clear textarea now
   const ta = document.getElementById('detox-text');
   ta.value = ''; updateDetoxCount(); autoGrowDetox();
-  // Hide input card, show perspective step
-  document.getElementById('w2-input-card').style.display = 'none';
+  document.getElementById('w2-overview').style.display = 'none';
   w2Creature = W2_CREATURES[Math.floor(Math.random() * W2_CREATURES.length)];
   document.getElementById('w2-creature-icon').textContent = w2Creature.icon;
   document.getElementById('w2-creature-name').textContent = w2Creature.name;
   document.getElementById('w2-creature-q').textContent = w2Creature.q;
+  // Reset hold ring
+  const ring = document.getElementById('hold-ring');
+  if (ring) { ring.style.transition='none'; ring.style.strokeDashoffset='339'; }
   const p = document.getElementById('w2-perspective');
   p.style.display = '';
   p.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
+function holdStart(e) {
+  if (e) e.preventDefault();
+  const ring = document.getElementById('hold-ring');
+  ring.style.transition = 'stroke-dashoffset 2s linear';
+  ring.style.strokeDashoffset = '0';
+  holdTimer = setTimeout(() => { startCreatureAnim(); }, 2000);
+}
+
+function holdCancel() {
+  clearTimeout(holdTimer); holdTimer = null;
+  const ring = document.getElementById('hold-ring');
+  if (ring) { ring.style.transition='stroke-dashoffset 0.3s ease'; ring.style.strokeDashoffset='339'; }
+}
+
 function startCreatureAnim() {
+  holdCancel();
   document.getElementById('w2-perspective').style.display = 'none';
   const scene = document.getElementById('w2-creature-scene');
   scene.style.display = '';
@@ -1727,116 +1778,169 @@ function startCreatureAnim() {
 function runCreatureCanvas(creature, onDone) {
   const scene = document.getElementById('w2-creature-scene');
   const canvas = document.getElementById('w2-canvas');
+  const userText = (w2UserText || '').slice(0, 30);
+
   requestAnimationFrame(() => {
     const dpr = window.devicePixelRatio || 1;
     const W = scene.clientWidth || 375;
-    const H = Math.round(W * 0.55);
+    const H = Math.round(W * 0.65);
     scene.style.minHeight = H + 'px';
-    canvas.width = W * dpr; canvas.height = H * dpr;
-    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+    canvas.width = W*dpr; canvas.height = H*dpr;
+    canvas.style.width = W+'px'; canvas.style.height = H+'px';
     const ctx = canvas.getContext('2d');
     ctx.scale(dpr, dpr);
 
-    // Ocean background
-    const bg = ctx.createLinearGradient(0, 0, 0, H);
-    bg.addColorStop(0, '#87CEEB'); bg.addColorStop(0.35, '#5BB8D8');
-    bg.addColorStop(1, '#1A5A8A');
-    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+    const bg = ctx.createLinearGradient(0,0,0,H);
+    bg.addColorStop(0,'#87CEEB'); bg.addColorStop(0.35,'#5BB8D8'); bg.addColorStop(1,'#1A5A8A');
 
-    // Bubbles
-    const bubbles = Array.from({length:12}, () => ({
-      x: Math.random()*W, y: H + Math.random()*60,
-      r: 3+Math.random()*6, speed: 0.4+Math.random()*0.6
+    const bubbles = Array.from({length:14}, () => ({
+      x:Math.random()*W, y:H+Math.random()*60, r:2+Math.random()*5, speed:0.3+Math.random()*0.5
     }));
 
-    const dir = creature.swimDir; // 1=left→right, -1=right→left
-    const startX = dir > 0 ? -120 : W + 120;
-    const endX   = dir > 0 ? W + 120 : -120;
-    const midX   = W * 0.5;
-    const midY   = H * 0.48;
-    const FONT_SIZE = Math.min(W * 0.22, 90);
+    const dir = creature.swimDir;
+    const startX = dir>0 ? -140 : W+140;
+    const endX   = dir>0 ? W+140 : -140;
+    const midX = W*0.5, midY = H*0.50;
+    const FONT_SIZE = Math.min(W*0.20, 88);
 
-    let cx = startX, cy = midY;
-    let phase = 'enter'; // enter → eat → exit
-    let phaseT = 0;
-    const enterDur = 1400, eatDur = 800, exitDur = 1200;
-    let last = null;
-    // "Food" burst particles
-    const particles = [];
+    let cx=startX, cy=midY;
+    let paperX=midX, paperY=midY-FONT_SIZE*0.55, paperAlpha=1, paperScale=1, paperRot=0;
+    let phase='enter';
+    let phaseT=0;
+    const enterDur=1400, pauseDur=500, eatDur=1000, exitDur=1300;
+    let last=null;
+    const particles=[];
+
+    // Draw crumpled paper with user text
+    function drawPaper(x, y, alpha, scale, rot) {
+      if (alpha <= 0.01) return;
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(scale, scale);
+      ctx.rotate(rot);
+      ctx.globalAlpha = alpha;
+      const pw=88, ph=68;
+      // Crumpled shape with jagged edges
+      ctx.beginPath();
+      ctx.moveTo(-pw/2+8, -ph/2+2);
+      ctx.lineTo(-pw/4, -ph/2-7);
+      ctx.lineTo(pw/8, -ph/2+3);
+      ctx.lineTo(pw/3, -ph/2-4);
+      ctx.lineTo(pw/2, -ph/2+6);
+      ctx.lineTo(pw/2+5, -ph/8);
+      ctx.lineTo(pw/2-2, ph/4);
+      ctx.lineTo(pw/2+3, ph/2-2);
+      ctx.lineTo(pw/4, ph/2+5);
+      ctx.lineTo(-pw/4+2, ph/2-1);
+      ctx.lineTo(-pw/2, ph/2+4);
+      ctx.lineTo(-pw/2-4, ph/4);
+      ctx.lineTo(-pw/2+2, -ph/8);
+      ctx.closePath();
+      // Paper fill with slight gradient
+      const pg = ctx.createLinearGradient(-pw/2,-ph/2,pw/2,ph/2);
+      pg.addColorStop(0,'#F8F4EC'); pg.addColorStop(0.5,'#EDE8DC'); pg.addColorStop(1,'#F5F0E8');
+      ctx.fillStyle=pg; ctx.fill();
+      ctx.strokeStyle='rgba(180,160,120,0.55)'; ctx.lineWidth=1; ctx.stroke();
+      // Crumple fold lines
+      ctx.strokeStyle='rgba(150,125,90,0.28)'; ctx.lineWidth=0.9;
+      [[-pw*0.35,-ph*0.4,-pw*0.05,ph*0.35],[pw*0.05,-ph*0.45,pw*0.35,ph*0.3],[-pw*0.1,-ph*0.1,pw*0.25,ph*0.15],[-pw*0.3,ph*0.1,pw*0.1,-ph*0.15]].forEach(([x1,y1,x2,y2])=>{
+        ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+      });
+      // User text on paper
+      const maxLen=8, lines=[];
+      for(let i=0;i<userText.length;i+=maxLen) lines.push(userText.slice(i,i+maxLen));
+      const fs=Math.max(7,Math.min(11,pw*0.9/(maxLen||1)));
+      ctx.font=`bold ${fs}px sans-serif`;
+      ctx.fillStyle='rgba(70,50,30,0.75)';
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      lines.slice(0,5).forEach((line,i)=>{
+        ctx.fillText(line, 0, (i-(Math.min(lines.length,5)-1)/2)*(fs+3));
+      });
+      ctx.restore();
+    }
 
     function loop(ts) {
-      if (!last) last = ts;
-      const dt = ts - last; last = ts;
-      phaseT += dt;
+      if (!last) last=ts;
+      const dt=ts-last; last=ts;
+      phaseT+=dt;
 
-      ctx.clearRect(0, 0, W, H);
-      ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
 
       // Bubbles
-      bubbles.forEach(b => {
-        b.y -= b.speed;
-        if (b.y < -20) { b.y = H + 10; b.x = Math.random()*W; }
-        ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI*2);
-        ctx.fillStyle = 'rgba(255,255,255,0.25)'; ctx.fill();
+      bubbles.forEach(b=>{
+        b.y-=b.speed; if(b.y<-20){b.y=H+10;b.x=Math.random()*W;}
+        ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,Math.PI*2);
+        ctx.fillStyle='rgba(255,255,255,0.22)'; ctx.fill();
       });
 
-      if (phase === 'enter') {
-        const t = Math.min(phaseT / enterDur, 1);
-        const ease = 1 - Math.pow(1-t, 3);
-        cx = startX + (midX - startX) * ease;
-        cy = midY + Math.sin(ts * 0.002) * 8;
-        if (t >= 1) { phase = 'eat'; phaseT = 0; }
-      } else if (phase === 'eat') {
-        cx = midX; cy = midY + Math.sin(ts * 0.004) * 6;
-        const t = phaseT / eatDur;
-        // spawn food burst at t=0.3
-        if (t > 0.3 && particles.length === 0) {
-          for (let i = 0; i < 20; i++) {
-            const ang = Math.random() * Math.PI * 2;
-            const spd = 1.5 + Math.random() * 3;
-            particles.push({ x: midX, y: midY, vx: Math.cos(ang)*spd, vy: Math.sin(ang)*spd, alpha: 1, r: 4+Math.random()*8 });
+      if (phase==='enter') {
+        const t=Math.min(phaseT/enterDur,1), ease=1-Math.pow(1-t,3);
+        cx=startX+(midX-startX)*ease; cy=midY+Math.sin(ts*0.002)*8;
+        paperRot=Math.sin(ts*0.001)*0.08; // gentle paper drift
+        if(t>=1){phase='pause';phaseT=0;}
+      } else if (phase==='pause') {
+        cx=midX; cy=midY+Math.sin(ts*0.004)*5;
+        paperRot=Math.sin(ts*0.0015)*0.10;
+        if(phaseT>=pauseDur){phase='eat';phaseT=0;}
+      } else if (phase==='eat') {
+        const t=phaseT/eatDur;
+        cx=midX+Math.sin(t*Math.PI*1.5)*6; cy=midY+Math.sin(ts*0.006)*4;
+        // Paper sucked toward creature mouth
+        if(t>0.1){
+          const pt=Math.min((t-0.1)/0.55,1);
+          const mouthX=dir>0?cx-FONT_SIZE*0.38:cx+FONT_SIZE*0.38;
+          const mouthY=cy-FONT_SIZE*0.1;
+          paperX=paperX+(mouthX-paperX)*pt*0.18;
+          paperY=paperY+(mouthY-paperY)*pt*0.18;
+          paperScale=Math.max(0.02, 1-pt*0.95);
+          paperAlpha=Math.max(0, 1-pt*1.1);
+          paperRot+=pt*0.15;
+        }
+        // Crumple particle burst
+        if(t>0.62&&particles.length===0){
+          for(let i=0;i<28;i++){
+            const ang=Math.random()*Math.PI*2,spd=0.8+Math.random()*4.5;
+            particles.push({x:midX,y:midY,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd-1,alpha:1,r:2+Math.random()*7,c:i%3===0?'rgba(248,244,236,0.95)':'rgba('+[180+Math.random()*60|0,155+Math.random()*50|0,100+Math.random()*40|0]+',0.9)'});
           }
         }
-        if (phaseT >= eatDur) { phase = 'exit'; phaseT = 0; }
-      } else if (phase === 'exit') {
-        const t = Math.min(phaseT / exitDur, 1);
-        const ease = t * t;
-        cx = midX + (endX - midX) * ease;
-        cy = midY - H * 0.25 * ease + Math.sin(ts * 0.003) * 6;
-        if (t >= 1) { requestAnimationFrame(() => onDone()); return; }
+        if(phaseT>=eatDur){phase='exit';phaseT=0;}
+      } else if (phase==='exit') {
+        const t=Math.min(phaseT/exitDur,1), ease=t*t;
+        cx=midX+(endX-midX)*ease; cy=midY-H*0.28*ease+Math.sin(ts*0.003)*5;
+        if(t>=1){requestAnimationFrame(()=>onDone()); return;}
       }
+
+      // Paper (behind creature)
+      drawPaper(paperX, paperY, paperAlpha, paperScale, paperRot);
 
       // Particles
-      particles.forEach(p => {
-        p.x += p.vx; p.y += p.vy; p.vy += 0.08; p.alpha -= 0.025;
-        ctx.globalAlpha = Math.max(0, p.alpha);
-        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-        ctx.fillStyle = creature.color; ctx.fill();
-        ctx.globalAlpha = 1;
+      particles.forEach(p=>{
+        p.x+=p.vx; p.y+=p.vy; p.vy+=0.12; p.vx*=0.95; p.alpha-=0.022;
+        ctx.globalAlpha=Math.max(0,p.alpha);
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fillStyle=p.c; ctx.fill(); ctx.globalAlpha=1;
       });
 
-      // Creature emoji
+      // Creature — bigger & scaling during eat
       ctx.save();
       ctx.translate(cx, cy);
-      if (dir < 0) ctx.scale(-1, 1); // flip for right-to-left
-      ctx.font = `${FONT_SIZE}px serif`;
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      // Mouth open during eat phase
-      if (phase === 'eat') {
-        ctx.globalAlpha = 1;
-        ctx.font = `${FONT_SIZE * 1.1}px serif`;
-      }
+      if(dir<0) ctx.scale(-1,1);
+      const eatT=phase==='eat'?phaseT/eatDur:0;
+      const mouthScale=phase==='eat'&&eatT<0.65?1+Math.sin(eatT*Math.PI*2)*0.18:1;
+      ctx.font=`${FONT_SIZE*mouthScale}px serif`;
+      ctx.textAlign='center'; ctx.textBaseline='middle';
       ctx.fillText(creature.icon, 0, 0);
       ctx.restore();
 
-      // "美味しい！" text during eat
-      if (phase === 'eat' && phaseT > 200) {
-        ctx.globalAlpha = Math.min((phaseT - 200) / 300, 1);
-        ctx.font = `bold ${16}px sans-serif`;
-        ctx.fillStyle = '#fff';
-        ctx.textAlign = 'center';
-        ctx.fillText('パクッ！', midX, midY - FONT_SIZE * 0.7);
-        ctx.globalAlpha = 1;
+      // "パクッ！" text
+      if(phase==='eat'&&phaseT>180&&phaseT<700){
+        const a=Math.min((phaseT-180)/180,1)*Math.min(1,(700-phaseT)/200);
+        ctx.globalAlpha=a;
+        ctx.font=`bold ${Math.round(W*0.055)}px sans-serif`;
+        ctx.fillStyle='#fff'; ctx.textAlign='center';
+        ctx.fillText('パクッ！', midX, midY-FONT_SIZE*0.78);
+        ctx.globalAlpha=1;
       }
 
       requestAnimationFrame(loop);
