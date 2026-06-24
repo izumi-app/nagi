@@ -656,9 +656,9 @@
     <p>評価なし・答えなし。ただ吐き出すだけでOKです。<br>音声入力でもテキストでも。</p>
   </div>
 
-  <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <div class="card-title" style="margin:0">つぶやいてみる</div>
+  <div class="card" id="w2-input-card">
+    <p style="font-size:14px;color:var(--text-muted);margin-bottom:12px;line-height:1.7">頭の中が空になるまで、全部吐き出してみましょう。<br>誰にも見せません。評価もしません。</p>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
       <button class="voice-btn" id="voice-btn" onclick="toggleVoice()">
         <span class="mic-dot" id="mic-dot"></span>
         <span id="voice-label">🎤 音声入力</span>
@@ -666,7 +666,6 @@
     </div>
     <div class="detox-area">
       <textarea class="detox-textarea" id="detox-text" placeholder="ここに頭の中を全部吐き出してください。
-誰にも見せません。後で消します。
 
 ・今、モヤモヤしていること
 ・「ねばならない」と思っていること
@@ -674,10 +673,10 @@
 
 なんでもOKです…"></textarea>
     </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px">
       <span class="text-muted" id="detox-count">0文字</span>
-      <button class="btn btn-danger" style="width:auto;padding:10px 20px" onclick="throwAway()" id="throw-btn" disabled>
-        🗑️ ゴミ箱へ捨てる
+      <button class="btn btn-primary" style="width:auto;padding:10px 24px" onclick="throwAway()" id="throw-btn" disabled>
+        次へ →
       </button>
     </div>
   </div>
@@ -1355,7 +1354,7 @@ function resetWork(n) {
     document.getElementById('throw-btn').disabled = true;
     document.getElementById('w2-perspective').style.display = 'none';
     document.getElementById('w2-creature-scene').style.display = 'none';
-    document.querySelector('#screen-work-2 .card:nth-child(2)').style.display = '';
+    document.getElementById('w2-input-card').style.display = '';
     if (speechRunning) toggleVoice();
   }
   if (n === 3) {
@@ -1608,7 +1607,7 @@ function throwAway() {
   const ta = document.getElementById('detox-text');
   ta.value = ''; updateDetoxCount(); autoGrowDetox();
   // Hide input card, show perspective step
-  document.querySelector('#screen-work-2 .card:nth-child(2)').style.display = 'none';
+  document.getElementById('w2-input-card').style.display = 'none';
   w2Creature = W2_CREATURES[Math.floor(Math.random() * W2_CREATURES.length)];
   document.getElementById('w2-creature-icon').textContent = w2Creature.icon;
   document.getElementById('w2-creature-name').textContent = w2Creature.name;
