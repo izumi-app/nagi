@@ -346,19 +346,19 @@
 
   /* SCORE map (cross layout) */
   .w5-map-grid {
-    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    display: flex; flex-direction: column; align-items: center; gap: 16px;
     padding: 8px 0;
   }
-  .w5-map-row-mid { display: flex; align-items: center; gap: 10px; width: 100%; justify-content: center; }
+  .w5-map-row-mid { display: flex; align-items: center; gap: 12px; width: 100%; justify-content: center; }
   .w5-map-node {
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    padding: 10px 12px; border-radius: 14px; border: 2px solid var(--border);
-    background: var(--surface2); min-width: 80px; text-align: center; cursor: pointer;
-    transition: all 0.2s; position: relative;
+    padding: 12px 10px; border-radius: 14px; border: 2px solid var(--border);
+    background: var(--surface2); width: 90px; min-width: 90px; max-width: 90px;
+    text-align: center; cursor: pointer; transition: all 0.2s; position: relative;
   }
-  .w5-node-label { font-size: 11px; font-weight: 700; margin-top: 4px; color: var(--text-muted); }
-  .w5-node-current { border-color: var(--primary); background: rgba(92,138,175,0.10); min-width: 92px; }
-  .w5-node-ideal   { border-color: #5B8F5B; background: rgba(91,143,91,0.10); }
+  .w5-node-label { font-size: 13px; font-weight: 700; margin-top: 6px; color: var(--text); line-height: 1.3; }
+  .w5-node-current { border-color: var(--primary); background: rgba(92,138,175,0.10); }
+  .w5-node-ideal   { border-color: #5B8F5B; background: rgba(91,143,91,0.10); width: 100px; min-width: 100px; max-width: 100px; }
   .w5-node-cause   { border-color: #999; }
   .w5-node-resource{ border-color: #8F5B2A; background: rgba(143,91,42,0.08); }
   .w5-node-effect  { border-color: #5B5B8F; background: rgba(91,91,143,0.08); }
@@ -625,11 +625,10 @@
       </div>
     </div>
     <div class="breathe-circle-wrap">
-      <div class="breathe-circle" id="breathe-circle">準備</div>
-      <div class="breathe-label" id="breathe-label">ボタンを押してスタート</div>
+      <div class="breathe-circle" id="breathe-circle" onclick="startBreathe()" style="cursor:pointer">準備</div>
+      <div class="breathe-label" id="breathe-label">円をタップしてスタート</div>
       <div class="breathe-timer" id="breathe-timer">3回繰り返します</div>
     </div>
-    <button class="btn btn-primary" id="breathe-start-btn" onclick="startBreathe()">深呼吸をはじめる</button>
   </div>
 
   <div class="card" id="w1-eye" style="display:none">
@@ -897,7 +896,7 @@
     <div class="card-title">ステップ 3 — どうやって手放しますか？</div>
     <div class="iw-type-grid">
       <button class="iw-type-btn" onclick="startIwScene('balloon')"><span class="iw-icon">🎈</span><span class="iw-name">風船で<br>飛ばす</span></button>
-      <button class="iw-type-btn" onclick="startIwScene('river')"><span class="iw-icon">🌊</span><span class="iw-name">滝へ<br>ダイブ</span></button>
+      <button class="iw-type-btn" onclick="startIwScene('river')"><span class="iw-icon">🚽</span><span class="iw-name">グッバイ</span></button>
       <button class="iw-type-btn" onclick="startIwScene('homerun')"><span class="iw-icon">⚾</span><span class="iw-name">夜空へ<br>ホームラン</span></button>
       <button class="iw-type-btn" onclick="startIwScene('blossom')"><span class="iw-icon">🌸</span><span class="iw-name">花吹雪で<br>散らす</span></button>
       <button class="iw-type-btn" onclick="startIwScene('rocket')"><span class="iw-icon">🚀</span><span class="iw-name">シャトルで<br>宇宙へ</span></button>
@@ -938,49 +937,35 @@
     <div class="card">
       <div class="card-title">🕸️ 思考の網ほどき</div>
       <h2>絡まった思考をほどいて、<br>仕分けて、眺めてみる</h2>
-      <p style="color:var(--text-muted);font-size:14px;line-height:1.8">頭の中の絡まりを、そっとほぐしていきましょう。<br>5つの視点で整理していきます。</p>
+      <p style="color:var(--text-muted);font-size:14px;line-height:1.8">頭の中の絡まりを、そっとほぐしていきましょう。</p>
     </div>
     <div class="card" style="padding:0;overflow:hidden;min-height:220px;position:relative">
       <canvas id="w5-net-canvas" style="width:100%;display:block"></canvas>
     </div>
     <div style="padding:0 0 16px">
-      <button class="btn btn-primary" style="width:100%" onclick="w5Untangle()">ほぐしてみる →</button>
+      <button class="btn btn-primary" style="width:100%" onclick="w5Untangle()">ほぐしてみましょうか →</button>
     </div>
   </div>
 
-  <!-- Phase 2: Reveal creatures -->
-  <div id="w5-phase-reveal" style="display:none">
-    <div class="card" style="text-align:center">
-      <p style="font-size:14px;color:var(--text-muted);margin-bottom:20px">網の中から、5つの視点が出てきました</p>
-      <div id="w5-creatures" style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:20px">
-        <div class="w5-creature-chip" id="wc-S" style="opacity:0;transition:opacity 0.5s">
-          <div style="font-size:36px">🦀</div><div style="font-size:11px;margin-top:4px;font-weight:700;color:var(--primary)">現状</div>
-        </div>
-        <div class="w5-creature-chip" id="wc-C" style="opacity:0;transition:opacity 0.5s 0.2s">
-          <div style="font-size:36px">🐙</div><div style="font-size:11px;margin-top:4px;font-weight:700;color:var(--text-muted)">原因</div>
-        </div>
-        <div class="w5-creature-chip" id="wc-O" style="opacity:0;transition:opacity 0.5s 0.4s">
-          <div style="font-size:36px">🐬</div><div style="font-size:11px;margin-top:4px;font-weight:700;color:#5B8F5B">理想</div>
-        </div>
-        <div class="w5-creature-chip" id="wc-R" style="opacity:0;transition:opacity 0.5s 0.6s">
-          <div style="font-size:36px">🦞</div><div style="font-size:11px;margin-top:4px;font-weight:700;color:#8F5B2A">リソース</div>
-        </div>
-        <div class="w5-creature-chip" id="wc-E" style="opacity:0;transition:opacity 0.5s 0.8s">
-          <div style="font-size:36px">🐡</div><div style="font-size:11px;margin-top:4px;font-weight:700;color:#5B5B8F">結果</div>
-        </div>
-      </div>
-      <button class="btn btn-primary" id="w5-reveal-next" style="opacity:0;transition:opacity 0.5s 1.2s;width:100%" onclick="w5ShowMap()">配置を確認する →</button>
+  <!-- Phase 2: 状況の入力 -->
+  <div id="w5-phase-situation" style="display:none">
+    <div class="card">
+      <div class="card-title">🕸️ 思考の網ほどき</div>
+      <h3 style="font-size:17px;font-weight:700;line-height:1.6;margin-bottom:12px">あなたがほぐすのは、<br>どんな網（状況）ですか？</h3>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">頭に浮かぶことを、そのまま書いてみてください。</p>
+      <textarea id="w5-situation-textarea" class="score-textarea" style="min-height:100px" placeholder="例：仕事の締め切りが重なって、何から手をつければいいかわからない…"></textarea>
+      <button class="btn btn-primary" style="width:100%;margin-top:14px" onclick="w5ShowMap()">次へ →</button>
     </div>
   </div>
 
   <!-- Phase 3: SCORE map -->
   <div id="w5-phase-map" style="display:none">
     <div class="card">
-      <p style="font-size:13px;color:var(--text-muted);text-align:center;margin-bottom:16px">この5つの視点を順番に探求していきます</p>
+      <p style="font-size:14px;color:var(--text-muted);text-align:center;margin-bottom:20px">5つの視点で仕分けして、それぞれ探求していきましょう</p>
       <div class="w5-map-grid">
         <div class="w5-map-node w5-node-ideal" id="wmap-O">
-          <div style="font-size:28px">🐬</div>
-          <div class="w5-node-label">理想・目標</div>
+          <div style="font-size:30px">🐬</div>
+          <div class="w5-node-label">理想の状態</div>
         </div>
         <div class="w5-map-row-mid">
           <div class="w5-map-node w5-node-effect" id="wmap-E">
@@ -988,8 +973,8 @@
             <div class="w5-node-label">結果の影響</div>
           </div>
           <div class="w5-map-node w5-node-current w5-node-active" id="wmap-S">
-            <div style="font-size:32px">🦀</div>
-            <div class="w5-node-label" style="font-weight:700">現状</div>
+            <div style="font-size:28px">🦀</div>
+            <div class="w5-node-label">現状</div>
           </div>
           <div class="w5-map-node w5-node-resource" id="wmap-R">
             <div style="font-size:28px">🦞</div>
@@ -1001,7 +986,7 @@
           <div class="w5-node-label">原因</div>
         </div>
       </div>
-      <button class="btn btn-primary" style="width:100%;margin-top:16px" onclick="w5StartQuestions()">探求をはじめる →</button>
+      <button class="btn btn-primary" style="width:100%;margin-top:20px" onclick="w5StartQuestions()">探求をはじめる →</button>
     </div>
   </div>
 
@@ -1029,7 +1014,7 @@
   <div id="w5-phase-overview" style="display:none">
     <div class="card">
       <div class="card-title">🔭 全体を眺める</div>
-      <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">ほどけた5つの視点です。もう一度探りたいものがあれば選んでください。</p>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">ほどけた5つの視点です。もう一度探りたいものがあれば、選んで編集してください。</p>
       <div id="w5-overview-list"></div>
       <button class="btn btn-primary" style="width:100%;margin-top:16px" onclick="w5ShowBabyStep()">ベイビーステップへ →</button>
     </div>
@@ -1056,61 +1041,73 @@
      SCREEN: After Scale
 ════════════════════════════════════════ -->
 <section id="screen-afterscale" class="screen">
-  <div class="card">
-    <div class="card-title">チェックアウト</div>
-    <h2>ワーク後、<br>心の海はどうですか？</h2>
-    <p>波は少し落ち着きましたか？ドラッグして今の状態を合わせてください。</p>
-    <div class="wave-gauge-wrap">
-      <div class="wave-gauge-labels">
-        <span>🌊<br>荒波</span>
-        <span>〜〜<br>さざ波</span>
-        <span>—<br>凪</span>
+
+  <!-- Phase A: 次の小さな一歩 -->
+  <div id="afterscale-phase-baby">
+    <div class="babystep-box" id="babystep-box">
+      <h3>🐣 次の小さな一歩</h3>
+      <p style="font-size:14px;color:var(--text-muted);margin-bottom:12px">
+        今すぐできる「最小の行動」を1つ選ぶか、自分で書いてください。
+      </p>
+      <div class="babystep-options" id="babystep-options"></div>
+      <div style="margin-top:10px;position:relative">
+        <input type="text" id="babystep-custom"
+          placeholder="✏️ 自分で書く…"
+          style="width:100%;padding:12px 16px;border:2px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font);font-size:14px;background:var(--surface);color:var(--text);"
+          oninput="onCustomBabyStep(this.value)"
+          onfocus="clearBabyStepSelection()">
       </div>
-      <div class="wave-gauge-track" id="after-gauge-track">
-        <div class="wave-gauge-fill" id="after-gauge-fill">
-          <div class="wave-surface" id="after-wave-s1"></div>
-          <div class="wave-surface-2" id="after-wave-s2"></div>
+    </div>
+    <button class="btn btn-primary" style="width:100%" onclick="goToCheckout()">チェックアウトへ →</button>
+    <div class="flex-row" style="gap:8px;margin-top:8px">
+      <button class="btn btn-ghost" style="flex:1" onclick="goBack()">← 戻る</button>
+    </div>
+  </div>
+
+  <!-- Phase B: チェックアウト + 変化の確認 -->
+  <div id="afterscale-phase-checkout" style="display:none">
+    <div class="card">
+      <div class="card-title">チェックアウト</div>
+      <h2>ワーク後、<br>心の海はどうですか？</h2>
+      <p>波は少し落ち着きましたか？ドラッグして今の状態を合わせてください。</p>
+      <div class="wave-gauge-wrap">
+        <div class="wave-gauge-labels">
+          <span>🌊<br>荒波</span>
+          <span>〜〜<br>さざ波</span>
+          <span>—<br>凪</span>
+        </div>
+        <div class="wave-gauge-track" id="after-gauge-track">
+          <div class="wave-gauge-fill" id="after-gauge-fill">
+            <div class="wave-surface" id="after-wave-s1"></div>
+            <div class="wave-surface-2" id="after-wave-s2"></div>
+          </div>
+        </div>
+        <div class="wave-gauge-right">
+          <div class="wave-value-num" id="after-val-num">—</div>
+          <div class="wave-value-name" id="after-val-name">ドラッグで設定</div>
         </div>
       </div>
-      <div class="wave-gauge-right">
-        <div class="wave-value-num" id="after-val-num">—</div>
-        <div class="wave-value-name" id="after-val-name">ドラッグで設定</div>
+    </div>
+
+    <div class="card" id="change-card" style="display:none">
+      <div class="card-title">変化の確認</div>
+      <div class="change-indicator">
+        <div style="text-align:center"><div class="text-muted" style="font-size:12px;margin-bottom:4px">ワーク前</div><div class="before-num" id="display-before">—</div></div>
+        <div class="arrow">→</div>
+        <div style="text-align:center"><div class="text-muted" style="font-size:12px;margin-bottom:4px">ワーク後</div><div class="after-num" id="display-after">—</div></div>
       </div>
+      <div class="change-text" id="change-text"></div>
+    </div>
+
+    <button class="btn btn-accent" id="after-complete-btn" onclick="completeSession()" style="display:none">
+      セッション完了 ✓
+    </button>
+    <div class="flex-row" style="gap:8px">
+      <button class="btn btn-ghost" style="flex:1" onclick="goBackToBaby()">← 戻る</button>
+      <button class="btn btn-primary" style="flex:1" onclick="startNewSession()">メニューを選ぶ</button>
     </div>
   </div>
 
-  <div class="card" id="change-card" style="display:none">
-    <div class="card-title">変化の確認</div>
-    <div class="change-indicator">
-      <div style="text-align:center"><div class="text-muted" style="font-size:12px;margin-bottom:4px">ワーク前</div><div class="before-num" id="display-before">—</div></div>
-      <div class="arrow">→</div>
-      <div style="text-align:center"><div class="text-muted" style="font-size:12px;margin-bottom:4px">ワーク後</div><div class="after-num" id="display-after">—</div></div>
-    </div>
-    <div class="change-text" id="change-text"></div>
-  </div>
-
-  <div class="babystep-box" id="babystep-box" style="display:none">
-    <h3>🐣 次の小さな一歩</h3>
-    <p style="font-size:14px;color:var(--text-muted);margin-bottom:12px">
-      今すぐできる「最小の行動」を1つ選ぶか、自分で書いてください。
-    </p>
-    <div class="babystep-options" id="babystep-options"></div>
-    <div style="margin-top:10px;position:relative">
-      <input type="text" id="babystep-custom"
-        placeholder="✏️ 自分で書く…"
-        style="width:100%;padding:12px 16px;border:2px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font);font-size:14px;background:var(--surface);color:var(--text);"
-        oninput="onCustomBabyStep(this.value)"
-        onfocus="clearBabyStepSelection()">
-    </div>
-  </div>
-
-  <button class="btn btn-accent" id="after-complete-btn" onclick="completeSession()">
-    セッション完了 ✓
-  </button>
-  <div class="flex-row" style="gap:8px">
-    <button class="btn btn-ghost" style="flex:1" onclick="goBack()">← 戻る</button>
-    <button class="btn btn-primary" style="flex:1" onclick="startNewSession()">メニューを選ぶ</button>
-  </div>
 </section>
 
 <!-- ══════════════════════════════════════
@@ -1162,7 +1159,7 @@
   </div>
 
   <div class="flex-row">
-    <button class="btn btn-ghost" onclick="showHistory()">← 戻る</button>
+    <button class="btn btn-ghost" onclick="showHistory()">📊 あなたの記録</button>
     <button class="btn btn-primary" onclick="showScreen('screen-menu')">メニュー</button>
   </div>
 </section>
@@ -1459,9 +1456,9 @@ function resetWork(n) {
     document.getElementById('w1-eye').style.display = 'none';
     document.getElementById('w1-move').style.display = 'none';
     document.getElementById('w1-done').style.display = 'none';
-    document.getElementById('breathe-start-btn').style.display = '';
     document.getElementById('breathe-circle').textContent = '準備';
-    document.getElementById('breathe-label').textContent = 'ボタンを押してスタート';
+    document.getElementById('breathe-circle').style.cursor = 'pointer';
+    document.getElementById('breathe-label').textContent = '円をタップしてスタート';
     document.getElementById('breathe-timer').textContent = '3回繰り返します';
     breatheRound = 0; breatheRunning = false;
   }
@@ -1508,7 +1505,7 @@ const BREATHE_ROUNDS = 3;
 function startBreathe() {
   if (breatheRunning) return;
   breatheRunning = true;
-  document.getElementById('breathe-start-btn').style.display = 'none';
+  document.getElementById('breathe-circle').style.cursor = 'default';
   breatheRound = 0;
   doBreatheRound();
 }
@@ -1549,17 +1546,17 @@ function doBreatheRound() {
 
   // Inhale 4s — circle expands
   highlight('rhythm-inhale');
-  label.textContent = '吸う…';
+  label.textContent = '吸って…';
   circle.classList.remove('hold','exhale'); circle.classList.add('inhale');
   countUp(4, () => {
     // Hold 4s — circle stays large
     highlight('rhythm-hold');
-    label.textContent = '止める…'; circle.textContent = '1';
+    label.textContent = '優しく止めて…'; circle.textContent = '1';
     circle.classList.remove('inhale'); circle.classList.add('hold');
     countUp(4, () => {
       // Exhale 8s — circle shrinks slowly
       highlight('rhythm-exhale');
-      label.textContent = '吐く…';
+      label.textContent = '吐いて…';
       circle.classList.remove('hold'); circle.classList.add('exhale');
       countUp(8, () => {
         circle.classList.remove('exhale');
@@ -2018,7 +2015,7 @@ let iwCurrentType = 'balloon';
 
 const IW_CONFIG = {
   balloon:   { title:'タップして空へ', hint:'風船をタップすると飛んでいきます', doneMsg:'🎈 飛んでいきました。\n重たかったものが、空の彼方へ。', bg:'linear-gradient(180deg,#87CEEB 0%,#C8E8F8 50%,#E8F4E0 100%)' },
-  river:     { title:'タップして流れに乗る', hint:'タップすると流れに乗って滝へ', doneMsg:'🌊 滝壺へ落ちていきました。\n深い水の底で、静かに溶けていきます。', bg:'linear-gradient(180deg,#4AB878 0%,#2A9860 30%,#1A6888 70%,#0A3858 100%)' },
+  river:     { title:'グッバイ', hint:'タップして流す', doneMsg:'✨ 流れていきました。\nキラキラとキレイになりました。', bg:'linear-gradient(180deg,#E8F4FB 0%,#C8E8F8 60%,#A0D0F0 100%)' },
   homerun:   { title:'タップして夜空へ！', hint:'タップすると星になります', doneMsg:'⭐ 星になりました。\n夜空のどこかで、ずっと輝いています。', bg:'linear-gradient(180deg,#020818 0%,#0A1A40 50%,#1A2A60 100%)' },
   blossom:   { title:'タップして花吹雪に', hint:'タップすると花びらが舞います', doneMsg:'🌸 散っていきました。\n花吹雪のように、軽やかに空へ。', bg:'linear-gradient(180deg,#FFE0EE 0%,#FFF0F8 60%,#FFF8FC 100%)' },
   rocket:    { title:'タップして宇宙へ', hint:'タップするとシャトル発射！', doneMsg:'🚀 宇宙へ飛び立ちました。\nもう重力は関係ありません。', bg:'linear-gradient(180deg,#000010 0%,#030320 40%,#080860 80%,#1040A0 100%)' },
@@ -2027,7 +2024,7 @@ const IW_CONFIG = {
 };
 
 const IW_DONE_DELAY = {
-  balloon: 6500, river: 8000, homerun: 6000,
+  balloon: 6500, river: 7000, homerun: 6000,
   blossom: 5500, rocket: 6500, arrow: 7500, fireworks: 7000
 };
 
@@ -2268,227 +2265,234 @@ function animRiver() {
   if (!canvas) return;
   if (lbl) { lbl.style.transition='opacity 0.4s'; lbl.style.opacity='0'; }
 
+  // ── Web Audio: toilet flush rumble ──────────────────────────────
+  (function playFlush() {
+    try {
+      const ac = new (window.AudioContext || window.webkitAudioContext)();
+      // Low rumble (ゴッッ)
+      const buf = ac.createBuffer(1, ac.sampleRate * 0.6, ac.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = (Math.random()*2-1) * Math.pow(1 - i/d.length, 0.7);
+      const src = ac.createBufferSource(); src.buffer = buf;
+      const filt = ac.createBiquadFilter(); filt.type = 'lowpass'; filt.frequency.value = 200;
+      const gain = ac.createGain(); gain.gain.setValueAtTime(1.2, ac.currentTime); gain.gain.linearRampToValueAtTime(0, ac.currentTime + 0.6);
+      src.connect(filt); filt.connect(gain); gain.connect(ac.destination);
+      src.start();
+      // Swirl water sound
+      setTimeout(() => {
+        const buf2 = ac.createBuffer(1, ac.sampleRate * 2.5, ac.sampleRate);
+        const d2 = buf2.getChannelData(0);
+        for (let i = 0; i < d2.length; i++) d2[i] = (Math.random()*2-1) * 0.35;
+        const src2 = ac.createBufferSource(); src2.buffer = buf2;
+        const f2 = ac.createBiquadFilter(); f2.type = 'bandpass'; f2.frequency.value = 800; f2.Q.value = 0.8;
+        const g2 = ac.createGain(); g2.gain.setValueAtTime(0.6, ac.currentTime); g2.gain.linearRampToValueAtTime(0, ac.currentTime + 2.5);
+        src2.connect(f2); f2.connect(g2); g2.connect(ac.destination); src2.start();
+      }, 300);
+    } catch(e) {}
+  })();
+
   requestAnimationFrame(() => {
     const dpr = window.devicePixelRatio || 1;
-    const W = scene.clientWidth || 375, H = scene.clientHeight || 600;
+    const W = scene.clientWidth || 375;
+    const H = Math.round(W * 0.85);
+    scene.style.minHeight = H + 'px';
     canvas.width = W*dpr; canvas.height = H*dpr;
     canvas.style.width = W+'px'; canvas.style.height = H+'px';
     const ctx = canvas.getContext('2d');
     ctx.scale(dpr, dpr);
 
-    const CLIFF_Y = H * 0.44;
-    const FALL_H  = H * 0.28;
-    const POOL_Y  = CLIFF_Y + FALL_H;
-    const FALL_CX = W * 0.5;
-    const FALL_W  = W * 0.40;
+    const CX = W * 0.5, CY = H * 0.52;
+    const TW = W * 0.60, TH = H * 0.42; // toilet bowl outer size
+    const userText = iwLeafText;
 
-    const rocks = [
-      {x:W*0.08,y:CLIFF_Y*0.52,w:22,h:13},{x:W*0.18,y:CLIFF_Y*0.67,w:16,h:10},
-      {x:W*0.84,y:CLIFF_Y*0.46,w:26,h:15},{x:W*0.74,y:CLIFF_Y*0.72,w:18,h:11},
-      {x:W*0.03,y:CLIFF_Y*0.80,w:20,h:12},{x:W*0.92,y:CLIFF_Y*0.60,w:14,h:9},
-    ];
-
-    function drawRock(x,y,w,h) {
-      ctx.beginPath(); ctx.ellipse(x,y,w,h,0,0,Math.PI*2);
-      const g=ctx.createRadialGradient(x-w*0.2,y-h*0.2,1,x,y,Math.max(w,h));
-      g.addColorStop(0,'#8A7860'); g.addColorStop(1,'#4A3A28');
-      ctx.fillStyle=g; ctx.fill();
-      ctx.strokeStyle='rgba(0,0,0,0.3)'; ctx.lineWidth=0.8; ctx.stroke();
-    }
+    // Paper note position (starts above bowl, gets sucked in)
+    const particles = [];
+    let startTs = null;
+    // Phases: 0–800 show bowl, 800–1800 paper falls into bowl, 1800–3000 swirl, 3000–5000 flush+sparkle, 5000–7000 sparkle lingers
 
     function drawBg() {
-      const sky=ctx.createLinearGradient(0,0,0,CLIFF_Y*0.28);
-      sky.addColorStop(0,'#B8E8C8'); sky.addColorStop(1,'#78C898');
-      ctx.fillStyle=sky; ctx.fillRect(0,0,W,CLIFF_Y*0.28);
-      const forest=['#1A6030','#226838','#1E5828'];
-      forest.forEach((c,i)=>{
-        ctx.fillStyle=c;
-        const bw=W*(0.26+i*0.04), bx=i%2===0?-bw*0.15:W-bw*0.85;
-        ctx.beginPath(); ctx.moveTo(bx,CLIFF_Y*0.28); ctx.lineTo(bx+bw/2,CLIFF_Y*(0.04-i*0.01)); ctx.lineTo(bx+bw,CLIFF_Y*0.28); ctx.closePath(); ctx.fill();
-        ctx.beginPath(); ctx.moveTo(bx+bw*0.2,CLIFF_Y*0.30); ctx.lineTo(bx+bw*0.68,CLIFF_Y*(0.09+i*0.02)); ctx.lineTo(bx+bw*1.12,CLIFF_Y*0.30); ctx.closePath(); ctx.fill();
-      });
+      ctx.fillStyle = '#F0F4F8';
+      ctx.fillRect(0, 0, W, H);
+      // Floor line
+      const fl = ctx.createLinearGradient(0, H*0.72, 0, H);
+      fl.addColorStop(0, '#DDE4EC'); fl.addColorStop(1, '#C8D4E0');
+      ctx.fillStyle = fl; ctx.fillRect(0, H*0.72, W, H*0.28);
     }
 
-    function drawRiver(ts) {
-      const rTop=CLIFF_Y*0.24, rBot=CLIFF_Y;
-      const rg=ctx.createLinearGradient(0,rTop,0,rBot);
-      rg.addColorStop(0,'#42BCEA'); rg.addColorStop(0.5,'#2AA8D8'); rg.addColorStop(1,'#1890C8');
-      ctx.fillStyle=rg; ctx.fillRect(0,rTop,W,rBot-rTop);
-      rocks.forEach(r=>drawRock(r.x,r.y,r.w,r.h));
-      const lanes=[
-        {y:rTop+10,spd:0.06,a:0.20,lw:2.5},{y:rTop+22,spd:0.09,a:0.17,lw:2},
-        {y:rTop+35,spd:0.07,a:0.14,lw:2},{y:rTop+48,spd:0.11,a:0.19,lw:2.5},
-        {y:rTop+62,spd:0.08,a:0.15,lw:1.5},{y:rTop+76,spd:0.10,a:0.18,lw:2},
-        {y:rBot-28,spd:0.13,a:0.23,lw:3},{y:rBot-14,spd:0.16,a:0.28,lw:3.5},
-      ];
-      lanes.forEach(ln=>{
-        const xOff=(ts*ln.spd)%(W*1.4);
-        ctx.beginPath(); ctx.strokeStyle=`rgba(255,255,255,${ln.a})`; ctx.lineWidth=ln.lw;
-        const sx=-(xOff%(W*1.4));
-        ctx.moveTo(sx,ln.y);
-        for(let x=sx;x<W+40;x+=40){ctx.quadraticCurveTo(x+8,ln.y-4,x+20,ln.y);ctx.quadraticCurveTo(x+32,ln.y+4,x+40,ln.y);}
-        ctx.stroke();
-      });
-      for(let i=0;i<7;i++){
-        const rx=W*0.08+i*(W*0.13), ry=CLIFF_Y*0.84+Math.sin(ts*0.004+i)*4;
-        ctx.beginPath(); ctx.ellipse(rx,ry,14+Math.sin(ts*0.005+i*2)*4,5,Math.sin(i)*0.3,0,Math.PI*2);
-        ctx.fillStyle=`rgba(255,255,255,${0.32+Math.sin(ts*0.006+i)*0.10})`; ctx.fill();
-      }
-    }
+    function drawToilet(flushT) {
+      // Tank (上の箱)
+      const tx = CX - TW*0.34, ty = CY - TH*0.92;
+      const tW = TW*0.68, tH = TH*0.40;
+      ctx.beginPath(); ctx.roundRect(tx, ty, tW, tH, 8);
+      const tg = ctx.createLinearGradient(tx, ty, tx+tW, ty+tH);
+      tg.addColorStop(0, '#FAFCFF'); tg.addColorStop(1, '#D8E4F0');
+      ctx.fillStyle = tg; ctx.fill();
+      ctx.strokeStyle = '#B0C0D0'; ctx.lineWidth = 2; ctx.stroke();
+      // Tank lid handle
+      ctx.beginPath(); ctx.roundRect(tx+tW*0.38, ty-10, tW*0.24, 12, 4);
+      ctx.fillStyle = '#C8D8E8'; ctx.fill(); ctx.stroke();
 
-    function drawCliff() {
-      const lw=FALL_CX-FALL_W/2, rx=FALL_CX+FALL_W/2;
-      const lg=ctx.createLinearGradient(0,CLIFF_Y,lw,POOL_Y);
-      lg.addColorStop(0,'#7A6A58'); lg.addColorStop(0.5,'#5A4A38'); lg.addColorStop(1,'#3A2A1A');
-      ctx.fillStyle=lg; ctx.fillRect(0,CLIFF_Y,lw,FALL_H);
-      ctx.strokeStyle='rgba(0,0,0,0.18)'; ctx.lineWidth=1;
-      [[lw*0.3,CLIFF_Y,lw*0.22,POOL_Y],[lw*0.65,CLIFF_Y,lw*0.72,POOL_Y]].forEach(([x1,y1,x2,y2])=>{ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();});
-      const rg2=ctx.createLinearGradient(rx,CLIFF_Y,W,POOL_Y);
-      rg2.addColorStop(0,'#7A6A58'); rg2.addColorStop(0.5,'#5A4A38'); rg2.addColorStop(1,'#3A2A1A');
-      ctx.fillStyle=rg2; ctx.fillRect(rx,CLIFF_Y,W-rx,FALL_H);
-      [[rx+W*0.08,CLIFF_Y,rx+W*0.04,POOL_Y],[rx+W*0.18,CLIFF_Y,rx+W*0.22,POOL_Y]].forEach(([x1,y1,x2,y2])=>{ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();});
-    }
+      // Bowl body (楕円台形)
+      ctx.beginPath();
+      ctx.moveTo(CX - TW*0.40, CY - TH*0.50);
+      ctx.bezierCurveTo(CX - TW*0.46, CY - TH*0.10, CX - TW*0.50, CY + TH*0.28, CX - TW*0.36, CY + TH*0.48);
+      ctx.lineTo(CX + TW*0.36, CY + TH*0.48);
+      ctx.bezierCurveTo(CX + TW*0.50, CY + TH*0.28, CX + TW*0.46, CY - TH*0.10, CX + TW*0.40, CY - TH*0.50);
+      ctx.closePath();
+      const bg = ctx.createLinearGradient(CX - TW*0.5, CY - TH*0.5, CX + TW*0.5, CY + TH*0.5);
+      bg.addColorStop(0, '#F8FBFF'); bg.addColorStop(0.6, '#EAF2FA'); bg.addColorStop(1, '#D0E4F4');
+      ctx.fillStyle = bg; ctx.fill();
+      ctx.strokeStyle = '#A8C0D8'; ctx.lineWidth = 2.5; ctx.stroke();
 
-    function drawFall(ts) {
-      const fl=FALL_CX-FALL_W/2, fr=FALL_CX+FALL_W/2;
-      const bg=ctx.createLinearGradient(FALL_CX,CLIFF_Y,FALL_CX,POOL_Y);
-      bg.addColorStop(0,'rgba(210,240,255,0.88)'); bg.addColorStop(0.35,'rgba(185,228,255,0.72)');
-      bg.addColorStop(0.75,'rgba(155,215,252,0.58)'); bg.addColorStop(1,'rgba(120,195,245,0.28)');
-      ctx.fillStyle=bg; ctx.fillRect(fl,CLIFF_Y,FALL_W,FALL_H);
-      const n=32;
-      for(let i=0;i<n;i++){
-        const phase=(ts*0.004*(0.88+i*0.055)+i/n)%1;
-        const fx=fl+2+(i/(n-1))*(FALL_W-4)+Math.sin(ts*0.003+i*0.9)*6;
-        const sLen=FALL_H*0.24;
-        const sy=CLIFF_Y+phase*(FALL_H+sLen)-sLen;
-        const ey=Math.min(sy+sLen,POOL_Y);
-        const a=0.12+((i%3===0)?0.38:0.20)*Math.sin(phase*Math.PI);
-        const sg=ctx.createLinearGradient(fx,sy,fx,ey);
-        sg.addColorStop(0,`rgba(255,255,255,0)`); sg.addColorStop(0.2,`rgba(255,255,255,${a})`);
-        sg.addColorStop(0.8,`rgba(235,250,255,${a})`); sg.addColorStop(1,`rgba(235,250,255,0)`);
-        ctx.beginPath(); ctx.moveTo(fx,sy); ctx.lineTo(fx+Math.sin(i*1.6)*4,ey);
-        ctx.strokeStyle=sg; ctx.lineWidth=i%4===0?2.8:1.4; ctx.stroke();
-      }
-      ctx.beginPath(); ctx.ellipse(FALL_CX,CLIFF_Y+6,FALL_W/2+14,11,0,0,Math.PI*2);
-      ctx.fillStyle='rgba(255,255,255,0.80)'; ctx.fill();
-      for(let i=0;i<10;i++){
-        const fx2=fl+6+(i/9)*(FALL_W-12);
-        ctx.beginPath(); ctx.arc(fx2,CLIFF_Y+7,3+Math.sin(ts*0.006+i)*2,Math.PI,0);
-        ctx.fillStyle='rgba(255,255,255,0.55)'; ctx.fill();
-      }
-      ctx.beginPath(); ctx.ellipse(FALL_CX,POOL_Y-5,FALL_W*0.42+Math.sin(ts*0.007)*10,12+Math.sin(ts*0.005)*3,0,0,Math.PI*2);
-      ctx.fillStyle='rgba(255,255,255,0.55)'; ctx.fill();
-      for(let i=0;i<8;i++){
-        const bx=FALL_CX+Math.cos(ts*0.003+i*0.8)*FALL_W*0.40;
-        const by=POOL_Y-3+Math.sin(ts*0.004+i)*6;
-        ctx.beginPath(); ctx.arc(bx,by,3+Math.sin(ts*0.01+i)*2,0,Math.PI*2);
-        ctx.fillStyle='rgba(255,255,255,0.45)'; ctx.fill();
-      }
-      [-1,1].forEach(side=>{
-        const mx=FALL_CX+side*(FALL_W/2+8);
-        const mg=ctx.createRadialGradient(mx,POOL_Y,5,mx,POOL_Y,70);
-        mg.addColorStop(0,'rgba(220,242,255,0.32)'); mg.addColorStop(1,'rgba(220,242,255,0)');
-        ctx.fillStyle=mg; ctx.fillRect(side>0?mx-5:mx-65,POOL_Y-55,75,90);
-      });
-    }
+      // Rim (便座)
+      ctx.beginPath(); ctx.ellipse(CX, CY - TH*0.44, TW*0.41, TH*0.13, 0, 0, Math.PI*2);
+      ctx.fillStyle = '#EDF5FF'; ctx.fill();
+      ctx.strokeStyle = '#A8C0D8'; ctx.lineWidth = 2; ctx.stroke();
 
-    function drawPool(ts, mistLevel) {
-      const pg=ctx.createLinearGradient(0,POOL_Y,0,H);
-      pg.addColorStop(0,'#1878A8'); pg.addColorStop(0.3,'#0E5A88'); pg.addColorStop(1,'#052038');
-      ctx.fillStyle=pg; ctx.fillRect(0,POOL_Y,W,H-POOL_Y);
-      for(let i=0;i<5;i++){
-        const py2=POOL_Y+18+i*20, xd=(ts*0.04*(0.6+i*0.15))%(W*1.2);
-        ctx.beginPath(); ctx.strokeStyle=`rgba(100,185,225,${0.11-i*0.018})`; ctx.lineWidth=1.5;
-        ctx.moveTo(-(xd%W),py2);
-        for(let x=-(xd%W);x<W+30;x+=30){ctx.quadraticCurveTo(x+8,py2-3,x+15,py2);ctx.quadraticCurveTo(x+22,py2+3,x+30,py2);}
-        ctx.stroke();
-      }
-      if(mistLevel>0){
-        const mg=ctx.createRadialGradient(FALL_CX,POOL_Y,0,FALL_CX,POOL_Y,W*0.70);
-        mg.addColorStop(0,`rgba(228,245,255,${mistLevel*0.78})`);
-        mg.addColorStop(0.5,`rgba(215,238,255,${mistLevel*0.42})`);
-        mg.addColorStop(1,'rgba(215,238,255,0)');
-        ctx.fillStyle=mg; ctx.fillRect(0,POOL_Y-70,W,140);
-      }
-    }
-
-    const ripples=[];
-    function addRipple(big) { ripples.push({r:big?9:3,alpha:0.92,big:!!big}); }
-    function drawRipples() {
-      ripples.forEach(rp=>{
-        rp.r+=rp.big?2.4:1.6; rp.alpha-=rp.big?0.014:0.019;
-        ctx.beginPath(); ctx.ellipse(FALL_CX,POOL_Y+24,rp.r*(rp.big?2.4:1.9),rp.r*0.55,0,0,Math.PI*2);
-        ctx.strokeStyle=`rgba(185,225,248,${Math.max(0,rp.alpha)})`; ctx.lineWidth=rp.big?2.8:1.6; ctx.stroke();
-      });
-      ripples.splice(0,ripples.length,...ripples.filter(r=>r.alpha>0));
-    }
-
-    const P1=2500, P2=3000, P3=3900, P4=5100, P5=7200;
-    const particles=[];
-    let splashDone=false;
-
-    function drawLeaf(ts, elapsed) {
-      let ox,oy,rot=0,sz=62,alpha=1;
-      if(elapsed<P1){
-        const t=elapsed/P1, ease=t<0.5?2*t*t:-1+(4-2*t)*t;
-        ox=W*0.04+(FALL_CX-FALL_W/2-sz*0.5-W*0.04)*ease;
-        oy=CLIFF_Y*0.50+Math.sin(ts*0.0025+t*10)*7; rot=Math.sin(ts*0.0035)*0.18;
-      } else if(elapsed<P2){
-        const t=(elapsed-P1)/(P2-P1);
-        ox=FALL_CX-FALL_W*0.12; oy=CLIFF_Y*0.50+(CLIFF_Y-CLIFF_Y*0.50)*t; rot=Math.PI*0.45*t;
-      } else if(elapsed<P3){
-        const t=(elapsed-P2)/(P3-P2), accel=t*t;
-        ox=FALL_CX+Math.sin(t*Math.PI*1.2)*FALL_W*0.18;
-        oy=CLIFF_Y+(POOL_Y+12-CLIFF_Y)*accel; rot=Math.PI*0.45+t*Math.PI*1.8; sz=62+t*16;
-      } else if(elapsed<P4){
-        if(!splashDone){
-          splashDone=true; addRipple(true); addRipple(false);
-          for(let i=0;i<44;i++){const ang=-Math.PI*0.5+(Math.random()-0.5)*Math.PI*1.1,spd=1.5+Math.random()*6.5;particles.push({x:FALL_CX,y:POOL_Y+8,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd-2.8,alpha:1,r:2+Math.random()*6.5,c:`rgba(185,228,255,1)`});}
-          for(let i=0;i<12;i++){const ang=-Math.PI*0.78+i*(Math.PI*0.56/11);particles.push({x:FALL_CX,y:POOL_Y+5,vx:Math.cos(ang)*4.5,vy:Math.sin(ang)*7.5-4.5,alpha:1,r:7,c:'rgba(255,255,255,0.95)'});}
+      // Water in bowl
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(CX - TW*0.38, CY - TH*0.38);
+      ctx.bezierCurveTo(CX - TW*0.44, CY, CX - TW*0.46, CY + TH*0.24, CX - TW*0.32, CY + TH*0.44);
+      ctx.lineTo(CX + TW*0.32, CY + TH*0.44);
+      ctx.bezierCurveTo(CX + TW*0.46, CY + TH*0.24, CX + TW*0.44, CY, CX + TW*0.38, CY - TH*0.38);
+      ctx.closePath();
+      ctx.clip();
+      const wg = ctx.createRadialGradient(CX, CY + TH*0.1, 5, CX, CY + TH*0.1, TW*0.48);
+      wg.addColorStop(0, 'rgba(100,200,255,0.55)'); wg.addColorStop(1, 'rgba(60,160,220,0.30)');
+      ctx.fillStyle = wg; ctx.fillRect(CX - TW*0.5, CY - TH*0.5, TW, TH);
+      // Swirl lines during flush
+      if (flushT > 0) {
+        const n = 8;
+        for (let i = 0; i < n; i++) {
+          const ang = (i / n) * Math.PI * 2 + flushT * 5;
+          const r1 = TW * 0.08, r2 = TW * 0.35;
+          const x1 = CX + Math.cos(ang) * r1 * (1 - flushT * 0.7);
+          const y1 = CY + TH*0.1 + Math.sin(ang) * r1 * 0.4;
+          const x2 = CX + Math.cos(ang + 1.2) * r2 * (1 - flushT * 0.5);
+          const y2 = CY + TH*0.1 + Math.sin(ang + 1.2) * r2 * 0.4;
+          ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+          ctx.strokeStyle = `rgba(180,230,255,${0.55 + flushT * 0.3})`; ctx.lineWidth = 2.5 + flushT * 2; ctx.stroke();
         }
-        return;
-      } else { return; }
+      }
+      ctx.restore();
+    }
 
-      const leafW=sz*1.15, leafH=sz*0.58;
-      ctx.save(); ctx.translate(ox,oy); ctx.rotate(rot); ctx.globalAlpha=alpha;
-      ctx.beginPath(); ctx.ellipse(0,0,leafW/2,leafH/2,0,0,Math.PI*2);
-      const lg2=ctx.createRadialGradient(-leafW*0.15,-leafH*0.2,2,0,0,leafW/2);
-      lg2.addColorStop(0,'#80DE98'); lg2.addColorStop(1,'#3A8A50');
-      ctx.fillStyle=lg2; ctx.fill(); ctx.strokeStyle='#2A7040'; ctx.lineWidth=1.5; ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(-leafW/2+4,0); ctx.lineTo(leafW/2-4,0);
-      ctx.strokeStyle='rgba(30,100,50,0.45)'; ctx.lineWidth=1; ctx.stroke();
-      [0.3,0.6,-0.3,-0.6].forEach(vx=>{ctx.beginPath();ctx.moveTo(vx*(leafW/2),0);ctx.lineTo(vx*(leafW/2)+7,-leafH*0.35);ctx.strokeStyle='rgba(30,100,50,0.28)';ctx.lineWidth=0.8;ctx.stroke();});
-      const fs=Math.max(9,Math.min(13,sz*0.22));
-      ctx.font=`bold ${fs}px sans-serif`; ctx.fillStyle='rgba(255,255,255,0.95)';
-      ctx.textAlign='center'; ctx.textBaseline='middle';
+    function drawPaper(elapsed) {
+      const P_APPEAR = 200, P_FALL = 1200, P_SWIRL = 1800, P_FLUSH = 3200;
+      if (elapsed < P_APPEAR || elapsed > P_FLUSH) return;
+
+      let px, py, rot = 0, sc = 1, alpha = 1;
+      const pw = 72, ph = 55;
+
+      if (elapsed < P_FALL) {
+        // Floating above bowl
+        const t = (elapsed - P_APPEAR) / (P_FALL - P_APPEAR);
+        const ease = 1 - Math.pow(1 - t, 2);
+        px = CX; py = CY - TH * 0.9 - (1 - ease) * H * 0.15;
+        rot = Math.sin(elapsed * 0.002) * 0.08;
+      } else if (elapsed < P_SWIRL) {
+        // Falls into bowl
+        const t = (elapsed - P_FALL) / (P_SWIRL - P_FALL);
+        const ease = t * t;
+        px = CX; py = CY - TH * 0.9 + ease * TH * 1.0;
+        rot = t * Math.PI * 0.5; sc = 1 - ease * 0.3;
+      } else {
+        // Swirling smaller
+        const t = (elapsed - P_SWIRL) / (P_FLUSH - P_SWIRL);
+        const ang = t * Math.PI * 4;
+        const r = TW * 0.25 * (1 - t);
+        px = CX + Math.cos(ang) * r; py = CY + TH * 0.1 + Math.sin(ang) * r * 0.35;
+        rot = ang; sc = 1 - t * 0.85; alpha = 1 - t;
+      }
+
+      ctx.save();
+      ctx.translate(px, py); ctx.rotate(rot); ctx.scale(sc, sc); ctx.globalAlpha = alpha;
+      // Paper body
+      ctx.beginPath();
+      ctx.moveTo(-pw/2+6, -ph/2); ctx.lineTo(pw/2-8, -ph/2+2);
+      ctx.lineTo(pw/2, -ph/2+8); ctx.lineTo(pw/2-2, ph/2-4);
+      ctx.lineTo(-pw/2+4, ph/2+2); ctx.lineTo(-pw/2-2, ph/2-6);
+      ctx.lineTo(-pw/2, -ph/2+6); ctx.closePath();
+      const pg2 = ctx.createLinearGradient(-pw/2, -ph/2, pw/2, ph/2);
+      pg2.addColorStop(0, '#FFFDF6'); pg2.addColorStop(1, '#F0ECD8');
+      ctx.fillStyle = pg2; ctx.fill();
+      ctx.strokeStyle = 'rgba(160,140,100,0.4)'; ctx.lineWidth = 1; ctx.stroke();
+      // Crumple line
+      ctx.beginPath(); ctx.moveTo(-pw*0.3, -ph*0.3); ctx.lineTo(pw*0.2, ph*0.25);
+      ctx.strokeStyle = 'rgba(140,120,80,0.2)'; ctx.lineWidth = 0.8; ctx.stroke();
+      // Text
+      const fs = Math.max(8, Math.min(11, pw * 0.14));
+      ctx.font = `bold ${fs}px sans-serif`; ctx.fillStyle = 'rgba(60,40,20,0.75)';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.save(); ctx.rotate(-rot);
-      ctx.fillText(iwLeafText.length>10?iwLeafText.slice(0,9)+'…':iwLeafText,0,0);
+      const maxCh = 7;
+      const lines = [];
+      for (let i = 0; i < userText.length; i += maxCh) lines.push(userText.slice(i, i + maxCh));
+      lines.slice(0, 4).forEach((line, i) => ctx.fillText(line, 0, (i - (Math.min(lines.length,4)-1)/2) * (fs+2.5)));
       ctx.restore(); ctx.restore();
     }
 
-    function drawParticles() {
-      particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=0.22;p.vx*=0.89;p.alpha-=0.021;ctx.globalAlpha=Math.max(0,p.alpha);ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=p.c;ctx.fill();ctx.globalAlpha=1;});
-      particles.splice(0,particles.length,...particles.filter(p=>p.alpha>0));
+    function drawSparkles(elapsed) {
+      const P_SPARK = 3200, P_END = 7000;
+      if (elapsed < P_SPARK) return;
+      const t = (elapsed - P_SPARK) / (P_END - P_SPARK);
+      if (particles.length === 0) {
+        const sparkColors = ['#FFD700','#7FFFAA','#87CEEB','#FFB6C1','#E0E0FF','#AAFFEE'];
+        for (let i = 0; i < 50; i++) {
+          const ang = Math.random() * Math.PI * 2;
+          const spd = 0.8 + Math.random() * 3.5;
+          particles.push({ x: CX, y: CY, vx: Math.cos(ang)*spd, vy: Math.sin(ang)*spd - 1.5, alpha: 1, r: 3 + Math.random()*5, c: sparkColors[i % sparkColors.length], type: Math.random() > 0.4 ? 'star' : 'circle' });
+        }
+      }
+      particles.forEach(p => {
+        p.x += p.vx; p.y += p.vy; p.vy += 0.06; p.vx *= 0.97; p.alpha -= 0.008;
+        ctx.globalAlpha = Math.max(0, p.alpha);
+        ctx.fillStyle = p.c;
+        if (p.type === 'star') {
+          ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.alpha * 3);
+          ctx.beginPath();
+          for (let k = 0; k < 5; k++) { const a = k * Math.PI * 0.4 - Math.PI/2; ctx.lineTo(Math.cos(a)*p.r, Math.sin(a)*p.r); const b = a + Math.PI*0.2; ctx.lineTo(Math.cos(b)*p.r*0.4, Math.sin(b)*p.r*0.4); }
+          ctx.closePath(); ctx.fill(); ctx.restore();
+        } else {
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+      });
+      particles.splice(0, particles.length, ...particles.filter(p => p.alpha > 0));
+
+      // ゴッッ text
+      if (t < 0.25) {
+        const ta = Math.min(t / 0.1, 1) * Math.max(0, 1 - (t - 0.1) / 0.15);
+        ctx.globalAlpha = ta;
+        ctx.font = `bold ${Math.round(W * 0.12)}px sans-serif`;
+        ctx.fillStyle = '#3A6A9A'; ctx.textAlign = 'center';
+        ctx.fillText('ゴッッ！', CX, CY - TH * 0.3);
+        ctx.globalAlpha = 1;
+      }
+      // キラキラ text
+      if (t > 0.3 && t < 0.75) {
+        const ta2 = Math.min((t - 0.3) / 0.1, 1) * Math.max(0, 1 - (t - 0.65) / 0.1);
+        ctx.globalAlpha = ta2;
+        ctx.font = `bold ${Math.round(W * 0.075)}px sans-serif`;
+        ctx.fillStyle = '#2A8A5A'; ctx.textAlign = 'center';
+        ctx.fillText('✨ キレイになりました ✨', CX, CY - TH * 0.5);
+        ctx.globalAlpha = 1;
+      }
     }
 
-    function drawRainbow(alpha) {
-      const colors=['rgba(255,50,50,','rgba(255,145,0,','rgba(255,235,0,','rgba(0,210,80,','rgba(30,130,255,','rgba(160,0,220,'];
-      const cy2=H+H*0.25;
-      colors.forEach((c,i)=>{const r2=H*0.60+i*20;ctx.beginPath();ctx.arc(W/2,cy2,r2,Math.PI,0);ctx.strokeStyle=c+alpha+')';ctx.lineWidth=16;ctx.stroke();});
-    }
-
-    let startTs=null, rippleTimer=0;
     function loop(ts) {
-      if(!startTs) startTs=ts;
-      const elapsed=ts-startTs;
-      const mistLevel=elapsed>P2?Math.min((elapsed-P2)/1500,1):0;
-      ctx.clearRect(0,0,W,H);
-      drawBg(); drawRiver(ts); drawCliff(); drawPool(ts,mistLevel); drawFall(ts);
-      drawRipples();
-      rippleTimer+=16; if(rippleTimer>280){rippleTimer=0;addRipple(false);}
-      drawLeaf(ts,elapsed); drawParticles();
-      if(elapsed>P4){const t=Math.min((elapsed-P4)/2000,1);const a=t*(1-Math.max(0,(elapsed-P5+1500)/1500))*0.40;if(a>0)drawRainbow(a);}
-      if(elapsed<P5) requestAnimationFrame(loop);
+      if (!startTs) startTs = ts;
+      const elapsed = ts - startTs;
+      const flushT = elapsed > 1800 ? Math.min((elapsed - 1800) / 1400, 1) : 0;
+
+      ctx.clearRect(0, 0, W, H);
+      drawBg();
+      drawToilet(flushT);
+      drawPaper(elapsed);
+      drawSparkles(elapsed);
+
+      if (elapsed < 7000) requestAnimationFrame(loop);
     }
     requestAnimationFrame(loop);
   });
@@ -2979,19 +2983,19 @@ function animFireworks() {
 // ═══════════════════════════════════════
 const W5_NODES = [
   { key:'S', icon:'🦀', label:'現状',      color:'var(--primary)',
-    q:'今、頭の中で一番絡まっているものは何ですか？',
-    hint:'状況を言葉にするだけでOK。良い・悪いは関係ありません。', ph:'例：案件が重なって、何から手をつければいいかわからない状態' },
+    q:'今、何が問題だと感じていますか？\n具体的に何が起こっていますか？',
+    hint:'起きてることをそのまま言葉にするだけでOK。良い・悪いは関係ありません。', ph:'例：案件が重なって、何から手をつければいいかわからない状態' },
   { key:'C', icon:'🐙', label:'原因',      color:'#888',
-    q:'なぜそうなっていると思いますか？',
+    q:'何が「現状」を起こしているのでしょうか？\n隠れている原因は？',
     hint:'分析より直感で。思い当たることを書いてみてください。', ph:'例：仕事を断れなかった、見積もりが甘かった…' },
-  { key:'O', icon:'🐬', label:'理想・目標', color:'#5B8F5B',
-    q:'本当はどんな状態になりたいですか？',
+  { key:'O', icon:'🐬', label:'理想の状態', color:'#5B8F5B',
+    q:'このことが解決したら、どうなりますか？\n理想の状態は？',
     hint:'「〜できている状態」「〜な自分」という形でも。', ph:'例：1つのことに集中して、落ち着いて仕事できている' },
   { key:'R', icon:'🦞', label:'リソース',   color:'#8F5B2A',
-    q:'今、使えるものや強みは何ですか？',
+    q:'「原因」や「現状」を変化させ、理想の状態に至るために、今、使えるものや強みは何ですか？\nこれまでに似たような状況を乗り越えた経験は？',
     hint:'スキル・人脈・時間・経験など。小さなものでもOK。', ph:'例：明日午前は空いている、〇〇さんに相談できる' },
   { key:'E', icon:'🐡', label:'結果の影響', color:'#5B5B8F',
-    q:'解決したら、あなたや周りにどんな変化が起きますか？',
+    q:'これが解決したら、あるいはその途中で、あなたや周りにどんなプラスやマイナスの影響がありますか？',
     hint:'未来の自分はどんな気持ち・状態になっていますか？', ph:'例：週末ゆっくり休める、チームが安心して動ける' },
 ];
 let w5Answers = {S:'',C:'',O:'',R:'',E:''};
@@ -3052,22 +3056,16 @@ function w5DrawNet() {
   ctx.fillText('頭の中の絡まり', W/2, H-14);
 }
 
-// ── Phase 2: Untangle → show creatures ────────────────────────────
+// ── Phase 2: Untangle → show situation input ──────────────────────
 function w5Untangle() {
   document.getElementById('w5-phase-intro').style.display = 'none';
-  document.getElementById('w5-phase-reveal').style.display = '';
-  // Stagger creature fade-in
-  setTimeout(()=>{
-    ['S','C','O','R','E'].forEach((k,i)=>{
-      setTimeout(()=>{ document.getElementById('wc-'+k).style.opacity='1'; },i*220);
-    });
-    setTimeout(()=>{ document.getElementById('w5-reveal-next').style.opacity='1'; }, 1200);
-  }, 50);
+  document.getElementById('w5-phase-situation').style.display = '';
+  setTimeout(()=>{ document.getElementById('w5-situation-textarea').focus(); }, 100);
 }
 
 // ── Phase 3: Show SCORE map ───────────────────────────────────────
 function w5ShowMap() {
-  document.getElementById('w5-phase-reveal').style.display = 'none';
+  document.getElementById('w5-phase-situation').style.display = 'none';
   document.getElementById('w5-phase-map').style.display = '';
 }
 
@@ -3087,6 +3085,7 @@ function w5RenderQuestion() {
   document.getElementById('w5-q-label').textContent = node.label;
   document.getElementById('w5-q-step').textContent = `${w5QIdx+1} / ${W5_NODES.length}`;
   document.getElementById('w5-progress').style.width = pct+'%';
+  document.getElementById('w5-q-question').style.whiteSpace = 'pre-line';
   document.getElementById('w5-q-question').textContent = node.q;
   document.getElementById('w5-q-hint').textContent = node.hint;
   const ta = document.getElementById('w5-q-textarea');
@@ -3168,7 +3167,7 @@ function w5Complete() {
 function w5Init() {
   // Reset all phases
   document.getElementById('w5-phase-intro').style.display = '';
-  ['reveal','map','questions','overview','baby'].forEach(p=>{
+  ['situation','map','questions','overview','baby'].forEach(p=>{
     document.getElementById('w5-phase-'+p).style.display = 'none';
   });
   w5Answers = {S:'',C:'',O:'',R:'',E:''};
@@ -3180,16 +3179,31 @@ function w5Init() {
 // After Scale & Baby Steps
 // ═══════════════════════════════════════
 function goToAfterScale() {
-  // Reset after gauge
+  state.afterScore = null;
+  document.getElementById('afterscale-phase-baby').style.display = '';
+  document.getElementById('afterscale-phase-checkout').style.display = 'none';
+  showBabySteps();
+  showScreen('screen-afterscale');
+}
+
+function goToCheckout() {
+  document.getElementById('afterscale-phase-baby').style.display = 'none';
+  const checkout = document.getElementById('afterscale-phase-checkout');
+  checkout.style.display = '';
+  // Reset gauge
   const fill = document.getElementById('after-gauge-fill');
   fill.style.height = '0%';
   document.getElementById('after-val-num').textContent = '—';
   document.getElementById('after-val-name').textContent = 'ドラッグで設定';
   state.afterScore = null;
   document.getElementById('change-card').style.display = 'none';
-  document.getElementById('babystep-box').style.display = '';
-  showBabySteps();
-  showScreen('screen-afterscale');
+  document.getElementById('after-complete-btn').style.display = 'none';
+  checkout.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function goBackToBaby() {
+  document.getElementById('afterscale-phase-checkout').style.display = 'none';
+  document.getElementById('afterscale-phase-baby').style.display = '';
 }
 
 function showChangeResult() {
@@ -3203,13 +3217,14 @@ function showChangeResult() {
 
   let msg = '波の変化を感じましたか？';
   if (diff !== null) {
-    if (diff >= 4) msg = '素晴らしい！波がぐっと静まりましたね ✨';
-    else if (diff >= 2) msg = '凪に近づいています 🌿';
-    else if (diff >= 1) msg = '少しさざ波になりましたね。小さな変化も大切です 🌱';
-    else if (diff === 0) msg = '今日は現状維持でもOK。ここに来たこと自体、一歩です。';
-    else msg = '今日は特に荒れた日だったんですね。それでも来てくれてありがとう。';
+    if (diff >= 4) msg = '素晴らしい！波がぐっと静まったかもしれませんね ✨';
+    else if (diff >= 2) msg = '凪に近づいているのかもしれません 🌿';
+    else if (diff >= 1) msg = '少しさざ波になってきたかもしれません。小さな変化も大切です 🌱';
+    else if (diff === 0) msg = '今日は現状維持でもOK。ここに来たこと自体、一歩かもしれません。';
+    else msg = '今日は特に荒れた日だったのかもしれませんね。それでも来てくれてありがとう。';
   }
   document.getElementById('change-text').textContent = msg;
+  document.getElementById('after-complete-btn').style.display = '';
 }
 
 const babyStepsByMenu = {
@@ -3217,7 +3232,7 @@ const babyStepsByMenu = {
   2: ['書き出したことを一度だけ読み返す', '今日の「やること」を3つだけ絞る', '信頼できる人に一言話す', '10分間、何もしない時間を作る'],
   3: ['今日の気分を5段階で日記に書く', '嫌なイメージを思い出して、また「薄く」してみる', '好きな音楽を一曲聴く', '深呼吸を3回やってみる'],
   4: ['軽くなった感覚をメモに残す', '今日の「できたこと」を1つ書く', '明日の最小タスクを1つ決める', '好きな香りを嗅ぐ'],
-  5: ['SCOREのOをもう一度読み返す', 'Rで書いたリソースを使える人に連絡する', '最小の次の行動を30分以内に実行する', '今日の整理を誰かに話す'],
+  5: ['整理した気づきをノートに一言書き残す', '信頼できる人に今日の発見を話してみる', '最小の次の行動を30分以内に実行する', '何もせず5分間、ゆっくり深呼吸する'],
 };
 
 function showBabySteps() {
