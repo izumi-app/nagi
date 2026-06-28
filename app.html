@@ -1533,30 +1533,36 @@ function doBreatheRound() {
       document.getElementById(r).style.background = r === id ? 'rgba(91,143,168,0.18)' : 'var(--surface2)';
     });
   };
+  // アナウンス後に一瞬間を置いてからカウント開始
   const countUp = (max, onDone) => {
-    let n = 1;
-    circle.textContent = n;
-    const iv = setInterval(() => {
-      n++;
-      if (n <= max) { circle.textContent = n; }
-      else { clearInterval(iv); onDone(); }
-    }, 1000);
-    return iv;
+    circle.textContent = '';
+    let iv;
+    const startCount = setTimeout(() => {
+      let n = 1;
+      circle.textContent = n;
+      iv = setInterval(() => {
+        n++;
+        if (n <= max) { circle.textContent = n; }
+        else { clearInterval(iv); onDone(); }
+      }, 1000);
+    }, 700);
+    // return cancel handle
+    return { cancel: () => { clearTimeout(startCount); clearInterval(iv); } };
   };
 
-  // Inhale 4s — circle expands
+  // Inhale 4s
   highlight('rhythm-inhale');
-  label.textContent = '吸って…';
+  label.textContent = '吸って';
   circle.classList.remove('hold','exhale'); circle.classList.add('inhale');
   countUp(4, () => {
-    // Hold 4s — circle stays large
+    // Hold 4s
     highlight('rhythm-hold');
-    label.textContent = '優しく止めて…'; circle.textContent = '1';
+    label.textContent = '優しく止めて';
     circle.classList.remove('inhale'); circle.classList.add('hold');
     countUp(4, () => {
-      // Exhale 8s — circle shrinks slowly
+      // Exhale 8s
       highlight('rhythm-exhale');
-      label.textContent = '吐いて…';
+      label.textContent = '吐いて';
       circle.classList.remove('hold'); circle.classList.add('exhale');
       countUp(8, () => {
         circle.classList.remove('exhale');
