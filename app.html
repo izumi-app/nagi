@@ -259,27 +259,53 @@
   }
   .smd-image-desc:focus { outline: none; border-color: var(--primary); }
 
-  .slider-group { display: flex; flex-direction: column; gap: 20px; }
-  .slider-item { }
+  /* Vertical slider layout */
+  .slider-group {
+    display: flex; flex-direction: row; justify-content: space-around;
+    align-items: stretch; gap: 6px; padding: 4px 0;
+  }
+  .slider-item {
+    display: flex; flex-direction: column; align-items: center;
+    flex: 1; gap: 4px;
+  }
   .slider-item label {
-    display: flex; justify-content: space-between;
-    font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--text);
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    font-size: 11px; font-weight: 600; color: var(--text); text-align: center;
   }
-  .slider-item label span { font-weight: 400; color: var(--primary); }
-  input[type="range"] {
-    width: 100%; height: 6px; border-radius: 3px;
+  .slider-item label .slider-icon { font-size: 16px; }
+  .slider-item label .slider-val { font-size: 15px; font-weight: 700; color: var(--primary); }
+  .slider-end-top { font-size: 10px; color: var(--text-muted); text-align: center; line-height: 1.2; min-height: 28px; display: flex; align-items: flex-end; }
+  .slider-end-bot { font-size: 10px; color: var(--text-muted); text-align: center; line-height: 1.2; min-height: 28px; display: flex; align-items: flex-start; }
+  input[type="range"].v-slider {
+    writing-mode: vertical-lr; direction: rtl;
+    width: 6px; height: 130px;
     appearance: none; background: var(--border); cursor: pointer;
+    border-radius: 3px; flex-shrink: 0;
   }
-  input[type="range"]::-webkit-slider-thumb {
+  input[type="range"].v-slider::-webkit-slider-thumb {
     appearance: none; width: 22px; height: 22px;
     border-radius: 50%; background: var(--primary);
     box-shadow: 0 2px 8px rgba(91,143,168,0.4);
   }
-  input[type="range"]::-webkit-slider-runnable-track {
+  input[type="range"].v-slider::-webkit-slider-runnable-track {
+    background: linear-gradient(to bottom, var(--border) var(--pct,50%), var(--primary) var(--pct,50%));
+    width: 6px; border-radius: 3px;
+  }
+  /* Keep horizontal sliders for other screens */
+  input[type="range"]:not(.v-slider) {
+    width: 100%; height: 6px; border-radius: 3px;
+    appearance: none; background: var(--border); cursor: pointer;
+  }
+  input[type="range"]:not(.v-slider)::-webkit-slider-thumb {
+    appearance: none; width: 22px; height: 22px;
+    border-radius: 50%; background: var(--primary);
+    box-shadow: 0 2px 8px rgba(91,143,168,0.4);
+  }
+  input[type="range"]:not(.v-slider)::-webkit-slider-runnable-track {
     background: linear-gradient(to right, var(--primary) var(--pct,50%), var(--border) var(--pct,50%));
     height: 6px; border-radius: 3px;
   }
-  .slider-ends { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+  .slider-ends { display: none; }
 
   .smd-preview {
     display: flex; align-items: center; justify-content: center;
@@ -771,34 +797,40 @@
 
     <div class="slider-group">
       <div class="slider-item">
-        <label>🔆 明るさ・鮮明さ <span id="chk-brightness">5</span></label>
-        <input type="range" min="1" max="10" value="5" step="1" id="chk-sld-brightness" oninput="updateChkDisplay()">
-        <div class="slider-ends"><span>薄い・モノクロ</span><span>鮮明・リアル</span></div>
+        <div class="slider-end-top">鮮明・<br>リアル</div>
+        <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="chk-sld-brightness" oninput="updateChkDisplay()">
+        <div class="slider-end-bot">薄い・<br>モノクロ</div>
+        <label><span class="slider-icon">🔆</span><span class="slider-val" id="chk-brightness">5</span></label>
       </div>
       <div class="slider-item">
-        <label>📐 サイズ <span id="chk-size">5</span></label>
-        <input type="range" min="1" max="10" value="5" step="1" id="chk-sld-size" oninput="updateChkDisplay()">
-        <div class="slider-ends"><span>小さい</span><span>大きい</span></div>
+        <div class="slider-end-top">大きい</div>
+        <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="chk-sld-size" oninput="updateChkDisplay()">
+        <div class="slider-end-bot">小さい</div>
+        <label><span class="slider-icon">📐</span><span class="slider-val" id="chk-size">5</span></label>
       </div>
       <div class="slider-item">
-        <label>📏 距離 <span id="chk-distance">5</span></label>
-        <input type="range" min="1" max="10" value="5" step="1" id="chk-sld-distance" oninput="updateChkDisplay()">
-        <div class="slider-ends"><span>遠い</span><span>すぐ目の前</span></div>
+        <div class="slider-end-top">目の前</div>
+        <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="chk-sld-distance" oninput="updateChkDisplay()">
+        <div class="slider-end-bot">遠い</div>
+        <label><span class="slider-icon">📏</span><span class="slider-val" id="chk-distance">5</span></label>
       </div>
       <div class="slider-item">
-        <label>🔉 音・声の大きさ <span id="chk-volume">5</span></label>
-        <input type="range" min="1" max="10" value="5" step="1" id="chk-sld-volume" oninput="updateChkDisplay()">
-        <div class="slider-ends"><span>ほぼ無音</span><span>大きく響く</span></div>
+        <div class="slider-end-top">大きく<br>響く</div>
+        <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="chk-sld-volume" oninput="updateChkDisplay()">
+        <div class="slider-end-bot">無音</div>
+        <label><span class="slider-icon">🔉</span><span class="slider-val" id="chk-volume">5</span></label>
       </div>
       <div class="slider-item">
-        <label>📍 位置（視野の中） <span id="chk-position">5</span></label>
-        <input type="range" min="1" max="10" value="5" step="1" id="chk-sld-position" oninput="updateChkDisplay()">
-        <div class="slider-ends"><span>端・周辺</span><span>正面・中央</span></div>
+        <div class="slider-end-top">正面・<br>中央</div>
+        <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="chk-sld-position" oninput="updateChkDisplay()">
+        <div class="slider-end-bot">端・<br>周辺</div>
+        <label><span class="slider-icon">📍</span><span class="slider-val" id="chk-position">5</span></label>
       </div>
       <div class="slider-item">
-        <label>💓 身体の緊張感 <span id="chk-tension">5</span></label>
-        <input type="range" min="1" max="10" value="5" step="1" id="chk-sld-tension" oninput="updateChkDisplay()">
-        <div class="slider-ends"><span>ゆるい</span><span>強く締まる</span></div>
+        <div class="slider-end-top">強く<br>締まる</div>
+        <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="chk-sld-tension" oninput="updateChkDisplay()">
+        <div class="slider-end-bot">ゆるい</div>
+        <label><span class="slider-icon">💓</span><span class="slider-val" id="chk-tension">5</span></label>
       </div>
     </div>
 
@@ -822,34 +854,40 @@
 
     <div class="slider-group" style="margin-top:20px">
       <div class="slider-item">
-        <label>🔆 明るさ・鮮明さ <span id="val-brightness">5</span></label>
-        <input type="range" min="1" max="10" value="5" step="1" id="sld-brightness" oninput="updateSmdPreview()">
-        <div class="slider-ends"><span>薄く・モノクロに</span><span>鮮明なまま</span></div>
+        <div class="slider-end-top">鮮明<br>なまま</div>
+        <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="sld-brightness" oninput="updateSmdPreview()">
+        <div class="slider-end-bot">薄く・<br>モノクロ</div>
+        <label><span class="slider-icon">🔆</span><span class="slider-val" id="val-brightness">5</span></label>
       </div>
       <div class="slider-item">
-        <label>📐 サイズ <span id="val-size">5</span></label>
-        <input type="range" min="1" max="10" value="5" step="1" id="sld-size" oninput="updateSmdPreview()">
-        <div class="slider-ends"><span>豆粒ほど小さく</span><span>大きいまま</span></div>
+        <div class="slider-end-top">大きい<br>まま</div>
+        <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="sld-size" oninput="updateSmdPreview()">
+        <div class="slider-end-bot">豆粒に<br>小さく</div>
+        <label><span class="slider-icon">📐</span><span class="slider-val" id="val-size">5</span></label>
       </div>
       <div class="slider-item">
-        <label>📏 距離 <span id="val-distance">5</span></label>
-        <input type="range" min="1" max="10" value="5" step="1" id="sld-distance" oninput="updateSmdPreview()">
-        <div class="slider-ends"><span>遠くへ押しやる</span><span>目の前のまま</span></div>
+        <div class="slider-end-top">目の前<br>のまま</div>
+        <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="sld-distance" oninput="updateSmdPreview()">
+        <div class="slider-end-bot">遠くへ<br>押しやる</div>
+        <label><span class="slider-icon">📏</span><span class="slider-val" id="val-distance">5</span></label>
       </div>
       <div class="slider-item">
-        <label>🔉 音・声の大きさ <span id="val-volume">5</span></label>
-        <input type="range" min="1" max="10" value="5" step="1" id="sld-volume" oninput="updateSmdPreview()">
-        <div class="slider-ends"><span>無音に</span><span>大きいまま</span></div>
+        <div class="slider-end-top">大きい<br>まま</div>
+        <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="sld-volume" oninput="updateSmdPreview()">
+        <div class="slider-end-bot">無音に</div>
+        <label><span class="slider-icon">🔉</span><span class="slider-val" id="val-volume">5</span></label>
       </div>
       <div class="slider-item">
-        <label>📍 位置（視野の中） <span id="val-position">5</span></label>
-        <input type="range" min="1" max="10" value="5" step="1" id="sld-position" oninput="updateSmdPreview()">
-        <div class="slider-ends"><span>端に追いやる</span><span>正面のまま</span></div>
+        <div class="slider-end-top">正面<br>のまま</div>
+        <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="sld-position" oninput="updateSmdPreview()">
+        <div class="slider-end-bot">端に<br>追いやる</div>
+        <label><span class="slider-icon">📍</span><span class="slider-val" id="val-position">5</span></label>
       </div>
       <div class="slider-item">
-        <label>💓 身体の緊張感 <span id="val-tension">5</span></label>
-        <input type="range" min="1" max="10" value="5" step="1" id="sld-tension" oninput="updateSmdPreview()">
-        <div class="slider-ends"><span>ゆるめる</span><span>緊張したまま</span></div>
+        <div class="slider-end-top">緊張<br>したまま</div>
+        <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="sld-tension" oninput="updateSmdPreview()">
+        <div class="slider-end-bot">ゆるめる</div>
+        <label><span class="slider-icon">💓</span><span class="slider-val" id="val-tension">5</span></label>
       </div>
     </div>
 
