@@ -307,6 +307,17 @@
   }
   .slider-ends { display: none; }
 
+  /* Work 3: 2.5D scene */
+  .w3-scene-wrap { position: relative; border-radius: 12px; overflow: hidden; touch-action: none; }
+  .w3-scene-wrap canvas { display: block; width: 100%; }
+  #w3-drag-el {
+    position: absolute; width: 40px; height: 40px;
+    font-size: 28px; display: flex; align-items: center; justify-content: center;
+    cursor: grab; user-select: none; touch-action: none;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));
+  }
+  #w3-drag-el:active { cursor: grabbing; }
+
   .smd-preview {
     display: flex; align-items: center; justify-content: center;
     height: 120px; border-radius: var(--radius-sm);
@@ -783,111 +794,77 @@
   </div>
 
   <!-- Step 1: テーマ特定 -->
-  <div class="card" id="w3-input-card">
+  <div class="card" id="w3-step1">
     <div class="card-title">ステップ 1 — イメージを特定する</div>
     <p class="score-hint">今、頭に浮かぶ「重くなる場面やプレッシャー」を書いてください。</p>
     <textarea class="smd-image-desc" id="smd-desc" rows="3" placeholder="例：明日の会議で詰められる場面、締め切りに間に合わない不安…"></textarea>
-    <button class="btn btn-primary" style="margin-top:14px" onclick="showSmdCheck()">現状を確認する →</button>
+    <button class="btn btn-primary" style="margin-top:14px" onclick="w3ToStep2()">空間に配置する →</button>
   </div>
 
-  <!-- Step 1b: 現状のサブモダリティを確認 -->
-  <div class="card" id="w3-check-card" style="display:none">
-    <div class="card-title">ステップ 1 — 今の感覚を確認する</div>
-    <p class="score-hint" style="margin-bottom:16px">そのイメージが今どう見えているか、感じているかを確認してください。</p>
-
-    <div class="slider-group">
-      <div class="slider-item">
-        <div class="slider-end-top">鮮明・<br>リアル</div>
-        <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="chk-sld-brightness" oninput="updateChkDisplay()">
-        <div class="slider-end-bot">薄い・<br>モノクロ</div>
-        <label><span class="slider-icon">🔆</span><span class="slider-val" id="chk-brightness">5</span></label>
-      </div>
-      <div class="slider-item">
-        <div class="slider-end-top">大きい</div>
-        <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="chk-sld-size" oninput="updateChkDisplay()">
-        <div class="slider-end-bot">小さい</div>
-        <label><span class="slider-icon">📐</span><span class="slider-val" id="chk-size">5</span></label>
-      </div>
-      <div class="slider-item">
-        <div class="slider-end-top">目の前</div>
-        <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="chk-sld-distance" oninput="updateChkDisplay()">
-        <div class="slider-end-bot">遠い</div>
-        <label><span class="slider-icon">📏</span><span class="slider-val" id="chk-distance">5</span></label>
-      </div>
-      <div class="slider-item">
-        <div class="slider-end-top">大きく<br>響く</div>
-        <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="chk-sld-volume" oninput="updateChkDisplay()">
-        <div class="slider-end-bot">無音</div>
-        <label><span class="slider-icon">🔉</span><span class="slider-val" id="chk-volume">5</span></label>
-      </div>
-      <div class="slider-item">
-        <div class="slider-end-top">正面・<br>中央</div>
-        <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="chk-sld-position" oninput="updateChkDisplay()">
-        <div class="slider-end-bot">端・<br>周辺</div>
-        <label><span class="slider-icon">📍</span><span class="slider-val" id="chk-position">5</span></label>
-      </div>
-      <div class="slider-item">
-        <div class="slider-end-top">強く<br>締まる</div>
-        <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="chk-sld-tension" oninput="updateChkDisplay()">
-        <div class="slider-end-bot">ゆるい</div>
-        <label><span class="slider-icon">💓</span><span class="slider-val" id="chk-tension">5</span></label>
-      </div>
+  <!-- Step 2: 2.5D 空間配置 -->
+  <div id="w3-step2" style="display:none">
+    <div class="card">
+      <div class="card-title">ステップ 2 — 空間に配置する</div>
+      <p class="score-hint">🔴 をドラッグして、スナップポイント（点線の円）に配置してください。</p>
     </div>
-
-    <button class="btn btn-primary" style="margin-top:16px" onclick="showSmdSliders()">調整に進む →</button>
-    <button class="btn btn-ghost" style="margin-top:8px" onclick="backToInput()">← 書き直す</button>
+    <div class="w3-scene-wrap" id="w3-scene-wrap">
+      <canvas id="w3-canvas"></canvas>
+      <div id="w3-drag-el">🔴</div>
+    </div>
+    <p id="w3-snap-label" style="text-align:center;min-height:22px;margin:10px 0 4px;font-size:13px;color:var(--primary);font-weight:600"></p>
+    <button id="w3-step2-btn" class="btn btn-primary" style="display:none;margin-top:4px" onclick="w3ToStep3()">スライダーで調整 →</button>
+    <button class="btn btn-ghost" style="margin-top:8px" onclick="w3ToStep1()">← 書き直す</button>
   </div>
 
-  <!-- Step 2: 調整 -->
-  <div class="card" id="w3-sliders" style="display:none">
-    <div class="card-title">ステップ 2 — インパクトを弱める</div>
-    <p class="score-hint" style="margin-bottom:16px">各スライダーを動かして、イメージを「小さく・薄く・遠く」していきましょう。</p>
-
-    <div class="smd-preview">
-      <div class="smd-blob" id="smd-blob"></div>
+  <!-- Step 3: スライダー -->
+  <div id="w3-step3" style="display:none">
+    <div class="card">
+      <div class="card-title">ステップ 3 — インパクトを弱める</div>
+      <p class="score-hint">スライダーを下げて、イメージを無力化していきましょう。</p>
+      <div class="w3-scene-wrap" id="w3-preview-wrap">
+        <canvas id="w3-preview-canvas"></canvas>
+      </div>
+      <div class="slider-group" style="margin-top:16px">
+        <div class="slider-item">
+          <div class="slider-end-top">目の前・<br>密着</div>
+          <input type="range" class="v-slider" min="1" max="10" value="10" step="1" id="sld-distance" oninput="w3UpdatePreview()">
+          <div class="slider-end-bot">はるか<br>遠く</div>
+          <label><span class="slider-icon">📏</span><span class="slider-val" id="val-distance">10</span></label>
+        </div>
+        <div class="slider-item">
+          <div class="slider-end-top">巨大・<br>覆い被さる</div>
+          <input type="range" class="v-slider" min="1" max="10" value="10" step="1" id="sld-size" oninput="w3UpdatePreview()">
+          <div class="slider-end-bot">豆粒・<br>極小</div>
+          <label><span class="slider-icon">📐</span><span class="slider-val" id="val-size">10</span></label>
+        </div>
+        <div class="slider-item">
+          <div class="slider-end-top">カラー・<br>鮮明</div>
+          <input type="range" class="v-slider" min="1" max="10" value="10" step="1" id="sld-brightness" oninput="w3UpdatePreview()">
+          <div class="slider-end-bot">白黒・<br>ぼんやり</div>
+          <label><span class="slider-icon">🔆</span><span class="slider-val" id="val-brightness">10</span></label>
+        </div>
+        <div class="slider-item">
+          <div class="slider-end-top">爆音・<br>響く</div>
+          <input type="range" class="v-slider" min="1" max="10" value="10" step="1" id="sld-volume" oninput="w3UpdatePreview()">
+          <div class="slider-end-bot">ほぼ<br>無音</div>
+          <label><span class="slider-icon">🔉</span><span class="slider-val" id="val-volume">10</span></label>
+        </div>
+        <div class="slider-item">
+          <div class="slider-end-top">動画・<br>速い</div>
+          <input type="range" class="v-slider" min="1" max="10" value="10" step="1" id="sld-motion" oninput="w3UpdatePreview()">
+          <div class="slider-end-bot">写真・<br>静止</div>
+          <label><span class="slider-icon">🎬</span><span class="slider-val" id="val-motion">10</span></label>
+        </div>
+        <div class="slider-item">
+          <div class="slider-end-top">ズッシリ<br>重い</div>
+          <input type="range" class="v-slider" min="1" max="10" value="10" step="1" id="sld-weight" oninput="w3UpdatePreview()">
+          <div class="slider-end-bot">羽のよう<br>に軽い</div>
+          <label><span class="slider-icon">⚖️</span><span class="slider-val" id="val-weight">10</span></label>
+        </div>
+      </div>
+      <button class="btn btn-primary" style="margin-top:16px" onclick="goToAfterScale()">変化を確認する →</button>
+      <button class="btn btn-ghost" style="margin-top:8px" onclick="w3ToStep2Again()">← 配置に戻る</button>
     </div>
-
-    <div class="slider-group" style="margin-top:20px">
-      <div class="slider-item">
-        <div class="slider-end-top">鮮明<br>なまま</div>
-        <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="sld-brightness" oninput="updateSmdPreview()">
-        <div class="slider-end-bot">薄く・<br>モノクロ</div>
-        <label><span class="slider-icon">🔆</span><span class="slider-val" id="val-brightness">5</span></label>
-      </div>
-      <div class="slider-item">
-        <div class="slider-end-top">大きい<br>まま</div>
-        <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="sld-size" oninput="updateSmdPreview()">
-        <div class="slider-end-bot">豆粒に<br>小さく</div>
-        <label><span class="slider-icon">📐</span><span class="slider-val" id="val-size">5</span></label>
-      </div>
-      <div class="slider-item">
-        <div class="slider-end-top">目の前<br>のまま</div>
-        <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="sld-distance" oninput="updateSmdPreview()">
-        <div class="slider-end-bot">遠くへ<br>押しやる</div>
-        <label><span class="slider-icon">📏</span><span class="slider-val" id="val-distance">5</span></label>
-      </div>
-      <div class="slider-item">
-        <div class="slider-end-top">大きい<br>まま</div>
-        <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="sld-volume" oninput="updateSmdPreview()">
-        <div class="slider-end-bot">無音に</div>
-        <label><span class="slider-icon">🔉</span><span class="slider-val" id="val-volume">5</span></label>
-      </div>
-      <div class="slider-item">
-        <div class="slider-end-top">正面<br>のまま</div>
-        <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="sld-position" oninput="updateSmdPreview()">
-        <div class="slider-end-bot">端に<br>追いやる</div>
-        <label><span class="slider-icon">📍</span><span class="slider-val" id="val-position">5</span></label>
-      </div>
-      <div class="slider-item">
-        <div class="slider-end-top">緊張<br>したまま</div>
-        <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="sld-tension" oninput="updateSmdPreview()">
-        <div class="slider-end-bot">ゆるめる</div>
-        <label><span class="slider-icon">💓</span><span class="slider-val" id="val-tension">5</span></label>
-      </div>
-    </div>
-
-    <button class="btn btn-primary" style="margin-top:16px" onclick="goToAfterScale()">変化を確認する →</button>
-    <button class="btn btn-ghost" style="margin-top:8px" onclick="backToCheck()">← 現状確認に戻る</button>
   </div>
 
   <div class="flex-row" style="gap:8px">
@@ -1502,16 +1479,11 @@ function resetWork(n) {
     w2UserText = ''; holdCancel();
   }
   if (n === 3) {
-    document.getElementById('w3-input-card').style.display = '';
-    document.getElementById('w3-check-card').style.display = 'none';
-    document.getElementById('w3-sliders').style.display = 'none';
+    document.getElementById('w3-step1').style.display = '';
+    document.getElementById('w3-step2').style.display = 'none';
+    document.getElementById('w3-step3').style.display = 'none';
     document.getElementById('smd-desc').value = '';
-    ['brightness','size','distance','volume','position','tension'].forEach(k => {
-      const chk = document.getElementById(`chk-sld-${k}`);
-      const sld = document.getElementById(`sld-${k}`);
-      if (chk) chk.value = 5;
-      if (sld) sld.value = 5;
-    });
+    w3PlacedSnap = null;
   }
   if (n === 4) {
     document.getElementById('w4-input-card').style.display = '';
@@ -1971,62 +1943,318 @@ function runCreatureCanvas(creature, onDone) {
 }
 
 // ═══════════════════════════════════════
-// Work 3: SMD Sliders
+// Work 3: 五感チューニング (2.5D SMD)
 // ═══════════════════════════════════════
-function showSmdCheck() {
-  document.getElementById('w3-input-card').style.display = 'none';
-  document.getElementById('w3-check-card').style.display = '';
-  updateChkDisplay();
+const W3_SNAPS = [
+  { id:'top',   label:'頭の真上',   rx:0.50, ry:0.10 },
+  { id:'front', label:'真正面',     rx:0.50, ry:0.86 },
+  { id:'right', label:'右肩の後ろ', rx:0.78, ry:0.36 },
+  { id:'left',  label:'左肩の後ろ', rx:0.22, ry:0.36 },
+  { id:'feet',  label:'足元',       rx:0.50, ry:0.70 },
+];
+let w3PlacedSnap = null;
+let w3DragListeners = [];
+
+function w3ToStep1() {
+  document.getElementById('w3-step2').style.display = 'none';
+  document.getElementById('w3-step1').style.display = '';
 }
 
-function backToInput() {
-  document.getElementById('w3-check-card').style.display = 'none';
-  document.getElementById('w3-input-card').style.display = '';
+function w3ToStep2() {
+  if (!document.getElementById('smd-desc').value.trim()) return;
+  document.getElementById('w3-step1').style.display = 'none';
+  document.getElementById('w3-step2').style.display = '';
+  w3PlacedSnap = null;
+  document.getElementById('w3-step2-btn').style.display = 'none';
+  document.getElementById('w3-snap-label').textContent = '';
+  setTimeout(w3InitCanvas, 60);
 }
 
-function backToCheck() {
-  document.getElementById('w3-sliders').style.display = 'none';
-  document.getElementById('w3-check-card').style.display = '';
-}
-
-function updateChkDisplay() {
-  ['brightness','size','distance','volume','position','tension'].forEach(k => {
-    const el = document.getElementById(`chk-sld-${k}`);
-    document.getElementById(`chk-${k}`).textContent = el.value;
-    el.style.setProperty('--pct', `${(el.value - 1) / 9 * 100}%`);
-  });
-}
-
-function showSmdSliders() {
-  // Copy check values as starting point for adjustment
-  ['brightness','size','distance','volume','position','tension'].forEach(k => {
-    const chkVal = document.getElementById(`chk-sld-${k}`).value;
-    document.getElementById(`sld-${k}`).value = chkVal;
-  });
-  document.getElementById('w3-check-card').style.display = 'none';
-  document.getElementById('w3-sliders').style.display = '';
-  updateSmdPreview();
-}
-
-function updateSmdPreview() {
-  ['brightness','size','distance','volume','position','tension'].forEach(k => {
+function w3ToStep3() {
+  document.getElementById('w3-step2').style.display = 'none';
+  document.getElementById('w3-step3').style.display = '';
+  ['distance','size','brightness','volume','motion','weight'].forEach(k => {
     const el = document.getElementById(`sld-${k}`);
+    el.value = 10;
+    document.getElementById(`val-${k}`).textContent = '10';
+    el.style.setProperty('--pct', '100%');
+  });
+  setTimeout(w3InitPreviewCanvas, 60);
+}
+
+function w3ToStep2Again() {
+  document.getElementById('w3-step3').style.display = 'none';
+  document.getElementById('w3-step2').style.display = '';
+  setTimeout(w3InitCanvas, 60);
+}
+
+// ─── Canvas shared drawing ───
+function w3DrawScene(ctx, W, H, placedId) {
+  ctx.clearRect(0, 0, W, H);
+
+  // Sky
+  const sky = ctx.createLinearGradient(0, 0, 0, H * 0.58);
+  sky.addColorStop(0, '#C4D4EC'); sky.addColorStop(1, '#D4E4F4');
+  ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H * 0.58);
+
+  // Floor
+  const floor = ctx.createLinearGradient(0, H * 0.58, 0, H);
+  floor.addColorStop(0, '#B0C4DE'); floor.addColorStop(1, '#9CB8D4');
+  ctx.fillStyle = floor; ctx.fillRect(0, H * 0.58, W, H * 0.42);
+
+  // Horizon
+  ctx.strokeStyle = 'rgba(80,110,170,0.2)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, H * 0.58); ctx.lineTo(W, H * 0.58); ctx.stroke();
+
+  // Perspective grid
+  const vx = W * 0.5, vy = H * 0.58;
+  ctx.strokeStyle = 'rgba(80,110,170,0.15)'; ctx.lineWidth = 1;
+  for (let i = -8; i <= 8; i++) {
+    ctx.beginPath(); ctx.moveTo(vx, vy); ctx.lineTo(W * 0.5 + i * W * 0.13, H); ctx.stroke();
+  }
+  for (let j = 1; j <= 7; j++) {
+    const t = j / 7;
+    const y = vy + (H - vy) * t * t;
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+
+  // Snap points
+  const avX = W * 0.5, avY = H * 0.50;
+  W3_SNAPS.forEach(sp => {
+    const sx = sp.rx * W, sy = sp.ry * H;
+    const placed = sp.id === placedId;
+    ctx.save();
+    ctx.beginPath(); ctx.arc(sx, sy, W * 0.058, 0, Math.PI * 2);
+    if (placed) {
+      ctx.fillStyle = 'rgba(91,143,168,0.22)'; ctx.fill();
+      ctx.strokeStyle = 'rgba(91,143,168,0.9)'; ctx.lineWidth = 2;
+    } else {
+      ctx.setLineDash([5, 4]);
+      ctx.strokeStyle = 'rgba(91,143,168,0.5)'; ctx.lineWidth = 1.5;
+    }
+    ctx.stroke(); ctx.restore();
+    // Label
+    ctx.fillStyle = 'rgba(50,80,140,0.75)';
+    ctx.font = `bold ${Math.max(10, W * 0.026)}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText(sp.label, sx, sy < H * 0.25 ? sy - W * 0.07 : sy + W * 0.08);
+  });
+
+  // Avatar shadow
+  ctx.save();
+  ctx.beginPath();
+  ctx.ellipse(avX, avY + W * 0.18, W * 0.075, W * 0.022, 0, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(50,70,120,0.18)'; ctx.fill(); ctx.restore();
+
+  // Avatar body
+  const r = W * 0.09;
+  ctx.save();
+  ctx.fillStyle = '#6278A0';
+  // Body
+  ctx.beginPath();
+  ctx.roundRect ? ctx.roundRect(avX - r * 0.58, avY - r * 0.08, r * 1.16, r * 1.55, r * 0.28)
+    : ctx.rect(avX - r * 0.58, avY - r * 0.08, r * 1.16, r * 1.55);
+  ctx.fill();
+  // Arms
+  ctx.beginPath();
+  ctx.ellipse(avX - r * 0.88, avY + r * 0.32, r * 0.27, r * 0.64, -0.1, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(avX + r * 0.88, avY + r * 0.32, r * 0.27, r * 0.64, 0.1, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+  // Head
+  ctx.save();
+  ctx.fillStyle = '#7890B8';
+  ctx.beginPath(); ctx.arc(avX, avY - r * 0.54, r * 0.42, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+}
+
+// ─── Step 2 canvas + drag ───
+function w3InitCanvas() {
+  const wrap = document.getElementById('w3-scene-wrap');
+  const canvas = document.getElementById('w3-canvas');
+  const W = wrap.clientWidth || 340;
+  const H = Math.round(W * 0.72);
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = W * dpr; canvas.height = H * dpr;
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+  wrap.style.height = H + 'px';
+
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  // Place drag icon at bottom-right start
+  const el = document.getElementById('w3-drag-el');
+  const startX = W * 0.84, startY = H * 0.84;
+  el.style.left = (startX - 20) + 'px'; el.style.top = (startY - 20) + 'px';
+
+  // Restore placed snap position if returning from step 3
+  if (w3PlacedSnap) {
+    const sp = W3_SNAPS.find(s => s.id === w3PlacedSnap);
+    if (sp) { el.style.left = (sp.rx * W - 20) + 'px'; el.style.top = (sp.ry * H - 20) + 'px'; }
+    document.getElementById('w3-step2-btn').style.display = '';
+    document.getElementById('w3-snap-label').textContent = `📍 ${W3_SNAPS.find(s=>s.id===w3PlacedSnap)?.label}に配置しました`;
+  }
+
+  w3DrawScene(ctx, W, H, w3PlacedSnap);
+
+  // Remove previous listeners
+  w3DragListeners.forEach(([t,f,o]) => document.removeEventListener(t, f, o));
+  w3DragListeners = [];
+
+  let dragging = false;
+
+  function getPos(e) {
+    const rect = wrap.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : e;
+    return { x: src.clientX - rect.left, y: src.clientY - rect.top };
+  }
+
+  function findSnap(x, y) {
+    const threshold = W * 0.1;
+    return W3_SNAPS.reduce((best, sp) => {
+      const d = Math.hypot(x - sp.rx * W, y - sp.ry * H);
+      return d < threshold && d < (best?.d ?? Infinity) ? { ...sp, d } : best;
+    }, null);
+  }
+
+  function onStart(e) {
+    const elRect = el.getBoundingClientRect();
+    const wrapRect = wrap.getBoundingClientRect();
+    const mx = (elRect.left + 20) - wrapRect.left;
+    const my = (elRect.top + 20) - wrapRect.top;
+    const pos = getPos(e);
+    if (Math.hypot(pos.x - mx, pos.y - my) > 40) return;
+    e.preventDefault(); dragging = true;
+  }
+
+  function onMove(e) {
+    if (!dragging) return; e.preventDefault();
+    const { x, y } = getPos(e);
+    const snap = findSnap(x, y);
+    if (snap) {
+      const sx = snap.rx * W, sy = snap.ry * H;
+      el.style.left = (sx - 20) + 'px'; el.style.top = (sy - 20) + 'px';
+      w3PlacedSnap = snap.id;
+      document.getElementById('w3-snap-label').textContent = `📍 ${snap.label}に配置しました`;
+      document.getElementById('w3-step2-btn').style.display = '';
+    } else {
+      el.style.left = (x - 20) + 'px'; el.style.top = (y - 20) + 'px';
+      w3PlacedSnap = null;
+      document.getElementById('w3-snap-label').textContent = '';
+      document.getElementById('w3-step2-btn').style.display = 'none';
+    }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    w3DrawScene(ctx, W, H, w3PlacedSnap);
+  }
+
+  function onEnd() { dragging = false; }
+
+  const listeners = [
+    ['mousemove', onMove, false],
+    ['touchmove', onMove, { passive: false }],
+    ['mouseup', onEnd, false],
+    ['touchend', onEnd, false],
+  ];
+  listeners.forEach(([t, f, o]) => document.addEventListener(t, f, o));
+  w3DragListeners = listeners;
+
+  el.onmousedown = el.ontouchstart = onStart;
+}
+
+// ─── Step 3 preview canvas ───
+function w3InitPreviewCanvas() {
+  const wrap = document.getElementById('w3-preview-wrap');
+  const canvas = document.getElementById('w3-preview-canvas');
+  const W = wrap.clientWidth || 340;
+  const H = Math.round(W * 0.72);
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = W * dpr; canvas.height = H * dpr;
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+  wrap.style.height = H + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  w3UpdatePreview();
+}
+
+function w3UpdatePreview() {
+  ['distance','size','brightness','volume','motion','weight'].forEach(k => {
+    const el = document.getElementById(`sld-${k}`);
+    if (!el) return;
     document.getElementById(`val-${k}`).textContent = el.value;
     el.style.setProperty('--pct', `${(el.value - 1) / 9 * 100}%`);
   });
 
-  const b = parseInt(document.getElementById('sld-brightness').value);
-  const s = parseInt(document.getElementById('sld-size').value);
-  const d = parseInt(document.getElementById('sld-distance').value);
+  const canvas = document.getElementById('w3-preview-canvas');
+  if (!canvas || !canvas.width) return;
+  const W = canvas.clientWidth, H = canvas.clientHeight;
+  const dpr = window.devicePixelRatio || 1;
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-  // Blob preview (scale 1-10)
-  const blob = document.getElementById('smd-blob');
-  blob.style.width = `${s * 8}px`;
-  blob.style.height = `${s * 8}px`;
-  blob.style.opacity = (b / 10 * 0.8).toFixed(2);
-  blob.style.filter = `blur(${(10-b)/3}px) grayscale(${(10-b)*10}%)`;
-  blob.style.transform = `scale(${1 - (d-1)/18})`;
+  const dist   = parseInt(document.getElementById('sld-distance').value);   // 10=near 1=far
+  const size   = parseInt(document.getElementById('sld-size').value);
+  const bright = parseInt(document.getElementById('sld-brightness').value);
+  const vol    = parseInt(document.getElementById('sld-volume').value);
+  const motion = parseInt(document.getElementById('sld-motion').value);
+  const weight = parseInt(document.getElementById('sld-weight').value);
 
+  const sp = W3_SNAPS.find(s => s.id === w3PlacedSnap) || W3_SNAPS[0];
+  w3DrawScene(ctx, W, H, sp.id);
+
+  const avX = W * 0.5, avY = H * 0.50;
+  const baseSx = sp.rx * W, baseSy = sp.ry * H;
+
+  // Distance: push outward from avatar
+  const push = 1 + (10 - dist) * 0.3;
+  const objX = avX + (baseSx - avX) * push;
+  const objY = avY + (baseSy - avY) * push;
+
+  // Size
+  const baseEm = W * 0.10;
+  const objEm = baseEm * (0.15 + size / 10 * 1.4);
+
+  // Volume rings
+  if (vol > 3) {
+    for (let i = 1; i <= Math.ceil(vol / 3.5); i++) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(objX, objY, objEm * 0.4 + i * objEm * 0.5, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(200,60,60,${0.08 * vol / 10 * (4 - i) / 3})`;
+      ctx.lineWidth = 3; ctx.stroke(); ctx.restore();
+    }
+  }
+
+  // Weight shadow
+  if (weight > 2) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.ellipse(objX, objY + objEm * 0.35, objEm * 0.45 * (weight / 10), objEm * 0.1, 0, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(30,40,80,${0.12 * weight / 10})`; ctx.fill(); ctx.restore();
+  }
+
+  // Motion blur lines
+  if (motion > 5) {
+    ctx.save(); ctx.globalAlpha = (motion - 5) / 10 * 0.45;
+    ctx.strokeStyle = 'rgba(180,50,50,0.6)'; ctx.lineWidth = 2;
+    for (let i = 1; i <= 4; i++) {
+      ctx.beginPath();
+      ctx.moveTo(objX - objEm * 0.25 * i, objY - objEm * 0.12 * i);
+      ctx.lineTo(objX - objEm * 0.18 * i, objY + objEm * 0.12 * i);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  // Draw 🔴 with clarity effects
+  ctx.save();
+  ctx.globalAlpha = 0.25 + bright / 10 * 0.75;
+  ctx.filter = `grayscale(${(10 - bright) * 10}%) blur(${(10 - bright) * 0.25}px)`;
+  ctx.font = `${objEm}px sans-serif`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('🔴', objX, objY);
+  ctx.restore();
 }
 
 // ═══════════════════════════════════════
