@@ -310,13 +310,13 @@
   /* Work 3: 2.5D scene */
   .w3-scene-wrap { position: relative; border-radius: 12px; overflow: hidden; touch-action: none; }
   .w3-scene-wrap canvas { display: block; width: 100%; }
-  #w3-drag-el {
+  #w3-drag-el, #w3-drag-el2 {
     position: absolute; width: 40px; height: 40px;
     font-size: 28px; display: flex; align-items: center; justify-content: center;
     cursor: grab; user-select: none; touch-action: none;
     filter: drop-shadow(0 2px 6px rgba(0,0,0,0.4));
   }
-  #w3-drag-el:active { cursor: grabbing; }
+  #w3-drag-el:active, #w3-drag-el2:active { cursor: grabbing; }
 
   .smd-preview {
     display: flex; align-items: center; justify-content: center;
@@ -801,62 +801,119 @@
     <button class="btn btn-primary" style="margin-top:14px" onclick="w3ToStep2()">より細かくみていくと？ →</button>
   </div>
 
-  <!-- Step 2: 2.5D 空間配置 + スライダー -->
+  <!-- Step 2: 現状確認 -->
   <div id="w3-step2" style="display:none">
     <div class="card">
       <div class="card-title">ステップ 2 — イメージの場所や構成要素を確認する</div>
-      <p class="score-hint">画面をタップして 🔴 を置いてください。ドラッグで移動できます。スライダーで感覚も調整しましょう。</p>
+      <p class="score-hint">🔴 をドラッグして、自分がそうだと思うところにセットしてください。スライダーで他の要素も調整しましょう。</p>
     </div>
     <div class="w3-scene-wrap" id="w3-scene-wrap">
       <canvas id="w3-canvas"></canvas>
       <div id="w3-drag-el">🔴</div>
     </div>
     <div class="card" style="margin-top:12px">
-      <div class="slider-group">
+      <div class="slider-group" id="w3-sliders-s2">
         <div class="slider-item">
-          <div class="slider-end-top">目の前・<br>密着</div>
-          <input type="range" class="v-slider" min="1" max="10" value="10" step="1" id="sld-distance" oninput="w3UpdatePreview()">
-          <div class="slider-end-bot">はるか<br>遠く</div>
-          <label><span class="slider-icon">📏</span><span class="slider-val" id="val-distance">10</span></label>
+          <div class="slider-end-top">近い<br>（大）</div>
+          <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="sld-distance" oninput="w3UpdatePreview()">
+          <div class="slider-end-bot">遠い<br>（小）</div>
+          <label><span class="slider-icon">📏</span><span class="slider-val" id="val-distance">5</span></label>
         </div>
         <div class="slider-item">
-          <div class="slider-end-top">巨大・<br>覆い被さる</div>
-          <input type="range" class="v-slider" min="1" max="10" value="10" step="1" id="sld-size" oninput="w3UpdatePreview()">
-          <div class="slider-end-bot">豆粒・<br>極小</div>
-          <label><span class="slider-icon">📐</span><span class="slider-val" id="val-size">10</span></label>
+          <div class="slider-end-top">明るい</div>
+          <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="sld-brightness" oninput="w3UpdatePreview()">
+          <div class="slider-end-bot">暗い</div>
+          <label><span class="slider-icon">☀️</span><span class="slider-val" id="val-brightness">5</span></label>
         </div>
         <div class="slider-item">
-          <div class="slider-end-top">カラー・<br>鮮明</div>
-          <input type="range" class="v-slider" min="1" max="10" value="10" step="1" id="sld-brightness" oninput="w3UpdatePreview()">
-          <div class="slider-end-bot">白黒・<br>ぼんやり</div>
-          <label><span class="slider-icon">🔆</span><span class="slider-val" id="val-brightness">10</span></label>
+          <div class="slider-end-top">カラー</div>
+          <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="sld-color" oninput="w3UpdatePreview()">
+          <div class="slider-end-bot">白黒</div>
+          <label><span class="slider-icon">🔆</span><span class="slider-val" id="val-color">5</span></label>
         </div>
         <div class="slider-item">
-          <div class="slider-end-top">爆音・<br>響く</div>
-          <input type="range" class="v-slider" min="1" max="10" value="10" step="1" id="sld-volume" oninput="w3UpdatePreview()">
-          <div class="slider-end-bot">ほぼ<br>無音</div>
-          <label><span class="slider-icon">🔉</span><span class="slider-val" id="val-volume">10</span></label>
+          <div class="slider-end-top">大<br>音量</div>
+          <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="sld-volume" oninput="w3UpdatePreview()">
+          <div class="slider-end-bot">無音</div>
+          <label><span class="slider-icon">🔉</span><span class="slider-val" id="val-volume">5</span></label>
         </div>
         <div class="slider-item">
-          <div class="slider-end-top">動画・<br>速い</div>
-          <input type="range" class="v-slider" min="1" max="10" value="10" step="1" id="sld-motion" oninput="w3UpdatePreview()">
-          <div class="slider-end-bot">写真・<br>静止</div>
-          <label><span class="slider-icon">🎬</span><span class="slider-val" id="val-motion">10</span></label>
+          <div class="slider-end-top">動画</div>
+          <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="sld-motion" oninput="w3UpdatePreview()">
+          <div class="slider-end-bot">静止画</div>
+          <label><span class="slider-icon">🎬</span><span class="slider-val" id="val-motion">5</span></label>
         </div>
         <div class="slider-item">
-          <div class="slider-end-top">ズッシリ<br>重い</div>
-          <input type="range" class="v-slider" min="1" max="10" value="10" step="1" id="sld-weight" oninput="w3UpdatePreview()">
-          <div class="slider-end-bot">羽のよう<br>に軽い</div>
-          <label><span class="slider-icon">⚖️</span><span class="slider-val" id="val-weight">10</span></label>
+          <div class="slider-end-top">重い</div>
+          <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="sld-weight" oninput="w3UpdatePreview()">
+          <div class="slider-end-bot">軽い</div>
+          <label><span class="slider-icon">⚖️</span><span class="slider-val" id="val-weight">5</span></label>
         </div>
       </div>
-      <button class="btn btn-primary" style="margin-top:16px" onclick="goToAfterScale()">変化を確認する →</button>
+      <p style="font-size:13px;color:var(--text-muted);line-height:1.8;margin-top:16px;padding:12px;background:var(--surface2);border-radius:10px">
+        このイメージがこんなふうに見えているから、ズシっとくるんですよね。まずは今どう映っているか、そのまま眺めてみましょう。
+      </p>
+      <button class="btn btn-primary" style="margin-top:14px" onclick="w3ToStep3()">このまま調整してみる →</button>
       <button class="btn btn-ghost" style="margin-top:8px" onclick="w3ToStep1()">← 書き直す</button>
     </div>
   </div>
 
-  <!-- Step 3: (legacy - redirects to step2) -->
-  <div id="w3-step3" style="display:none"></div>
+  <!-- Step 3: 調整 -->
+  <div id="w3-step3" style="display:none">
+    <div class="card">
+      <div class="card-title">ステップ 3 — イメージをいい感じに調整する</div>
+      <p class="score-hint">場所やスライダーを動かして、イメージをいい感じに薄めていきましょう。</p>
+    </div>
+    <div class="w3-scene-wrap" id="w3-scene-wrap2">
+      <canvas id="w3-canvas2"></canvas>
+      <div id="w3-drag-el2">🔴</div>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <div class="slider-group" id="w3-sliders-s3">
+        <div class="slider-item">
+          <div class="slider-end-top">近い<br>（大）</div>
+          <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="sld2-distance" oninput="w3UpdatePreview2()">
+          <div class="slider-end-bot">遠い<br>（小）</div>
+          <label><span class="slider-icon">📏</span><span class="slider-val" id="val2-distance">5</span></label>
+        </div>
+        <div class="slider-item">
+          <div class="slider-end-top">明るい</div>
+          <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="sld2-brightness" oninput="w3UpdatePreview2()">
+          <div class="slider-end-bot">暗い</div>
+          <label><span class="slider-icon">☀️</span><span class="slider-val" id="val2-brightness">5</span></label>
+        </div>
+        <div class="slider-item">
+          <div class="slider-end-top">カラー</div>
+          <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="sld2-color" oninput="w3UpdatePreview2()">
+          <div class="slider-end-bot">白黒</div>
+          <label><span class="slider-icon">🔆</span><span class="slider-val" id="val2-color">5</span></label>
+        </div>
+        <div class="slider-item">
+          <div class="slider-end-top">大<br>音量</div>
+          <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="sld2-volume" oninput="w3UpdatePreview2()">
+          <div class="slider-end-bot">無音</div>
+          <label><span class="slider-icon">🔉</span><span class="slider-val" id="val2-volume">5</span></label>
+        </div>
+        <div class="slider-item">
+          <div class="slider-end-top">動画</div>
+          <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="sld2-motion" oninput="w3UpdatePreview2()">
+          <div class="slider-end-bot">静止画</div>
+          <label><span class="slider-icon">🎬</span><span class="slider-val" id="val2-motion">5</span></label>
+        </div>
+        <div class="slider-item">
+          <div class="slider-end-top">重い</div>
+          <input type="range" class="v-slider" min="1" max="10" value="5" step="1" id="sld2-weight" oninput="w3UpdatePreview2()">
+          <div class="slider-end-bot">軽い</div>
+          <label><span class="slider-icon">⚖️</span><span class="slider-val" id="val2-weight">5</span></label>
+        </div>
+      </div>
+      <p style="font-size:13px;color:var(--text-muted);line-height:1.8;margin-top:16px;padding:12px;background:var(--surface2);border-radius:10px">
+        イメージのインパクトは、どれくらい変化しましたか？
+      </p>
+      <button class="btn btn-primary" style="margin-top:14px" onclick="w3Complete()">変化を確認する →</button>
+      <button class="btn btn-ghost" style="margin-top:8px" onclick="w3BackToStep2()">← 現状確認に戻る</button>
+    </div>
+  </div>
 
   <div class="flex-row" style="gap:8px">
     <button class="btn btn-ghost" style="flex:1" onclick="goBack()">← 戻る</button>
@@ -1126,13 +1183,7 @@
   <div class="card" id="event-invite" style="display:none">
     <div class="event-card">
       <div class="tag tag-teal" style="margin-bottom:12px">NEXT STEP</div>
-      <h3>「整理された今の自分」で<br>次の一歩を踏み出しませんか？</h3>
-      <p>このアプリで整理したデータを持って、プロと一緒に「どう軽やかに前進するか」を考える、少額のオンラインセッションです。</p>
-      <div class="event-price">¥3,000〜 / 回</div>
-      <a href="#" class="btn btn-primary" onclick="trackEventClick(); return false;">
-        ゆるメントレに参加する →
-      </a>
-      <p style="font-size:12px;margin-top:10px">※外部のオンラインイベントページに移動します</p>
+      <div id="next-step-content"></div>
     </div>
   </div>
 
@@ -1474,7 +1525,7 @@ function resetWork(n) {
     document.getElementById('w3-step2').style.display = 'none';
     document.getElementById('w3-step3').style.display = 'none';
     document.getElementById('smd-desc').value = '';
-    w3ObjRx = null; w3ObjRy = null;
+    w3ObjRx = null; w3ObjRy = null; w3Obj2Rx = null; w3Obj2Ry = null;
   }
   if (n === 4) {
     document.getElementById('w4-input-card').style.display = '';
@@ -1946,23 +1997,45 @@ function w3ToStep1() {
 }
 
 function w3ToStep2() {
-  if (!document.getElementById('smd-desc').value.trim()) return;
   document.getElementById('w3-step1').style.display = 'none';
   document.getElementById('w3-step2').style.display = '';
-  // Reset sliders to MAX on first entry only
+  document.getElementById('w3-step3').style.display = 'none';
+  // Reset sliders to middle (5) on first entry
   if (w3ObjRx === null) {
-    ['distance','size','brightness','volume','motion','weight'].forEach(k => {
+    ['distance','brightness','color','volume','motion','weight'].forEach(k => {
       const el = document.getElementById(`sld-${k}`);
-      el.value = 10;
-      document.getElementById(`val-${k}`).textContent = '10';
-      el.style.setProperty('--pct', '100%');
+      if (!el) return;
+      el.value = 5;
+      document.getElementById(`val-${k}`).textContent = '5';
+      el.style.setProperty('--pct', '44%');
     });
   }
   setTimeout(w3InitCanvas, 60);
 }
 
-function w3ToStep3() {} // merged into step2
-function w3ToStep2Again() { w3ToStep2(); }
+function w3ToStep3() {
+  document.getElementById('w3-step2').style.display = 'none';
+  document.getElementById('w3-step3').style.display = '';
+  // Copy placement from step 2
+  w3Obj2Rx = w3ObjRx; w3Obj2Ry = w3ObjRy;
+  // Copy slider values from step 2 as starting point
+  ['distance','brightness','color','volume','motion','weight'].forEach(k => {
+    const src = document.getElementById(`sld-${k}`);
+    const dst = document.getElementById(`sld2-${k}`);
+    if (src && dst) { dst.value = src.value; document.getElementById(`val2-${k}`).textContent = src.value; }
+  });
+  setTimeout(w3InitCanvas2, 60);
+}
+
+function w3BackToStep2() {
+  document.getElementById('w3-step3').style.display = 'none';
+  document.getElementById('w3-step2').style.display = '';
+  setTimeout(w3InitCanvas, 60);
+}
+
+function w3Complete() {
+  goToAfterScale();
+}
 
 // ─── Canvas shared drawing ───
 function w3DrawScene(ctx, W, H) {
@@ -2109,7 +2182,7 @@ function w3UpdatePreview() {
 }
 
 function w3Redraw(ctx, W, H, dpr) {
-  ['distance','size','brightness','volume','motion','weight'].forEach(k => {
+  ['distance','brightness','color','volume','motion','weight'].forEach(k => {
     const el = document.getElementById(`sld-${k}`);
     if (!el) return;
     document.getElementById(`val-${k}`).textContent = el.value;
@@ -2121,22 +2194,17 @@ function w3Redraw(ctx, W, H, dpr) {
   if (w3ObjRx === null) return;
 
   const dist   = parseInt(document.getElementById('sld-distance').value);
-  const size   = parseInt(document.getElementById('sld-size').value);
   const bright = parseInt(document.getElementById('sld-brightness').value);
+  const color  = parseInt(document.getElementById('sld-color').value);
   const vol    = parseInt(document.getElementById('sld-volume').value);
   const motion = parseInt(document.getElementById('sld-motion').value);
   const weight = parseInt(document.getElementById('sld-weight').value);
 
-  const avX = W * 0.5, avY = H * 0.50;
-  const baseX = w3ObjRx * W, baseY = w3ObjRy * H;
+  const objX = w3ObjRx * W, objY = w3ObjRy * H;
 
-  // Distance: push outward from avatar
-  const push = 1 + (10 - dist) * 0.28;
-  const objX = avX + (baseX - avX) * push;
-  const objY = avY + (baseY - avY) * push;
-
+  // Distance: near (10) = large, far (1) = tiny
   const baseEm = W * 0.10;
-  const objEm = baseEm * (0.15 + size / 10 * 1.4);
+  const objEm = baseEm * (0.15 + dist / 10 * 1.4);
 
   // Volume rings
   if (vol > 3) {
@@ -2173,7 +2241,138 @@ function w3Redraw(ctx, W, H, dpr) {
   // Draw 🔴
   ctx.save();
   ctx.globalAlpha = 0.25 + bright / 10 * 0.75;
-  ctx.filter = `grayscale(${(10 - bright) * 10}%) blur(${(10 - bright) * 0.25}px)`;
+  ctx.filter = `grayscale(${(10 - color) * 10}%) blur(${(10 - bright) * 0.25}px)`;
+  ctx.font = `${objEm}px sans-serif`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('🔴', objX, objY);
+  ctx.restore();
+}
+
+// ─── Step 3 canvas state ───
+let w3Obj2Rx = null, w3Obj2Ry = null;
+let w3DragListeners2 = [];
+
+function w3InitCanvas2() {
+  const wrap = document.getElementById('w3-scene-wrap2');
+  const canvas = document.getElementById('w3-canvas2');
+  if (!wrap || !canvas) return;
+  const W = wrap.clientWidth || 340;
+  const H = Math.round(W * 0.72);
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = W * dpr; canvas.height = H * dpr;
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+  wrap.style.height = H + 'px';
+
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const el = document.getElementById('w3-drag-el2');
+  if (w3Obj2Rx === null) { w3Obj2Rx = w3ObjRx ?? 0.80; w3Obj2Ry = w3ObjRy ?? 0.38; }
+  el.style.left = (w3Obj2Rx * W - 20) + 'px';
+  el.style.top  = (w3Obj2Ry * H - 20) + 'px';
+
+  w3Redraw2(ctx, W, H, dpr);
+
+  w3DragListeners2.forEach(([t,f,o]) => document.removeEventListener(t, f, o));
+  w3DragListeners2 = [];
+
+  let dragging2 = false;
+
+  function getPos(e) {
+    const rect = wrap.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : e;
+    return { x: src.clientX - rect.left, y: src.clientY - rect.top };
+  }
+
+  function moveTo(x, y) {
+    x = Math.max(16, Math.min(W - 16, x));
+    y = Math.max(16, Math.min(H - 16, y));
+    w3Obj2Rx = x / W; w3Obj2Ry = y / H;
+    el.style.left = (x - 20) + 'px'; el.style.top = (y - 20) + 'px';
+    w3Redraw2(ctx, W, H, dpr);
+  }
+
+  canvas.addEventListener('click', e => { if (dragging2) return; const { x, y } = getPos(e); moveTo(x, y); });
+
+  function onStart(e) { e.preventDefault(); dragging2 = true; }
+  function onMove(e) { if (!dragging2) return; e.preventDefault(); const { x, y } = getPos(e); moveTo(x, y); }
+  function onEnd() { setTimeout(() => { dragging2 = false; }, 50); }
+
+  const listeners = [
+    ['mousemove', onMove, false], ['touchmove', onMove, { passive: false }],
+    ['mouseup', onEnd, false], ['touchend', onEnd, false],
+  ];
+  listeners.forEach(([t,f,o]) => document.addEventListener(t, f, o));
+  w3DragListeners2 = listeners;
+  el.onmousedown = e => { e.preventDefault(); dragging2 = true; };
+  el.ontouchstart = e => { e.preventDefault(); dragging2 = true; };
+}
+
+function w3UpdatePreview2() {
+  const canvas = document.getElementById('w3-canvas2');
+  if (!canvas || !canvas.width) return;
+  const W = canvas.clientWidth, H = canvas.clientHeight;
+  const dpr = window.devicePixelRatio || 1;
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  w3Redraw2(ctx, W, H, dpr);
+}
+
+function w3Redraw2(ctx, W, H, dpr) {
+  ['distance','brightness','color','volume','motion','weight'].forEach(k => {
+    const el = document.getElementById(`sld2-${k}`);
+    if (!el) return;
+    document.getElementById(`val2-${k}`).textContent = el.value;
+    el.style.setProperty('--pct', `${(el.value - 1) / 9 * 100}%`);
+  });
+
+  w3DrawScene(ctx, W, H);
+
+  if (w3Obj2Rx === null) return;
+
+  const dist   = parseInt(document.getElementById('sld2-distance').value);
+  const bright = parseInt(document.getElementById('sld2-brightness').value);
+  const color  = parseInt(document.getElementById('sld2-color').value);
+  const vol    = parseInt(document.getElementById('sld2-volume').value);
+  const motion = parseInt(document.getElementById('sld2-motion').value);
+  const weight = parseInt(document.getElementById('sld2-weight').value);
+
+  const objX = w3Obj2Rx * W, objY = w3Obj2Ry * H;
+  const baseEm = W * 0.10;
+  const objEm = baseEm * (0.15 + dist / 10 * 1.4);
+
+  if (vol > 3) {
+    for (let i = 1; i <= Math.ceil(vol / 3.5); i++) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(objX, objY, objEm * 0.4 + i * objEm * 0.5, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(200,60,60,${0.07 * vol / 10 * (4 - i) / 3})`;
+      ctx.lineWidth = 3; ctx.stroke(); ctx.restore();
+    }
+  }
+
+  if (weight > 2) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.ellipse(objX, objY + objEm * 0.35, objEm * 0.45 * (weight / 10), objEm * 0.1, 0, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(30,40,80,${0.12 * weight / 10})`; ctx.fill(); ctx.restore();
+  }
+
+  if (motion > 5) {
+    ctx.save(); ctx.globalAlpha = (motion - 5) / 10 * 0.45;
+    ctx.strokeStyle = 'rgba(180,50,50,0.6)'; ctx.lineWidth = 2;
+    for (let i = 1; i <= 4; i++) {
+      ctx.beginPath();
+      ctx.moveTo(objX - objEm * 0.25 * i, objY - objEm * 0.12 * i);
+      ctx.lineTo(objX - objEm * 0.18 * i, objY + objEm * 0.12 * i);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  ctx.save();
+  ctx.globalAlpha = 0.25 + bright / 10 * 0.75;
+  ctx.filter = `grayscale(${(10 - color) * 10}%) blur(${(10 - bright) * 0.25}px)`;
   ctx.font = `${objEm}px sans-serif`;
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillText('🔴', objX, objY);
@@ -3353,9 +3552,21 @@ function w5Init() {
 // ═══════════════════════════════════════
 function goToAfterScale() {
   state.afterScore = null;
-  document.getElementById('afterscale-phase-baby').style.display = '';
-  document.getElementById('afterscale-phase-checkout').style.display = 'none';
-  showBabySteps();
+  if (state.currentMenu === 3) {
+    // イメージチューニングは「次の小さな一歩」をスキップ
+    document.getElementById('afterscale-phase-baby').style.display = 'none';
+    document.getElementById('afterscale-phase-checkout').style.display = '';
+    const fill = document.getElementById('after-gauge-fill');
+    fill.style.height = '0%';
+    document.getElementById('after-val-num').textContent = '—';
+    document.getElementById('after-val-name').textContent = 'ドラッグで設定';
+    document.getElementById('change-card').style.display = 'none';
+    document.getElementById('after-complete-btn').style.display = 'none';
+  } else {
+    document.getElementById('afterscale-phase-baby').style.display = '';
+    document.getElementById('afterscale-phase-checkout').style.display = 'none';
+    showBabySteps();
+  }
   showScreen('screen-afterscale');
 }
 
@@ -3505,8 +3716,41 @@ function setupExitScreen(data, xpEarned) {
   const avg = drops.length ? Math.round(drops.reduce((a,b) => a+b, 0) / drops.length * 10) / 10 : null;
   document.getElementById('stat-avg-drop').textContent = avg !== null ? `-${avg}` : '—';
 
-  // Show event invite?
+  // Show event invite with random NEXT STEP content
   const shouldInvite = data.totalClears >= 3 || (data.scoreCompletes >= 1);
+  if (shouldInvite) {
+    const nextStepItems = [
+      {
+        label: 'オンラインイベント',
+        title: 'できることから、ゆるく、ちょっとずつやる会',
+        desc: 'ストレスをため込まず、軽やかに前に進むためのオンライン会です。ゆるく参加するだけでも OK。',
+        url: 'https://peatix.com/group/16396265',
+        btnText: 'イベントをみてみる →',
+      },
+      {
+        label: '体感型ストレスマネジメント講座',
+        title: 'もやもやから、フラットへ。心のしくみを体感する講座',
+        desc: 'このアプリと同じ考え方をベースに、より深く体感できるオンライン講座です。',
+        url: 'https://www.reservestock.jp/stores/article/8711?article_id=91487&category_id=54529',
+        btnText: '講座をみてみる →',
+      },
+      {
+        label: 'メールマガジン',
+        title: 'ゆるく続く、心のメンテナンス便り',
+        desc: '心のしくみや、ストレスをほぐすヒントを定期的にお届けしています。まずは読むだけでもどうぞ。',
+        url: 'https://www.reservestock.jp/subscribe/276917',
+        btnText: '登録してみる →',
+      },
+    ];
+    const item = nextStepItems[Math.floor(Math.random() * nextStepItems.length)];
+    document.getElementById('next-step-content').innerHTML = `
+      <div class="tag tag-blue" style="margin-bottom:10px">${item.label}</div>
+      <h3 style="margin:0 0 10px">${item.title}</h3>
+      <p style="font-size:13px;color:var(--text-muted);line-height:1.7;margin-bottom:14px">${item.desc}</p>
+      <a href="${item.url}" target="_blank" rel="noopener" class="btn btn-primary">${item.btnText}</a>
+      <p style="font-size:12px;margin-top:10px;color:var(--text-muted)">※外部ページに移動します</p>
+    `;
+  }
   document.getElementById('event-invite').style.display = shouldInvite ? '' : 'none';
 }
 
