@@ -605,7 +605,7 @@
     <div class="menu-card" onclick="selectMenu(3)">
       <div class="menu-icon" style="background:rgba(123,174,127,0.15)">🎨</div>
       <div class="menu-info">
-        <h3>五感チューニング</h3>
+        <h3>イメージチューニング</h3>
         <p>嫌なイメージの「見え方・聞こえ方」を変える</p>
       </div>
       <span class="menu-tag" id="tag-3" style="display:none">おすすめ</span>
@@ -788,43 +788,31 @@
 ════════════════════════════════════════ -->
 <section id="screen-work-3" class="screen">
   <div class="card">
-    <div class="card-title">🎨 五感チューニング</div>
-    <h2>嫌なイメージの<br>インパクトを弱める</h2>
-    <p>頭の中の不快なシーンを確認し、感覚を調整していきます。</p>
+    <div class="card-title">🎨 イメージチューニング</div>
+    <h2>望ましくないイメージの<br>インパクトを薄める</h2>
+    <p>私たちはイメージにとても強く影響を受けますから、自分が動きやすいように調整していきましょう。イメージの中ではなんでもできますからね。</p>
   </div>
 
   <!-- Step 1: テーマ特定 -->
   <div class="card" id="w3-step1">
-    <div class="card-title">ステップ 1 — イメージを特定する</div>
+    <div class="card-title">ステップ 1 — どのイメージを調整する？</div>
     <p class="score-hint">今、頭に浮かぶ「重くなる場面やプレッシャー」を書いてください。</p>
     <textarea class="smd-image-desc" id="smd-desc" rows="3" placeholder="例：明日の会議で詰められる場面、締め切りに間に合わない不安…"></textarea>
-    <button class="btn btn-primary" style="margin-top:14px" onclick="w3ToStep2()">空間に配置する →</button>
+    <button class="btn btn-primary" style="margin-top:14px" onclick="w3ToStep2()">より細かくみていくと？ →</button>
   </div>
 
-  <!-- Step 2: 2.5D 空間配置 -->
+  <!-- Step 2: 2.5D 空間配置 + スライダー -->
   <div id="w3-step2" style="display:none">
     <div class="card">
-      <div class="card-title">ステップ 2 — 空間に配置する</div>
-      <p class="score-hint">🔴 をドラッグして、スナップポイント（点線の円）に配置してください。</p>
+      <div class="card-title">ステップ 2 — イメージの場所や構成要素を確認する</div>
+      <p class="score-hint">画面をタップして 🔴 を置いてください。ドラッグで移動できます。スライダーで感覚も調整しましょう。</p>
     </div>
     <div class="w3-scene-wrap" id="w3-scene-wrap">
       <canvas id="w3-canvas"></canvas>
       <div id="w3-drag-el">🔴</div>
     </div>
-    <p id="w3-snap-label" style="text-align:center;min-height:22px;margin:10px 0 4px;font-size:13px;color:var(--primary);font-weight:600"></p>
-    <button id="w3-step2-btn" class="btn btn-primary" style="display:none;margin-top:4px" onclick="w3ToStep3()">スライダーで調整 →</button>
-    <button class="btn btn-ghost" style="margin-top:8px" onclick="w3ToStep1()">← 書き直す</button>
-  </div>
-
-  <!-- Step 3: スライダー -->
-  <div id="w3-step3" style="display:none">
-    <div class="card">
-      <div class="card-title">ステップ 3 — インパクトを弱める</div>
-      <p class="score-hint">スライダーを下げて、イメージを無力化していきましょう。</p>
-      <div class="w3-scene-wrap" id="w3-preview-wrap">
-        <canvas id="w3-preview-canvas"></canvas>
-      </div>
-      <div class="slider-group" style="margin-top:16px">
+    <div class="card" style="margin-top:12px">
+      <div class="slider-group">
         <div class="slider-item">
           <div class="slider-end-top">目の前・<br>密着</div>
           <input type="range" class="v-slider" min="1" max="10" value="10" step="1" id="sld-distance" oninput="w3UpdatePreview()">
@@ -863,9 +851,12 @@
         </div>
       </div>
       <button class="btn btn-primary" style="margin-top:16px" onclick="goToAfterScale()">変化を確認する →</button>
-      <button class="btn btn-ghost" style="margin-top:8px" onclick="w3ToStep2Again()">← 配置に戻る</button>
+      <button class="btn btn-ghost" style="margin-top:8px" onclick="w3ToStep1()">← 書き直す</button>
     </div>
   </div>
+
+  <!-- Step 3: (legacy - redirects to step2) -->
+  <div id="w3-step3" style="display:none"></div>
 
   <div class="flex-row" style="gap:8px">
     <button class="btn btn-ghost" style="flex:1" onclick="goBack()">← 戻る</button>
@@ -1442,7 +1433,7 @@ function loadRecentHistory() {
 }
 
 function menuName(n) {
-  return ['','ブレークステート','デトックス','五感チューニング','イメージワーク','思考の網ほどき'][n] || '—';
+  return ['','ブレークステート','デトックス','イメージチューニング','イメージワーク','思考の網ほどき'][n] || '—';
 }
 
 // ═══════════════════════════════════════
@@ -1483,7 +1474,7 @@ function resetWork(n) {
     document.getElementById('w3-step2').style.display = 'none';
     document.getElementById('w3-step3').style.display = 'none';
     document.getElementById('smd-desc').value = '';
-    w3PlacedSnap = null;
+    w3ObjRx = null; w3ObjRy = null;
   }
   if (n === 4) {
     document.getElementById('w4-input-card').style.display = '';
@@ -1943,16 +1934,10 @@ function runCreatureCanvas(creature, onDone) {
 }
 
 // ═══════════════════════════════════════
-// Work 3: 五感チューニング (2.5D SMD)
+// Work 3: イメージチューニング (2.5D SMD)
 // ═══════════════════════════════════════
-const W3_SNAPS = [
-  { id:'top',   label:'頭の真上',   rx:0.50, ry:0.10 },
-  { id:'front', label:'真正面',     rx:0.50, ry:0.86 },
-  { id:'right', label:'右肩の後ろ', rx:0.78, ry:0.36 },
-  { id:'left',  label:'左肩の後ろ', rx:0.22, ry:0.36 },
-  { id:'feet',  label:'足元',       rx:0.50, ry:0.70 },
-];
-let w3PlacedSnap = null;
+// 🔴 position as ratio (0-1) of canvas size; null = not placed yet
+let w3ObjRx = null, w3ObjRy = null;
 let w3DragListeners = [];
 
 function w3ToStep1() {
@@ -1964,32 +1949,23 @@ function w3ToStep2() {
   if (!document.getElementById('smd-desc').value.trim()) return;
   document.getElementById('w3-step1').style.display = 'none';
   document.getElementById('w3-step2').style.display = '';
-  w3PlacedSnap = null;
-  document.getElementById('w3-step2-btn').style.display = 'none';
-  document.getElementById('w3-snap-label').textContent = '';
+  // Reset sliders to MAX on first entry only
+  if (w3ObjRx === null) {
+    ['distance','size','brightness','volume','motion','weight'].forEach(k => {
+      const el = document.getElementById(`sld-${k}`);
+      el.value = 10;
+      document.getElementById(`val-${k}`).textContent = '10';
+      el.style.setProperty('--pct', '100%');
+    });
+  }
   setTimeout(w3InitCanvas, 60);
 }
 
-function w3ToStep3() {
-  document.getElementById('w3-step2').style.display = 'none';
-  document.getElementById('w3-step3').style.display = '';
-  ['distance','size','brightness','volume','motion','weight'].forEach(k => {
-    const el = document.getElementById(`sld-${k}`);
-    el.value = 10;
-    document.getElementById(`val-${k}`).textContent = '10';
-    el.style.setProperty('--pct', '100%');
-  });
-  setTimeout(w3InitPreviewCanvas, 60);
-}
-
-function w3ToStep2Again() {
-  document.getElementById('w3-step3').style.display = 'none';
-  document.getElementById('w3-step2').style.display = '';
-  setTimeout(w3InitCanvas, 60);
-}
+function w3ToStep3() {} // merged into step2
+function w3ToStep2Again() { w3ToStep2(); }
 
 // ─── Canvas shared drawing ───
-function w3DrawScene(ctx, W, H, placedId) {
+function w3DrawScene(ctx, W, H) {
   ctx.clearRect(0, 0, W, H);
 
   // Sky
@@ -2018,27 +1994,7 @@ function w3DrawScene(ctx, W, H, placedId) {
     ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
   }
 
-  // Snap points
   const avX = W * 0.5, avY = H * 0.50;
-  W3_SNAPS.forEach(sp => {
-    const sx = sp.rx * W, sy = sp.ry * H;
-    const placed = sp.id === placedId;
-    ctx.save();
-    ctx.beginPath(); ctx.arc(sx, sy, W * 0.058, 0, Math.PI * 2);
-    if (placed) {
-      ctx.fillStyle = 'rgba(91,143,168,0.22)'; ctx.fill();
-      ctx.strokeStyle = 'rgba(91,143,168,0.9)'; ctx.lineWidth = 2;
-    } else {
-      ctx.setLineDash([5, 4]);
-      ctx.strokeStyle = 'rgba(91,143,168,0.5)'; ctx.lineWidth = 1.5;
-    }
-    ctx.stroke(); ctx.restore();
-    // Label
-    ctx.fillStyle = 'rgba(50,80,140,0.75)';
-    ctx.font = `bold ${Math.max(10, W * 0.026)}px sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.fillText(sp.label, sx, sy < H * 0.25 ? sy - W * 0.07 : sy + W * 0.08);
-  });
 
   // Avatar shadow
   ctx.save();
@@ -2050,12 +2006,10 @@ function w3DrawScene(ctx, W, H, placedId) {
   const r = W * 0.09;
   ctx.save();
   ctx.fillStyle = '#6278A0';
-  // Body
   ctx.beginPath();
   ctx.roundRect ? ctx.roundRect(avX - r * 0.58, avY - r * 0.08, r * 1.16, r * 1.55, r * 0.28)
     : ctx.rect(avX - r * 0.58, avY - r * 0.08, r * 1.16, r * 1.55);
   ctx.fill();
-  // Arms
   ctx.beginPath();
   ctx.ellipse(avX - r * 0.88, avY + r * 0.32, r * 0.27, r * 0.64, -0.1, 0, Math.PI * 2);
   ctx.fill();
@@ -2070,7 +2024,7 @@ function w3DrawScene(ctx, W, H, placedId) {
   ctx.restore();
 }
 
-// ─── Step 2 canvas + drag ───
+// ─── Step 2 canvas: free placement ───
 function w3InitCanvas() {
   const wrap = document.getElementById('w3-scene-wrap');
   const canvas = document.getElementById('w3-canvas');
@@ -2084,22 +2038,17 @@ function w3InitCanvas() {
   const ctx = canvas.getContext('2d');
   ctx.scale(dpr, dpr);
 
-  // Place drag icon at bottom-right start
+  // Drag element
   const el = document.getElementById('w3-drag-el');
-  const startX = W * 0.84, startY = H * 0.84;
-  el.style.left = (startX - 20) + 'px'; el.style.top = (startY - 20) + 'px';
+  // Default position: right shoulder area if not yet set
+  if (w3ObjRx === null) { w3ObjRx = 0.80; w3ObjRy = 0.38; }
+  el.style.left = (w3ObjRx * W - 20) + 'px';
+  el.style.top  = (w3ObjRy * H - 20) + 'px';
 
-  // Restore placed snap position if returning from step 3
-  if (w3PlacedSnap) {
-    const sp = W3_SNAPS.find(s => s.id === w3PlacedSnap);
-    if (sp) { el.style.left = (sp.rx * W - 20) + 'px'; el.style.top = (sp.ry * H - 20) + 'px'; }
-    document.getElementById('w3-step2-btn').style.display = '';
-    document.getElementById('w3-snap-label').textContent = `📍 ${W3_SNAPS.find(s=>s.id===w3PlacedSnap)?.label}に配置しました`;
-  }
+  // Initial draw with sliders
+  w3Redraw(ctx, W, H, dpr);
 
-  w3DrawScene(ctx, W, H, w3PlacedSnap);
-
-  // Remove previous listeners
+  // Remove old listeners
   w3DragListeners.forEach(([t,f,o]) => document.removeEventListener(t, f, o));
   w3DragListeners = [];
 
@@ -2111,45 +2060,30 @@ function w3InitCanvas() {
     return { x: src.clientX - rect.left, y: src.clientY - rect.top };
   }
 
-  function findSnap(x, y) {
-    const threshold = W * 0.1;
-    return W3_SNAPS.reduce((best, sp) => {
-      const d = Math.hypot(x - sp.rx * W, y - sp.ry * H);
-      return d < threshold && d < (best?.d ?? Infinity) ? { ...sp, d } : best;
-    }, null);
+  function moveTo(x, y) {
+    // Clamp within canvas
+    x = Math.max(16, Math.min(W - 16, x));
+    y = Math.max(16, Math.min(H - 16, y));
+    w3ObjRx = x / W; w3ObjRy = y / H;
+    el.style.left = (x - 20) + 'px'; el.style.top = (y - 20) + 'px';
+    w3Redraw(ctx, W, H, dpr);
   }
 
-  function onStart(e) {
-    const elRect = el.getBoundingClientRect();
-    const wrapRect = wrap.getBoundingClientRect();
-    const mx = (elRect.left + 20) - wrapRect.left;
-    const my = (elRect.top + 20) - wrapRect.top;
-    const pos = getPos(e);
-    if (Math.hypot(pos.x - mx, pos.y - my) > 40) return;
-    e.preventDefault(); dragging = true;
-  }
+  // Tap on canvas → place 🔴 there
+  canvas.addEventListener('click', e => {
+    if (dragging) return;
+    const { x, y } = getPos(e);
+    moveTo(x, y);
+  });
 
+  // Drag the 🔴 itself
+  function onStart(e) { e.preventDefault(); dragging = true; }
   function onMove(e) {
     if (!dragging) return; e.preventDefault();
     const { x, y } = getPos(e);
-    const snap = findSnap(x, y);
-    if (snap) {
-      const sx = snap.rx * W, sy = snap.ry * H;
-      el.style.left = (sx - 20) + 'px'; el.style.top = (sy - 20) + 'px';
-      w3PlacedSnap = snap.id;
-      document.getElementById('w3-snap-label').textContent = `📍 ${snap.label}に配置しました`;
-      document.getElementById('w3-step2-btn').style.display = '';
-    } else {
-      el.style.left = (x - 20) + 'px'; el.style.top = (y - 20) + 'px';
-      w3PlacedSnap = null;
-      document.getElementById('w3-snap-label').textContent = '';
-      document.getElementById('w3-step2-btn').style.display = 'none';
-    }
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    w3DrawScene(ctx, W, H, w3PlacedSnap);
+    moveTo(x, y);
   }
-
-  function onEnd() { dragging = false; }
+  function onEnd() { setTimeout(() => { dragging = false; }, 50); }
 
   const listeners = [
     ['mousemove', onMove, false],
@@ -2157,28 +2091,24 @@ function w3InitCanvas() {
     ['mouseup', onEnd, false],
     ['touchend', onEnd, false],
   ];
-  listeners.forEach(([t, f, o]) => document.addEventListener(t, f, o));
+  listeners.forEach(([t,f,o]) => document.addEventListener(t, f, o));
   w3DragListeners = listeners;
-
-  el.onmousedown = el.ontouchstart = onStart;
+  el.onmousedown = e => { e.preventDefault(); dragging = true; };
+  el.ontouchstart = e => { e.preventDefault(); dragging = true; };
 }
 
-// ─── Step 3 preview canvas ───
-function w3InitPreviewCanvas() {
-  const wrap = document.getElementById('w3-preview-wrap');
-  const canvas = document.getElementById('w3-preview-canvas');
-  const W = wrap.clientWidth || 340;
-  const H = Math.round(W * 0.72);
-  const dpr = window.devicePixelRatio || 1;
-  canvas.width = W * dpr; canvas.height = H * dpr;
-  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
-  wrap.style.height = H + 'px';
-  const ctx = canvas.getContext('2d');
-  ctx.scale(dpr, dpr);
-  w3UpdatePreview();
-}
-
+// Called by sliders (oninput) and by canvas redraw
 function w3UpdatePreview() {
+  const canvas = document.getElementById('w3-canvas');
+  if (!canvas || !canvas.width) return;
+  const W = canvas.clientWidth, H = canvas.clientHeight;
+  const dpr = window.devicePixelRatio || 1;
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  w3Redraw(ctx, W, H, dpr);
+}
+
+function w3Redraw(ctx, W, H, dpr) {
   ['distance','size','brightness','volume','motion','weight'].forEach(k => {
     const el = document.getElementById(`sld-${k}`);
     if (!el) return;
@@ -2186,32 +2116,25 @@ function w3UpdatePreview() {
     el.style.setProperty('--pct', `${(el.value - 1) / 9 * 100}%`);
   });
 
-  const canvas = document.getElementById('w3-preview-canvas');
-  if (!canvas || !canvas.width) return;
-  const W = canvas.clientWidth, H = canvas.clientHeight;
-  const dpr = window.devicePixelRatio || 1;
-  const ctx = canvas.getContext('2d');
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  w3DrawScene(ctx, W, H);
 
-  const dist   = parseInt(document.getElementById('sld-distance').value);   // 10=near 1=far
+  if (w3ObjRx === null) return;
+
+  const dist   = parseInt(document.getElementById('sld-distance').value);
   const size   = parseInt(document.getElementById('sld-size').value);
   const bright = parseInt(document.getElementById('sld-brightness').value);
   const vol    = parseInt(document.getElementById('sld-volume').value);
   const motion = parseInt(document.getElementById('sld-motion').value);
   const weight = parseInt(document.getElementById('sld-weight').value);
 
-  const sp = W3_SNAPS.find(s => s.id === w3PlacedSnap) || W3_SNAPS[0];
-  w3DrawScene(ctx, W, H, sp.id);
-
   const avX = W * 0.5, avY = H * 0.50;
-  const baseSx = sp.rx * W, baseSy = sp.ry * H;
+  const baseX = w3ObjRx * W, baseY = w3ObjRy * H;
 
   // Distance: push outward from avatar
-  const push = 1 + (10 - dist) * 0.3;
-  const objX = avX + (baseSx - avX) * push;
-  const objY = avY + (baseSy - avY) * push;
+  const push = 1 + (10 - dist) * 0.28;
+  const objX = avX + (baseX - avX) * push;
+  const objY = avY + (baseY - avY) * push;
 
-  // Size
   const baseEm = W * 0.10;
   const objEm = baseEm * (0.15 + size / 10 * 1.4);
 
@@ -2221,7 +2144,7 @@ function w3UpdatePreview() {
       ctx.save();
       ctx.beginPath();
       ctx.arc(objX, objY, objEm * 0.4 + i * objEm * 0.5, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(200,60,60,${0.08 * vol / 10 * (4 - i) / 3})`;
+      ctx.strokeStyle = `rgba(200,60,60,${0.07 * vol / 10 * (4 - i) / 3})`;
       ctx.lineWidth = 3; ctx.stroke(); ctx.restore();
     }
   }
@@ -2234,7 +2157,7 @@ function w3UpdatePreview() {
     ctx.fillStyle = `rgba(30,40,80,${0.12 * weight / 10})`; ctx.fill(); ctx.restore();
   }
 
-  // Motion blur lines
+  // Motion blur
   if (motion > 5) {
     ctx.save(); ctx.globalAlpha = (motion - 5) / 10 * 0.45;
     ctx.strokeStyle = 'rgba(180,50,50,0.6)'; ctx.lineWidth = 2;
@@ -2247,7 +2170,7 @@ function w3UpdatePreview() {
     ctx.restore();
   }
 
-  // Draw 🔴 with clarity effects
+  // Draw 🔴
   ctx.save();
   ctx.globalAlpha = 0.25 + bright / 10 * 0.75;
   ctx.filter = `grayscale(${(10 - bright) * 10}%) blur(${(10 - bright) * 0.25}px)`;
