@@ -310,6 +310,7 @@
   /* Work 3: 2.5D scene */
   .w3-scene-wrap { position: relative; border-radius: 12px; overflow: hidden; touch-action: none; }
   .w3-scene-wrap canvas { display: block; width: 100%; }
+  .slider-val { display: none; }
   #w3-drag-el, #w3-drag-el2 {
     position: absolute; width: 40px; height: 40px;
     font-size: 28px; display: flex; align-items: center; justify-content: center;
@@ -519,7 +520,7 @@
 
 <!-- Header -->
 <header class="app-header">
-  <div class="logo">🌊 心を凪に</div>
+  <div class="logo">🌊 心を凪に <span style="font-size:10px;font-weight:500;color:var(--text-muted);letter-spacing:0;border:1px solid var(--border);border-radius:4px;padding:1px 5px;vertical-align:middle">β版</span></div>
   <div class="xp-badge">
     <span class="star">⭐</span>
     <span id="header-xp">0 XP</span>
@@ -790,7 +791,7 @@
   <div class="card">
     <div class="card-title">🎨 イメージチューニング</div>
     <h2>望ましくないイメージの<br>インパクトを薄める</h2>
-    <p>私たちはイメージにとても強く影響を受けますから、自分が動きやすいように調整していきましょう。イメージの中ではなんでもできますからね。</p>
+    <p>私たちはイメージにとても強く影響を受けます。イメージの中ではなんでもできますから、自分が動きやすいように調整していきましょう。</p>
   </div>
 
   <!-- Step 1: テーマ特定 -->
@@ -798,14 +799,14 @@
     <div class="card-title">ステップ 1 — どのイメージを調整する？</div>
     <p class="score-hint">今、頭に浮かぶ「重くなる場面やプレッシャー」を書いてください。</p>
     <textarea class="smd-image-desc" id="smd-desc" rows="3" placeholder="例：明日の会議で詰められる場面、締め切りに間に合わない不安…"></textarea>
-    <button class="btn btn-primary" style="margin-top:14px" onclick="w3ToStep2()">より細かくみていくと？ →</button>
+    <button class="btn btn-primary" style="margin-top:14px" onclick="w3ToStep2()">イメージの構成要素をみていくと？ →</button>
   </div>
 
   <!-- Step 2: 現状確認 -->
   <div id="w3-step2" style="display:none">
     <div class="card">
       <div class="card-title">ステップ 2 — イメージの場所や構成要素を確認する</div>
-      <p class="score-hint">🔴 をドラッグして、自分がそうだと思うところにセットしてください。スライダーで他の要素も調整しましょう。</p>
+      <p class="score-hint">🔴 を、自分がそうだと思う場所にドラッグします。他の要素も確認して、スライダーでセットしましょう。</p>
     </div>
     <div class="w3-scene-wrap" id="w3-scene-wrap">
       <canvas id="w3-canvas"></canvas>
@@ -851,10 +852,10 @@
         </div>
       </div>
       <p style="font-size:13px;color:var(--text-muted);line-height:1.8;margin-top:16px;padding:12px;background:var(--surface2);border-radius:10px">
-        このイメージがこんなふうに見えているから、ズシっとくるんですよね。まずは今どう映っているか、そのまま眺めてみましょう。
+        あなたが望ましくないと感じるのは、この構成要素でイメージを創り上げているからではないでしょうか。まずは現在の構成要素を、そのまま眺めてみてくださいね。
       </p>
-      <button class="btn btn-primary" style="margin-top:14px" onclick="w3ToStep3()">このまま調整してみる →</button>
-      <button class="btn btn-ghost" style="margin-top:8px" onclick="w3ToStep1()">← 書き直す</button>
+      <button class="btn btn-primary" style="margin-top:14px" onclick="w3ToStep3()">では、調整しますよ →</button>
+      <button class="btn btn-ghost" style="margin-top:8px" onclick="w3ToStep1()">← 戻る</button>
     </div>
   </div>
 
@@ -907,12 +908,20 @@
           <label><span class="slider-icon">⚖️</span><span class="slider-val" id="val2-weight">5</span></label>
         </div>
       </div>
-      <p style="font-size:13px;color:var(--text-muted);line-height:1.8;margin-top:16px;padding:12px;background:var(--surface2);border-radius:10px">
-        イメージのインパクトは、どれくらい変化しましたか？
-      </p>
-      <button class="btn btn-primary" style="margin-top:14px" onclick="w3Complete()">変化を確認する →</button>
-      <button class="btn btn-ghost" style="margin-top:8px" onclick="w3BackToStep2()">← 現状確認に戻る</button>
+      <button class="btn btn-primary" style="margin-top:14px" onclick="w3ShowMsg()">変化を確認する →</button>
+      <button class="btn btn-ghost" style="margin-top:8px" onclick="w3BackToStep2()">← 戻る</button>
     </div>
+  </div>
+
+  <!-- Step 3 message (page-send) -->
+  <div id="w3-step3-msg" style="display:none">
+    <div class="card">
+      <div class="card-title">振り返り</div>
+      <p style="line-height:1.9;margin-bottom:12px">イメージのインパクトは、どれくらい変化しましたか？</p>
+      <p style="line-height:1.9">他にどの構成要素を調整すると、あなたにとってより望ましくなりますか？</p>
+    </div>
+    <button class="btn btn-primary" onclick="w3Complete()">チェックアウトへ →</button>
+    <button class="btn btn-ghost" style="margin-top:8px" onclick="w3BackToMsg()">← 戻る</button>
   </div>
 
   <div class="flex-row" style="gap:8px">
@@ -1524,6 +1533,7 @@ function resetWork(n) {
     document.getElementById('w3-step1').style.display = '';
     document.getElementById('w3-step2').style.display = 'none';
     document.getElementById('w3-step3').style.display = 'none';
+    document.getElementById('w3-step3-msg').style.display = 'none';
     document.getElementById('smd-desc').value = '';
     w3ObjRx = null; w3ObjRy = null; w3Obj2Rx = null; w3Obj2Ry = null;
   }
@@ -2029,8 +2039,19 @@ function w3ToStep3() {
 
 function w3BackToStep2() {
   document.getElementById('w3-step3').style.display = 'none';
+  document.getElementById('w3-step3-msg').style.display = 'none';
   document.getElementById('w3-step2').style.display = '';
   setTimeout(w3InitCanvas, 60);
+}
+
+function w3ShowMsg() {
+  document.getElementById('w3-step3').style.display = 'none';
+  document.getElementById('w3-step3-msg').style.display = '';
+}
+
+function w3BackToMsg() {
+  document.getElementById('w3-step3-msg').style.display = 'none';
+  document.getElementById('w3-step3').style.display = '';
 }
 
 function w3Complete() {
@@ -2181,12 +2202,18 @@ function w3UpdatePreview() {
   w3Redraw(ctx, W, H, dpr);
 }
 
+const W3_SLD_COLORS = { distance:'#4A90D9', brightness:'#F5C518', color:'#A855F7', volume:'#F97316', motion:'#22C55E', weight:'#EF4444' };
+
 function w3Redraw(ctx, W, H, dpr) {
   ['distance','brightness','color','volume','motion','weight'].forEach(k => {
     const el = document.getElementById(`sld-${k}`);
     if (!el) return;
-    document.getElementById(`val-${k}`).textContent = el.value;
-    el.style.setProperty('--pct', `${(el.value - 1) / 9 * 100}%`);
+    const valEl = document.getElementById(`val-${k}`);
+    if (valEl) valEl.textContent = el.value;
+    const pct = (el.value - 1) / 9 * 100;
+    el.style.setProperty('--pct', `${pct}%`);
+    const c = W3_SLD_COLORS[k] || 'var(--primary)';
+    el.style.background = `linear-gradient(to top, ${c} 0%, ${c} ${pct}%, var(--border) ${pct}%, var(--border) 100%)`;
   });
 
   w3DrawScene(ctx, W, H);
@@ -2322,8 +2349,12 @@ function w3Redraw2(ctx, W, H, dpr) {
   ['distance','brightness','color','volume','motion','weight'].forEach(k => {
     const el = document.getElementById(`sld2-${k}`);
     if (!el) return;
-    document.getElementById(`val2-${k}`).textContent = el.value;
-    el.style.setProperty('--pct', `${(el.value - 1) / 9 * 100}%`);
+    const valEl = document.getElementById(`val2-${k}`);
+    if (valEl) valEl.textContent = el.value;
+    const pct = (el.value - 1) / 9 * 100;
+    el.style.setProperty('--pct', `${pct}%`);
+    const c = W3_SLD_COLORS[k] || 'var(--primary)';
+    el.style.background = `linear-gradient(to top, ${c} 0%, ${c} ${pct}%, var(--border) ${pct}%, var(--border) 100%)`;
   });
 
   w3DrawScene(ctx, W, H);
